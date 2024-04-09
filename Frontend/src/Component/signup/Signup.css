@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
+
+img{
+    max-width: 100%;
+}
+
+.SignupContainer {
+    background: url('/public/img/bg.jpg');
+    background-size: cover;
+    font-family: "Rubik", sans-serif;
+}
+
+
+.formRow {
+    width: 100%;
+    max-width: 1200px;
+    border-radius: 4px;
+}
+
+.signupText {
+    margin-top: 2rem;
+    font-size: 28px !important;
+}
+
+.submitBtn:hover{
+    background-color: white !important;
+    color: #0d6efd !important;
+}
+
+.loginText{
+    font-size: 14px;
+}

@@ -1,0 +1,23 @@
+.custom-nav{
+    background-color: #222222 !important;
+}
+
+
+.custom-nav ul li{
+    margin: 20px 0 !important;
+}
+
+.custom-nav i.bi, .custom-nav a{
+    color: white;
+}
+
+.custom-nav i.bi, .custom-nav a:hover{
+    opacity: 0.8;
+}
+
+.custom-nav a{
+    text-decoration: none;
+}
+.sidebar{
+    width: 230px;
+}

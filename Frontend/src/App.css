@@ -1,0 +1,54 @@
+body {
+  background-color: #fbfbfb;
+}
+@media (min-width: 991.98px) {
+  main {
+    padding-left: 240px;
+  }
+}
+.topNav{
+  margin-left: 250px;
+}
+
+@media (max-width: 991.98px) {
+  .sidebar {
+    width: 100%;
+  }
+}
+.MainContainer{
+  margin-left: 250px;
+  margin-top: 10px; 
+  margin-right: 10px;
+}
+.error{
+  color: red;
+}
+li{
+  list-style-type: none;
+}
+.login-form{
+  margin-left: 300px;
+}
+.has-error .form-control{
+  border-color: red;
+}
+.form-label{
+  border-color: red;
+}
+.centered-text {
+  text-align: center;
+}
+.Grid{
+  margin-left: 250px;
+  margin-top: 10px; 
+  margin-right: 10px;
+}
+.add{
+  margin-top: 35px;
+  font-size:35px;
+}
+.remove{
+  font-size:30px;
+  margin-top: 30px;
+
+}

@@ -443,13 +443,16 @@ function UserForm() {
                 ))}
               </div>
             </div>
-            <div className="row mt-4">
-              <div className="col-10"></div>
-              <div className="col-2 d-flex justify-content-end">
+            <div className="mt-4 d-flex justify-content-end">
+
+
+              <div className="">
                 <button type="button" className="btn btn-primary me-2"
                   onClick={resetForm}>
                   Reset Form
                 </button>
+              </div>
+              <div className="">
                 <button
                   type="button"
                   className="btn btn-success"

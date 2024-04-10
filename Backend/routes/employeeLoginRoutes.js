@@ -1,13 +1,13 @@
 const express = require("express");
 const body_parser = require("body-parser");
-const employeeController = require("../controllers/employeeLogin");
+const loginEmployeeController = require("../controllers/employeeLoginController");
 
-const employeeRoutes = express();
-employeeRoutes.use(body_parser.json());
-employeeRoutes.use(body_parser.urlencoded({ extended: true }));
+const loginEmployeeRoutes = express();
+loginEmployeeRoutes.use(body_parser.json());
+loginEmployeeRoutes.use(body_parser.urlencoded({ extended: true }));
 
-employeeRoutes.post("/register", employeeController.newEmployee)
-employeeRoutes.post("/login", employeeController.verifyLogin)
-employeeRoutes.post("/loggedin", employeeController.verifyToken)
+loginEmployeeRoutes.post("/register", loginEmployeeController.newLoginEmployee)
+loginEmployeeRoutes.post("/login", loginEmployeeController.verifyEmployeeLogin)
+loginEmployeeRoutes.post("/loggedin", loginEmployeeController.verifyToken)
 
-module.exports = employeeRoutes
+module.exports = loginEmployeeRoutes

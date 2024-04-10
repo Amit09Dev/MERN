@@ -1,20 +1,19 @@
-const { user } = require("../models/EmployeeModel");
+const { LoginEmployee } = require("../models/EmployeeModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const jwt_secret_key =
   "YJDRetsrtcdyutoiUtv!cyuzsterQWerqwsrtxcyuvuiRyuoitxsERTwirytuev";
-  
 
-const newEmployee = async (req, res) => {
+const newLoginEmployee = async (req, res) => {
   try {
     const employee = req.body;
-    const existingEmail = await user.findOne({ email: employee.email });
+    const existingEmail = await LoginEmployee.findOne({ email: employee.email });
 
     if (existingEmail) {
       res.status(409).json({ message: "Email has already been used" });
     } else {
       bcrypt.hash(employee.password, 10, function (err, hash) {
-        user.create({
+        LoginEmployee.create({
           email: employee.email,
           password: hash,
           orignalPasswordDemo: employee.password,
@@ -28,11 +27,10 @@ const newEmployee = async (req, res) => {
   }
 };
 
-const verifyLogin = async (req, res) => {
+const verifyEmployeeLogin = async (req, res) => {
   try {
     const employeeLoginCred = req.body;
-    console.log(employeeLoginCred);
-    const existingEmail = await user.findOne({
+    const existingEmail = await LoginEmployee.findOne({
       email: employeeLoginCred.email,
     });
     const hash = existingEmail.password;
@@ -40,13 +38,12 @@ const verifyLogin = async (req, res) => {
       bcrypt.compare(employeeLoginCred.password, hash, function (err, result) {
         if (result) {
           const token = jwt.sign(
-            { userEmail: existingEmail.email,
-              userId: existingEmail._id },
+            { loginEmployeeEmail: existingEmail.email, loginEmployeeId: existingEmail._id },
             jwt_secret_key,
             { expiresIn: "1h" }
           );
 
-          res.status(200).json({ token });
+          res.status(200).json({ token, msg: "login successful" });
         } else {
           res.status(409).json({ message: "Incorrect Password" });
         }
@@ -60,20 +57,18 @@ const verifyLogin = async (req, res) => {
 };
 
 const verifyToken = async (req, res) => {
-  try {
+  try {    
     const authHeader = req.headers["authorization"];
-    const token = authHeader.split(" ")[1];
-    jwt.verify(token, jwt_secret_key, (err, decoded) => {
+    const token = authHeader.split(" ")[1];    
+    jwt.verify(token, jwt_secret_key, (err, decoded) => {      
       if (err) {
         return res.status(403).json({ message: "Invalid token" });
       }
-      console.log(token);
-      console.log(decoded.userId);
+      res.status(200).json({ msg: "Token validation successful", data:decoded});
     });
-    res.status(200).json({ msg: "success" });
-  } catch (error) {
+  } catch (error) {    
     res.status(400).send({ success: false, msg: error.message });
   }
 };
 
-module.exports = { newEmployee, verifyLogin, verifyToken };
+module.exports = { newLoginEmployee, verifyEmployeeLogin, verifyToken };

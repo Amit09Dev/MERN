@@ -1,17 +1,24 @@
 import React from 'react';
 import '../signup/Signup.css';
 import { Link } from "react-router-dom"
-import { useState } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import axiosInstance from "../../api/Axios";
 
-//import { toast } from "react-toastify"
 const LoginForm = () => {
   const navigate = useNavigate();
   const [inputValue, setInputValue] = useState({
     email: "",
     password: ""
   })
+
+
+  useEffect(() => {
+    if (sessionStorage.getItem("token")) {
+      navigate("/UserForm");
+    }
+  }, []);
 
   const [error, setError] = useState("");
 
@@ -28,18 +35,17 @@ const LoginForm = () => {
 
   const verifyLogin = async () => {
     const result = validateInput(inputValue);
-
     try {
-      const res = await axios.post("http://localhost:8000/api/login", inputValue)
-      localStorage.setItem("token", JSON.stringify(res.data))
-      if(localStorage.getItem("token")){
+      const res = await axiosInstance.post("/login", inputValue)
+      console.log(res);
+      sessionStorage.setItem("token", res.data.token);
+      toast.success("Logged in Successfully")
+      if (res.data) {
         navigate("/UserForm");
       }
-      
     }
     catch (error) {
       console.log(error);
-      //toast.warn(error.data.message);
     }
 
     console.log(result);

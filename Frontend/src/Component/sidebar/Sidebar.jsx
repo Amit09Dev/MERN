@@ -11,7 +11,7 @@ function Sidebar() {
             <ul className="list-unstyled mt-3 px-2">
                 <li className="d-flex align-items-center my-2">
                     <i className="bi bi-person-check-fill me-2"></i>
-                    <Link to="/userForm">DashBoard</Link>
+                    <Link to="/userform">DashBoard</Link>
                     <i className="fa-angle-right fa ms-auto fa-xs fa me-2"></i>
 
                 </li>

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const studentSchema = mongoose.Schema({
+const employeeSchema = mongoose.Schema({
   firstName: {
     type: String,
     required: true,
@@ -42,25 +42,25 @@ const studentSchema = mongoose.Schema({
     type:String,
     required:false
   },
-  employeeID: {
+  loginEmployeeID: {
     type: String,
     required: false
   }
 });
 
 
-const userSchema = new mongoose.Schema({
+const loginEmployeeSchema = new mongoose.Schema({
  email: { type: String, required: true },
  password: { type: String, required: true },
  orignalPasswordDemo: { type: String, required: true }
  });
 
 
-const user = mongoose.model('User', userSchema);
+const LoginEmployee = mongoose.model('LoginEmployee', loginEmployeeSchema);
 
-const stu = mongoose.model("post", studentSchema);
+const Employee = mongoose.model("Employee", employeeSchema);
 
 module.exports = {
-  user: user,
-  stu: stu
+  LoginEmployee: LoginEmployee,
+  Employee: Employee
 }

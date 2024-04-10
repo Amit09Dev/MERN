@@ -58,7 +58,7 @@ const deleteEmployee = async (req, res) => {
 const updateEmployee = async (req, res) => {
   try {
     const employee = req.body;
-    const existingEmail = await Employee.findOne({ email: employee.email });
+    const existingEmail = await Employee.findOne({$and: [{ email: employee.email },{_id: {$ne: req.params.id}}]});
 
     if (existingEmail) {
       res.status(409).json({ message: "Email has already been used" });

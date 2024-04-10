@@ -57,17 +57,16 @@ const verifyEmployeeLogin = async (req, res) => {
 };
 
 const verifyToken = async (req, res) => {
-  try {
+  try {    
     const authHeader = req.headers["authorization"];
-    const token = authHeader.split(" ")[1];
-    jwt.verify(token, jwt_secret_key, (err, decoded) => {
+    const token = authHeader.split(" ")[1];    
+    jwt.verify(token, jwt_secret_key, (err, decoded) => {      
       if (err) {
         return res.status(403).json({ message: "Invalid token" });
       }
-      res.status(200).json({ msg: "Token validation successful" });
+      res.status(200).json({ msg: "Token validation successful", data:decoded});
     });
-    res.status(200).json({ msg: "success" });
-  } catch (error) {
+  } catch (error) {    
     res.status(400).send({ success: false, msg: error.message });
   }
 };

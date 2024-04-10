@@ -3,8 +3,9 @@ import { Link } from "react-router-dom"
 import { useState } from 'react';
 import { toast } from "react-toastify";
 import axios from "axios";
-
+import { useNavigate } from "react-router-dom";
 function Signup() {
+    const navigate = useNavigate();
     const baseUrl = "http://localhost:8000/api"
     const [inputValue, setInputValue] = useState({
         email: "",
@@ -27,8 +28,8 @@ function Signup() {
         const result = validateInput(inputValue);
         console.log(inputValue)
         try {
-            const signup = await axios.post(`${baseUrl}/register`, inputValue);
-            console.log(signup);
+        await axios.post(`${baseUrl}/register`, inputValue);
+          navigate("/login")
         } catch (error) {
             console.error("Error:", error);
             toast.error(error.message);

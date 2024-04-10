@@ -1,6 +1,7 @@
 import './Signup.css';
 import { Link } from "react-router-dom"
 import { useState } from 'react';
+import { toast } from "react-toastify";
 import axios from "axios";
 
 function Signup() {
@@ -30,6 +31,7 @@ function Signup() {
             console.log(signup);
         } catch (error) {
             console.error("Error:", error);
+            toast.error(error.message);
         }
 
     }

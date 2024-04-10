@@ -1,11 +1,11 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import makeAnimated from 'react-select/animated';
 import Select from 'react-select';
+import axiosInstance from "../../api/Axios";
 function UserForm() {
   const userFormData = {
     firstName: "",
@@ -49,7 +49,7 @@ const handleChange = (selectedOption) => {
   
   useEffect(() => {
     if (id) {
-      axios.get(`http://localhost:8000/api/user/${id}`)
+      axiosInstance.get(`http://localhost:8000/api/user/${id}`)
         .then((response) => {
           const data = response.data;
           console.log("updated data ", data);
@@ -107,18 +107,12 @@ const handleChange = (selectedOption) => {
         };
         console.log(updatedFormData);
         if (id === undefined) {
-           await axios.post(
-            "http://localhost:8000/api/create",
-            updatedFormData
-          );
+           await axiosInstance.post("/addEmp", updatedFormData );
           insertnotify();
           resetForm();
           console.log("Form data is valid:", updatedFormData);
         } else {
-          const response = await axios.patch(
-            `http://localhost:8000/api/user/${id}`,
-            updatedFormData
-          );
+          const response = await axiosInstance.patch(`/emp/${id}`,updatedFormData );
           updatenotify();
           resetForm();
           navigate("/UserData");

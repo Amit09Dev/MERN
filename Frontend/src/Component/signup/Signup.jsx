@@ -2,11 +2,11 @@ import './Signup.css';
 import { Link } from "react-router-dom"
 import { useState } from 'react';
 import { toast } from "react-toastify";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../../api/Axios";
+
 function Signup() {
     const navigate = useNavigate();
-    const baseUrl = "http://localhost:8000/api"
     const [inputValue, setInputValue] = useState({
         email: "",
         password: "",
@@ -26,10 +26,12 @@ function Signup() {
 
     const verifyRegister = async () => {
         const result = validateInput(inputValue);
-        console.log(inputValue)
         try {
-        await axios.post(`${baseUrl}/register`, inputValue);
-          navigate("/login")
+            const signup = await axiosInstance.post("/register", inputValue);
+            if(signup.status === 200) {
+                toast.success("Registered Succesfully")
+                navigate("/login");
+            }
         } catch (error) {
             console.error("Error:", error);
             toast.error(error.message);

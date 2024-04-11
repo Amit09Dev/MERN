@@ -40,7 +40,16 @@ function UserForm() {
   const navigate = useNavigate();
   const { id } = useParams();
   const animatedComponents = makeAnimated();
+<<<<<<< Updated upstream
 
+=======
+  const RoleList = [
+    { id: 0, value: 'User', label: 'User' },
+    { id: 1, value: 'Admin', label: 'Admin' },
+    { id: 2, value: 'Super Admin', label: 'Super Admin' }
+  ]
+  const [selectedOption, setSelectedOption] = useState(null);
+>>>>>>> Stashed changes
   const handleChange = (selectedOption) => {
     setSelectedOption(selectedOption);
     const selectedValues = selectedOption ? selectedOption.map(option => option.value) : [];

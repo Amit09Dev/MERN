@@ -15,9 +15,18 @@ const LoginForm = () => {
 
 
   useEffect(() => {
-    if (sessionStorage.getItem("token")) {
-      navigate("/UserForm");
+    const checkToken = async () => {
+      try {
+        const result = await axiosInstance.post("/loggedin");
+        if (result.status === 200) {
+          navigate("/UserForm");
+        }
+      }
+      catch (error) {
+        toast.warn("Please login");
+      }
     }
+    checkToken();
   }, []);
 
   const [error, setError] = useState("");
@@ -38,7 +47,7 @@ const LoginForm = () => {
     try {
       const res = await axiosInstance.post("/login", inputValue)
       console.log(res);
-      sessionStorage.setItem("token", res.data.token);
+      localStorage.setItem("token", res.data.token);
       toast.success("Logged in Successfully")
       if (res.data) {
         navigate("/UserForm");

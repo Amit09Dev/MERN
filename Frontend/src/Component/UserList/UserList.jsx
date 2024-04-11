@@ -8,12 +8,20 @@ import TopNabvar from "../topNavbar/topNavbar";
 import Sidebar from "../sidebar/Sidebar";
 import makeAnimated from 'react-select/animated';
 import Select from 'react-select';
-
-
+import "primereact/resources/themes/lara-light-cyan/theme.css";
+import { PrimeReactProvider } from "primereact/api";
+import { Paginator } from 'primereact/paginator';
 
 function UserData() {
   const deletenotify = () => toast.error("Data delete Successfully");
   const [users, setUsers] = useState([]);
+  const [first, setFirst] = useState(1);
+  const [rows, setRows] = useState(10);
+
+  const onPageChange = (event) => {
+    setFirst((event.first / event.rows) + 1);
+    setRows(event.rows);
+  };
 
   const [inputValue, setInputValue] = useState({
     userName: "",
@@ -24,9 +32,32 @@ function UserData() {
   const [selectedOption, setSelectedOption] = useState(null);
   const navigate = useNavigate();
 
+  const getData = async () => {
+    const data = {
+      "page": first,
+      "pageSize": rows
+    }
+    try {
+      const result = await axiosInstance.get('/emp', {
+        params: data
+      });
+      const elems = document.querySelectorAll(".p-highlight");
+      elems.forEach.call(elems, function (el) {
+        el.classList.remove("p-highlight");
+      });
+      var activeElem = document.querySelector(`[aria-label= "Page ${first}" ]`);
+      activeElem.classList.add("p-highlight")
+      console.log(result.data.page)
+      setUsers(result.data.data);
+    }
+    catch (error) {
+      console.log(error);
+    }
+  }
+
   useEffect(() => {
-    fetchData();
-  }, []);
+    getData();
+  }, [first, rows]);
 
   const animatedComponents = makeAnimated();
   const RoleList = [
@@ -53,12 +84,28 @@ function UserData() {
     });
   };
 
-  const SearchResults = () => {
+  const SearchResults = async () => {
     if (inputValue.firstName === "" && inputValue.email === "" && inputValue.startDate === "" && inputValue.endDate === "") {
       toast.warn("Enter Some Value to Search");
       return
     }
     else {
+      const data = {
+        "fullName": inputValue.userName,
+        "page": first,
+        "pageSize": rows,
+        "userRole": inputValue.userRole
+      }
+      try {
+        const search = await axiosInstance.get("/emp", {
+          params: data
+        })
+        setUsers(search.data.data);
+      }
+      catch (error) {
+        console.log(error);
+      }
+
       const updatedFormData = {
         ...inputValue,
       };
@@ -91,7 +138,7 @@ function UserData() {
   };
 
   return (
-    <>
+    <PrimeReactProvider value={{ unstyled: false }} >
       <TopNabvar />
       <Sidebar />
       <div className="MainContainer">
@@ -151,9 +198,7 @@ function UserData() {
             </div>
           </nav>
         </div>
-        <div className="row g-0 mx-1">
 
-        </div>
         <table className="table table-striped p-3 shadow-sm">
           <thead>
             <tr>
@@ -172,9 +217,8 @@ function UserData() {
           <tbody>
             {users.length === 0 ? (
               <tr>
-                <td colSpan="3"></td>
-                <td colSpan="6" className="fs-5 text-center">No records found </td>
-                <td colSpan="3"></td>
+                <td colSpan="12" className="fs-5 text-center">No records found </td>
+
               </tr>
             ) : (
               users.map((user, index) => (
@@ -228,9 +272,12 @@ function UserData() {
             }
           </tbody >
         </table >
+        <div>
+          <Paginator first={first} rows={rows} totalRecords={100}
+            rowsPerPageOptions={[5, 10, 20]} onPageChange={onPageChange} />
+        </div>
       </div >
-
-    </>
+    </PrimeReactProvider>
   );
 }
 

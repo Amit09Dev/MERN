@@ -1,16 +1,20 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Paginator } from 'primereact/paginator';
 import axios from 'axios';
 import './test.css';
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 import { PrimeReactProvider } from "primereact/api";
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+
 
 
 export default function BasicDemo() {
+
     const [first, setFirst] = useState(0);
     const [rows, setRows] = useState(10);
     const [posts, setPosts] = useState([]);
-
+    console.log(first, rows)
     const onPageChange = (event) => {
         setFirst(event.first);
         setRows(event.rows);
@@ -26,39 +30,22 @@ export default function BasicDemo() {
             });
             setPosts(result.data);
         }
-
         fetchData();
+        console.log(posts);
     }, [first, rows]);
 
 
     return (
         <PrimeReactProvider value={{ unstyled: false }}>
 
-            <table className="table table-striped p-3 shadow-sm">
-                <thead>
-                    <tr>
-                        <th scope="col">ID</th>
-                        <th scope="col">Title</th>
-                        <th scope="col">Body</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {
-                        posts.map((user, index) => (
-                            <tr key={index}>
-                                <td>{user.id}</td>
-                                <td>{user.title}</td>
-                                <td>{user.body}</td>
-                                <td>
-                                    <div>
-                                        Action
-                                    </div>
-                                </td>
-                            </tr>
-                        ))
-                    }
-                </tbody>
-            </table>
+            <div className="card">
+                <DataTable value={posts} sortMode="multiple" tableStyle={{ minWidth: '50rem' }}>
+                    <Column field="id" header="id" sortable ></Column>
+                    <Column field="title" header="title" sortable ></Column>
+                    <Column field="body" header="body" sortable ></Column>
+                    
+                </DataTable>
+            </div>
             <div className="card">
                 <Paginator first={first} rows={rows} totalRecords={100}
                     rowsPerPageOptions={[5, 10, 20]} onPageChange={onPageChange} />

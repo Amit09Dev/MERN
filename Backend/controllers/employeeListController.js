@@ -18,7 +18,7 @@ const newEmployeeAdd = async (req, res) => {
       res.status(409).json({ message: "Email has already been used" });
     } else {
       newEmpData.loginEmployeeId = getCurrentEmployeeLoggeedinId(req.headers.authorization);
-      const _newEmpData = await Employee.create( newEmpData );
+      const _newEmpData = await Employee.create(newEmpData);
       console.log("2");
       res.status(200).json(_newEmpData);
     }
@@ -29,30 +29,59 @@ const newEmployeeAdd = async (req, res) => {
 
 const allEmployeeList = async (req, res) => {
   try {
-    // const page = parseInt(req.query.page);
-    // const pageSize = parseInt(req.query.pageSize);
-    // const page = 2;
-    // const pageSize = 1;
-    // const startIndex = page - 1;
-    // const endIndex = page * pageSize;
+    const page = parseInt(req.query.page);
+    const pageSize = parseInt(req.query.pageSize);
+    const startIndex = (page * pageSize) - pageSize;
 
-    // const paginatedEmployeesQuery = Employee.find()
-    //   .skip(startIndex)
-    //   .limit(endIndex - startIndex)
-    //   .exec()
-    //   .then((employees) => {
-    //     console.log(employees);
-    //     res.status(200).json(employees);
-    //   })
-    //   .catch((err) => {
-    //     res.status(400).send({ success: false, msg: err });
-    //   });
-const _loginEmployeeId = getCurrentEmployeeLoggeedinId(req.headers.authorization)
+    const _loginEmployeeId = getCurrentEmployeeLoggeedinId(req.headers.authorization);
 
-    const allEmployees = await Employee.find({
-      "loginEmployeeId": _loginEmployeeId,
-    });
-    res.status(200).send(allEmployees);
+    let aggregationPipeline = [
+      {
+        $match: {
+          loginEmployeeId: _loginEmployeeId,
+        },
+      }
+    ];
+
+    const fullName = req.query.fullName;
+    if (fullName) {
+      const [firstName, lastName] = fullName.split(" ");
+      aggregationPipeline.push({
+        $match: {
+          $and: [
+            { firstName: { $regex: new RegExp(firstName, 'i') } },
+            { lastName: { $regex: new RegExp(lastName, 'i') } },
+          ],
+        },
+      });
+    }
+
+    const userRoles = req.query.userRole;
+    if (userRoles && userRoles.length > 0) {
+      const roleMatches = userRoles.map(role => ({ userRole: role }));
+      aggregationPipeline.push({
+        $match: {
+          $and: roleMatches
+        }
+      });
+    }
+
+    aggregationPipeline.push(
+      {
+        $skip: startIndex,
+      },
+      {
+        $limit: pageSize,
+      }
+    );
+
+
+    const employees = await Employee.aggregate(aggregationPipeline).exec();
+    const data = {
+      "data": employees
+    }
+    res.status(200).json(data);
+
   } catch (error) {
     res.status(400).send({ success: false, msg: error.message });
   }
@@ -98,7 +127,7 @@ const updateEmployee = async (req, res) => {
           zip: req.body.zip,
           jobRole: req.body.jobRole,
           userRole: req.body.userRole,
-          loginEmployeeID: getCurrentEmployeeLoggeedinId( req.headers.authorization ),
+          loginEmployeeID: getCurrentEmployeeLoggeedinId(req.headers.authorization),
           pastExperience: req.body.pastExperience
         },
         { new: true }

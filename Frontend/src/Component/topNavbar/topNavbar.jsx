@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 function TopNabvar() {
   const navigate = useNavigate();
   const signout = () => {
-    sessionStorage.setItem("token", "");
+    localStorage.setItem("token", "");
     navigate("/login")
     toast.success("User Logged out");
   }

@@ -18,7 +18,7 @@ function UserForm() {
     city: "",
     zip: "",
     jobRole: "",
-    userRole: "",
+    userRole: [],
     color: "#000000",
     pastExperience: []
   };
@@ -28,18 +28,19 @@ function UserForm() {
     startDate: '',
     endDate: ''
   };
+  const RoleList = [
+    {id:0, value: 'User', label: 'User' },
+    { id:1, value: 'Admin', label: 'Admin' },
+    {id:2, value: 'Super Admin', label: 'Super Admin' }
+  ]
   const [formData, setFormData] = useState(userFormData);
   const [errors, setErrors] = useState({});
   const [gridList, setGridList] = useState([initialGridState]);
+  const [selectedOption, setSelectedOption] = useState(null);
   const navigate = useNavigate();
   const { id } = useParams();
   const animatedComponents = makeAnimated();
-  const RoleList = [
-    { value: 'User', label: 'User' },
-    { value: 'Admin', label: 'Admin' },
-    { value: 'Super Admin', label: 'Super Admin' }
-  ]
-  const [selectedOption, setSelectedOption] = useState(null);
+
   const handleChange = (selectedOption) => {
     setSelectedOption(selectedOption);
     const selectedValues = selectedOption ? selectedOption.map(option => option.value) : [];
@@ -54,7 +55,7 @@ function UserForm() {
       axiosInstance.get(`/emp/${id}`)
         .then((response) => {
           const data = response.data;
-          console.log("updated data ", data.pastExperience[0]);
+          console.log("updated data ", data);
           setFormData({
             firstName: data.firstName || "",
             lastName: data.lastName || "",
@@ -63,21 +64,26 @@ function UserForm() {
             state: data.state || "",
             city: data.city || "",
             zip: data.zip || "",
-            jobRole: data.jobRole || "",
-            userRole: data.userRole || "",
+            jobRole: data.jobRole || "", 
             color: data.color,
-            pastExperience: [{
-              companyName: data.pastExperience[0].companyName || "",
-              startDate: data.pastExperience[0].startDate || "",
-              endDate: data.pastExperience[0].endDate || "",
-            }]
           });
+          const selectedRoles = data.userRole.map(role => RoleList.find(r => r.value === role));
+          setSelectedOption(selectedRoles);
+          const pastExperiences = data.pastExperience.map(experience => ({
+            id: experience.id,
+            companyName: experience.companyName || "",
+            startDate: experience.startDate || "",
+            endDate: experience.endDate || ""
+          }));
+          setGridList(pastExperiences);
         })
         .catch((error) => {
           console.error("Error fetching user data:", error);
         });
     }
   }, [id]);
+  
+  
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     setFormData({
@@ -295,6 +301,7 @@ function UserForm() {
                   id="userRole"
                   components={animatedComponents}
                   options={RoleList}
+                  defaultValue={[RoleList[0], RoleList[1]]}
                   className="basic-multi-select"
                   classNamePrefix="select"
                   value={selectedOption}

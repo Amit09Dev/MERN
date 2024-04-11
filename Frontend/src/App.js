@@ -1,7 +1,7 @@
 import './App.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import UserForm from './Component/UserForm/UserForm.jsx';
-import UserList from './Component/UserData/UserList';
+import UserList from './Component/UserList/UserList.jsx';
 import Login from './Component/login/login.jsx';
 import Signup from './Component/signup/Signup.jsx';
 

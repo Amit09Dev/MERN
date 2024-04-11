@@ -12,7 +12,7 @@ const employeeSchema = mongoose.Schema({
   email: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
   address: {
     type: String,
@@ -35,32 +35,34 @@ const employeeSchema = mongoose.Schema({
     required: true,
   },
   userRole: {
+    type: Array,
+    required: true,
+  },
+  color: {
+    type: String,
+    required: false,
+  },
+  loginEmployeeId: {
     type: String,
     required: true,
   },
-  color:{
-    type:String,
-    required:false
+  pastExperience: {
+    type: Array,
+    required: false,
   },
-  loginEmployeeID: {
-    type: String,
-    required: false
-  }
 });
 
-
 const loginEmployeeSchema = new mongoose.Schema({
- email: { type: String, required: true },
- password: { type: String, required: true },
- orignalPasswordDemo: { type: String, required: true }
- });
+  email: { type: String, required: true },
+  password: { type: String, required: true },
+  orignalPasswordDemo: { type: String, required: true },
+});
 
-
-const LoginEmployee = mongoose.model('LoginEmployee', loginEmployeeSchema);
+const LoginEmployee = mongoose.model("LoginEmployee", loginEmployeeSchema);
 
 const Employee = mongoose.model("Employee", employeeSchema);
 
 module.exports = {
   LoginEmployee: LoginEmployee,
-  Employee: Employee
-}
+  Employee: Employee,
+};

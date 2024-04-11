@@ -11,7 +11,7 @@ app.use(
 app.use("/api", employeeListRoutes);
 app.use("/api", employeeLoginRoutes);
 
-mongoose.connect("mailto:mongodb+srv://amitkagilsys:znnt61kw9zk2ahj5@mern.nkfnvqn.mongodb.net/");
+mongoose.connect("mongodb://127.0.0.1:27017/ReactBackend");
 
 app.listen(8000, function () {
   console.log("Server is running");

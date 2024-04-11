@@ -29,9 +29,9 @@ function UserForm() {
     endDate: ''
   };
   const RoleList = [
-    {id:0, value: 'User', label: 'User' },
-    { id:1, value: 'Admin', label: 'Admin' },
-    {id:2, value: 'Super Admin', label: 'Super Admin' }
+    { id: 0, value: 'User', label: 'User' },
+    { id: 1, value: 'Admin', label: 'Admin' },
+    { id: 2, value: 'Super Admin', label: 'Super Admin' }
   ]
   const [formData, setFormData] = useState(userFormData);
   const [errors, setErrors] = useState({});
@@ -40,16 +40,7 @@ function UserForm() {
   const navigate = useNavigate();
   const { id } = useParams();
   const animatedComponents = makeAnimated();
-<<<<<<< Updated upstream
 
-=======
-  const RoleList = [
-    { id: 0, value: 'User', label: 'User' },
-    { id: 1, value: 'Admin', label: 'Admin' },
-    { id: 2, value: 'Super Admin', label: 'Super Admin' }
-  ]
-  const [selectedOption, setSelectedOption] = useState(null);
->>>>>>> Stashed changes
   const handleChange = (selectedOption) => {
     setSelectedOption(selectedOption);
     const selectedValues = selectedOption ? selectedOption.map(option => option.value) : [];
@@ -73,10 +64,11 @@ function UserForm() {
             state: data.state || "",
             city: data.city || "",
             zip: data.zip || "",
-            jobRole: data.jobRole || "", 
+            jobRole: data.jobRole || "",
             color: data.color,
           });
           const selectedRoles = data.userRole.map(role => RoleList.find(r => r.value === role));
+          
           setSelectedOption(selectedRoles);
           const pastExperiences = data.pastExperience.map(experience => ({
             id: experience.id,
@@ -91,8 +83,8 @@ function UserForm() {
         });
     }
   }, [id]);
-  
-  
+
+
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     setFormData({

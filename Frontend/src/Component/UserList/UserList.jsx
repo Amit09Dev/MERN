@@ -3,18 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-<<<<<<< Updated upstream
-import TopNabvar from "../topNavbar/topNavbar";
-import Sidebar from "../sidebar/Sidebar";
-import axiosInstance from "../../api/Axios";
-=======
 import axiosInstance from "../../api/Axios";
 import TopNabvar from "../topNavbar/topNavbar";
 import Sidebar from "../sidebar/Sidebar";
 import makeAnimated from 'react-select/animated';
 import Select from 'react-select';
 
->>>>>>> Stashed changes
+
 
 function UserData() {
   const deletenotify = () => toast.error("Data delete Successfully");
@@ -97,33 +92,6 @@ function UserData() {
 
   return (
     <>
-<<<<<<< Updated upstream
-      <TopNabvar/>
-      <Sidebar/>
-      <div className="MainContainer">
-        <div className="row mt-3 g-0">
-          <nav aria-label="breadcrumb">
-            <div className="row g-0">
-              <div className="col-4">
-                <ol className="breadcrumb">
-                  <li className="breadcrumb-item">User</li>
-                  <li className="breadcrumb-item">
-                    <i className="bi bi-house f-4"></i>
-                  </li>
-                  <li className="breadcrumb-item active" aria-current="page">
-                    User List
-                  </li>
-                </ol>
-              </div>
-              <div className="col-4"></div>
-              <div className="col-4">
-
-              </div>
-            </div>
-          </nav>
-        </div>
-        <div className="row mx-1 g-0">
-=======
       <TopNabvar />
       <Sidebar />
       <div className="MainContainer">
@@ -184,7 +152,7 @@ function UserData() {
           </nav>
         </div>
         <div className="row g-0 mx-1">
->>>>>>> Stashed changes
+
         </div>
         <table className="table table-striped p-3 shadow-sm">
           <thead>
@@ -194,19 +162,13 @@ function UserData() {
               <th scope="col">Address</th>
               <th scope="col">State</th>
               <th scope="col">City</th>
-              <th scope="col">CompanyName</th>
-<<<<<<< Updated upstream
-              <th scope="col">startDate</th>
-              <th scope="col">EndDate</th>
-=======
               <th scope="col">Start Date</th>
               <th scope="col">End Date</th>
->>>>>>> Stashed changes
               <th scope="col">Job Role</th>
               <th scope="col">User Role</th>
               <th scope="col">Action</th>
-            </tr>
-          </thead>
+            </tr >
+          </thead >
           <tbody>
             {users.length === 0 ? (
               <tr>
@@ -238,15 +200,12 @@ function UserData() {
                     ))}
                   </td>
                   <td>{user.jobRole}</td>
-<<<<<<< Updated upstream
                   <td>
                     {user.userRole.map((role, roleIndex) => (
                       <div key={roleIndex}>{role}</div>
                     ))}
                   </td>
-=======
-                  <td>{user.userRole}</td>
->>>>>>> Stashed changes
+
                   <td>
                     <div>
                       <Link to={`/userForm/${user._id}`}>
@@ -263,18 +222,14 @@ function UserData() {
                       />
                     </div>
                   </td>
-                </tr>
+                </tr >
               ))
-            )}
-          </tbody>
-        </table>
-<<<<<<< Updated upstream
-      </div>
-=======
+            )
+            }
+          </tbody >
+        </table >
+      </div >
 
-      </div>
-
->>>>>>> Stashed changes
     </>
   );
 }

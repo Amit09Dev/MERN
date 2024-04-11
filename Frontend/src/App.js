@@ -1,11 +1,7 @@
 import './App.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import UserForm from './Component/UserForm/UserForm.jsx';
-<<<<<<< Updated upstream
 import UserList from './Component/UserList/UserList.jsx';
-=======
-import UserList from './Component/UserList/UserList';
->>>>>>> Stashed changes
 import Login from './Component/login/login.jsx';
 import Signup from './Component/signup/Signup.jsx';
 import BasicDemo from './Component/test';

@@ -14,5 +14,5 @@ app.use("/api", employeeLoginRoutes);
 mongoose.connect("mongodb://127.0.0.1:27017/ReactBackend");
 
 app.listen(8000, function () {
-  console.log("Server is running");
+  console.log("Server is successfully running");
 });

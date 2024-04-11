@@ -99,6 +99,7 @@ const updateEmployee = async (req, res) => {
           jobRole: req.body.jobRole,
           userRole: req.body.userRole,
           loginEmployeeID: getCurrentEmployeeLoggeedinId( req.headers.authorization ),
+          pastExperience: req.body.pastExperience
         },
         { new: true }
       );

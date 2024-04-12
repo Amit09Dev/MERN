@@ -1,4 +1,4 @@
-const { LoginEmployee, Employee } = require("../models/EmployeeModel");
+const { LoginEmployee, Employee, Role } = require("../models/EmployeeModel");
 const jwt = require("jsonwebtoken");
 const { all } = require("../routes/employeeLoginRoutes");
 const jwt_secret_key =
@@ -7,20 +7,17 @@ const jwt_secret_key =
 const newEmployeeAdd = async (req, res) => {
   try {
     const newEmpData = req.body;
-    console.log();
 
     const existingEmail = await Employee.findOne({
       email: newEmpData.email,
       loginEmployeeId: getCurrentEmployeeLoggeedinId(req.headers.authorization),
     });
-    console.log("1");
 
     if (existingEmail) {
       res.status(409).json({ message: "Email has already been used" });
     } else {
       newEmpData.loginEmployeeId = getCurrentEmployeeLoggeedinId(req.headers.authorization);
       const _newEmpData = await Employee.create(newEmpData);
-      console.log("2");
       res.status(200).json(_newEmpData);
     }
   } catch (error) {
@@ -78,8 +75,11 @@ const allEmployeeList = async (req, res) => {
 
 
     const employees = await Employee.aggregate(aggregationPipeline).exec();
+    const pages = Math.ceil(employees.length / pageSize)
+    console.log(employees.length / pageSize);
     const data = {
-      "data": employees
+      "data": employees,
+      "pages": pages
     }
     res.status(200).json(data);
 
@@ -147,10 +147,22 @@ function getCurrentEmployeeLoggeedinId(authorization) {
   return loginEmployeeId;
 }
 
+const getUserRole = async (req, res) => {
+  try {
+    console.log('Fetching roles...')
+    const roles = await Role.find({});
+    console.log("Roles", roles)
+    res.status(200).json(roles);
+  } catch (error) {
+    res.status(400).send({ success: false, msg: error.message });
+  }
+}
+
 module.exports = {
   newEmployeeAdd,
   allEmployeeList,
   employeeById,
   deleteEmployee,
   updateEmployee,
+  getUserRole
 };

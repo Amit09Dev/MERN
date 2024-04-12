@@ -7,9 +7,6 @@ const { LoginEmployee, Employee } = require("../models/EmployeeModel");
 
 const checkEmail = async (req, res) => {
   try {
-
-    console.log(req.body.email);
-
     const student = await Employee.findOne({ email: req.body.email });
 
     if (student) {

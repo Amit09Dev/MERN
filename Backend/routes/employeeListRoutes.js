@@ -13,5 +13,6 @@ employeeListRoutes.patch("/emp/:id", employeeListController.updateEmployee);
 employeeListRoutes.delete("/emp/:id", employeeListController.deleteEmployee);
 employeeListRoutes.post("/addEmp", employeeListController.newEmployeeAdd);
 employeeListRoutes.get("/checkEmail", emailExistCheck.checkEmail)
+employeeListRoutes.get("/role", employeeListController.getUserRole)
 
 module.exports = employeeListRoutes;

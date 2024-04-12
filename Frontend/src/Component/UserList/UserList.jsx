@@ -11,12 +11,13 @@ import Select from 'react-select';
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 import { PrimeReactProvider } from "primereact/api";
 import { Paginator } from 'primereact/paginator';
+import "./UserList.css"
 
 function UserData() {
   const deletenotify = () => toast.error("Data delete Successfully");
   const [users, setUsers] = useState([]);
   const [first, setFirst] = useState(1);
-  const [rows, setRows] = useState(10);
+  const [rows, setRows] = useState(5);
 
   const onPageChange = (event) => {
     setFirst((event.first / event.rows) + 1);
@@ -47,7 +48,8 @@ function UserData() {
       });
       var activeElem = document.querySelector(`[aria-label= "Page ${first}" ]`);
       activeElem.classList.add("p-highlight")
-      console.log(result.data.page)
+      console.log(result.data)
+      console.log(result.data.pages)
       setUsers(result.data.data);
     }
     catch (error) {
@@ -273,8 +275,8 @@ function UserData() {
             }
           </tbody >
         </table >
-        <div>
-          <Paginator first={first} rows={rows} totalRecords={100}
+        <div className="position-absolute top-100 start-50 translate-middle">
+          <Paginator first={first} rows={rows} totalRecords={100} 
             rowsPerPageOptions={[5, 10, 20]} onPageChange={onPageChange} />
         </div>
       </div >

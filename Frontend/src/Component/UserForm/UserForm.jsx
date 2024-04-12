@@ -8,6 +8,9 @@ import Select from 'react-select';
 import TopNabvar from "../topNavbar/topNavbar";
 import Sidebar from "../sidebar/Sidebar";
 import axiosInstance from "../../api/Axios";
+import { InputText } from 'primereact/inputtext';
+import { Button } from 'primereact/button';
+import 'primeicons/primeicons.css';
 function UserForm() {
   const userFormData = {
     firstName: "",
@@ -68,7 +71,7 @@ function UserForm() {
             color: data.color,
           });
           const selectedRoles = data.userRole.map(role => RoleList.find(r => r.value === role));
-          
+
           setSelectedOption(selectedRoles);
           const pastExperiences = data.pastExperience.map(experience => ({
             id: experience.id,
@@ -126,12 +129,12 @@ function UserForm() {
           resetForm();
           console.log("Form data is valid:", updatedFormData);
         } else {
+          console.log("Form data is valid:", updatedFormData);
           const response = await axiosInstance.patch(`/emp/${id}`, updatedFormData);
           updatenotify();
           resetForm();
           navigate("/userlist");
           console.log("Response:", response.data);
-          console.log("Form data is valid:", updatedFormData);
         }
       } catch (error) {
         console.error("Error:", error);
@@ -172,7 +175,7 @@ function UserForm() {
   const validateForm = (data) => {
     const errors = {};
 
-    const requiredFields = ['firstName', 'lastName', 'email', 'jobRole', 'userRole', 'address', 'city', 'state', 'zip'];
+    const requiredFields = ['firstName', 'lastName', 'email', 'jobRole', 'address', 'city', 'state', 'zip'];
     requiredFields.forEach(field => {
       if (!data[field]) {
         const fieldName = field === 'firstName' ? 'First name' : field === 'lastName' ? 'Last name' : field;
@@ -204,7 +207,9 @@ function UserForm() {
     }
     setFormData(userFormData);
     setErrors({});
-    setGridList([initialGridState]);
+    setGridList([
+      
+    ]);
 
   };
   const insertnotify = () => toast.success("Data insert Successfully");
@@ -286,7 +291,7 @@ function UserForm() {
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder="name@example.com"
-                ></input>
+                />
                 {errors.email && <span className="error">{errors.email}</span>}
               </div>
             </div>

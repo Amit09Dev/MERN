@@ -207,6 +207,7 @@ function UserData() {
               <th scope="col">Address</th>
               <th scope="col">State</th>
               <th scope="col">City</th>
+              <th scope="col">Company Name</th>
               <th scope="col">Start Date</th>
               <th scope="col">End Date</th>
               <th scope="col">Job Role</th>

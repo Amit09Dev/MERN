@@ -7,6 +7,7 @@ const jwt_secret_key =
 const newEmployeeAdd = async (req, res) => {
   try {
     const newEmpData = req.body;
+    console.log();
 
     const existingEmail = await Employee.findOne({
       email: newEmpData.email,

@@ -1,69 +1,42 @@
-// // AddGrid.jsx
-// import React, { useState } from 'react';
+import React, { useState } from 'react';
 
-// function AddGrid({ handleGridDataChange, resetGridData }) {
-//     const [gridData, setGridData] = useState({
-//         companyName: '',
-//         startDate: '',
-//         endDate: '',
-//     });
+function MyForm() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
-//     const onInputChange = (e) => {
-//         const { name, value } = e.target;
-//         setGridData(prevState => ({
-//             ...prevState,
-//             [name]: value
-//         }));
-//         handleGridDataChange(gridData);
-//     };
+  const handleClick = () => {
+    console.log("Email:", email);
+    console.log("Password:", password);
+    console.log("Confirm Password:", confirmPassword);
+  };
 
-//     const handleReset = () => {
-//         setGridData({
-//             companyName: '',
-//             startDate: '',
-//             endDate: '',
-//         });
-//         resetGridData();
-//     };
+  return (
+    <div>
+      <label htmlFor="email">Email:</label><br />
+      <input
+        type="email"
+        id="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      /><br />
+      <label htmlFor="password">Password:</label><br />
+      <input
+        type="password"
+        id="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      /><br />
+      <label htmlFor="confirmPassword">Confirm Password:</label><br />
+      <input
+        type="password"
+        id="confirmPassword"
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+      /><br /><br />
+      <button onClick={handleClick}>Log Values</button>
+    </div>
+  );
+}
 
-//     return (
-//         <div className='row'>
-//             <div className="col-4">
-//                 <label className='form-label' htmlFor="companyName">Company Name:</label>
-//                 <input
-//                     className='form-control'
-//                     type="text"
-//                     id="companyName"
-//                     name="companyName"
-//                     placeholder='Enter Company name'
-//                     value={gridData.companyName}
-//                     onChange={onInputChange}
-//                 />
-//             </div>
-//             <div className="col-4">
-//                 <label className='form-label' htmlFor="startDate">Start Job Date:</label>
-//                 <input
-//                     className='form-control'
-//                     type="date"
-//                     id="startDate"
-//                     name="startDate"
-//                     value={gridData.startDate}
-//                     onChange={onInputChange}
-//                 />
-//             </div>
-//             <div className="col-4">
-//                 <label className='form-label' htmlFor="endDate">End Job Date:</label>
-//                 <input
-//                     className='form-control'
-//                     type="date"
-//                     id="endDate"
-//                     name="endDate"
-//                     value={gridData.endDate}
-//                     onChange={onInputChange}
-//                 />
-//             </div>
-//         </div>
-//     );
-// }
-
-// export default AddGrid;
+export default MyForm;

@@ -23,11 +23,23 @@ function Signup() {
         });
         setError({})
     };
-
+useEffect(){
+    clearToken();
+}
+const clearToken= () => {
+   if(localStorage.getItem("token")){
+    localStorage.removeItem("token");
+   }
+}
     const verifyRegister = async () => {
         const result = validateInput(inputValue);
+      if(Object.keys(result).length===0){
+        const Data={
+            email:inputValue.email.trim(),
+            password:inputValue.confirmPassword.trim()
+        }
         try {
-            const signup = await axiosInstance.post("/register", inputValue);
+            const signup = await axiosInstance.post("/register", Data);
             if(signup.status === 200) {
                 toast.success("Registered Succesfully")
                 navigate("/login");
@@ -35,7 +47,9 @@ function Signup() {
         } catch (error) {
             console.error("Error:", error);
             toast.error(error.message);
-        }
+        }   
+      }
+        
 
     }
 
@@ -57,6 +71,7 @@ function Signup() {
             errors.confirmPassword = "Confrim password and Password is not same"
         }
         setError(errors);
+        return errors;
     }
 
     const isValidEmail = (email) => {

@@ -1,8 +1,5 @@
-const { LoginEmployee, Employee } = require("../models/EmployeeModel");
+const { Employee } = require("../models/EmployeeModel");
 const jwt = require("jsonwebtoken");
-const { all } = require("../routes/employeeLoginRoutes");
-const jwt_secret_key =
-  "YJDRetsrtcdyutoiUtv!cyuzsterQWerqwsrtxcyuvuiRyuoitxsERTwirytuev";
 
 const newEmployeeAdd = async (req, res) => {
   try {
@@ -11,14 +8,14 @@ const newEmployeeAdd = async (req, res) => {
 
     const existingEmail = await Employee.findOne({
       email: newEmpData.email,
-      loginEmployeeId: getCurrentEmployeeLoggeedinId(req.headers.authorization),
+      loginEmployeeId: req.loginEmployeeId,
     });
     console.log("1");
 
     if (existingEmail) {
       res.status(409).json({ message: "Email has already been used" });
     } else {
-      newEmpData.loginEmployeeId = getCurrentEmployeeLoggeedinId(req.headers.authorization);
+      newEmpData.loginEmployeeId = req.loginEmployeeId;
       const _newEmpData = await Employee.create(newEmpData);
       console.log("2");
       res.status(200).json(_newEmpData);
@@ -32,16 +29,16 @@ const allEmployeeList = async (req, res) => {
   try {
     const page = parseInt(req.query.page);
     const pageSize = parseInt(req.query.pageSize);
-    const startIndex = (page * pageSize) - pageSize;
+    const startIndex = page * pageSize - pageSize;
 
-    const _loginEmployeeId = getCurrentEmployeeLoggeedinId(req.headers.authorization);
+    const _loginEmployeeId = req.loginEmployeeId;
 
     let aggregationPipeline = [
       {
         $match: {
           loginEmployeeId: _loginEmployeeId,
         },
-      }
+      },
     ];
 
     const fullName = req.query.fullName;
@@ -50,8 +47,8 @@ const allEmployeeList = async (req, res) => {
       aggregationPipeline.push({
         $match: {
           $and: [
-            { firstName: { $regex: new RegExp(firstName, 'i') } },
-            { lastName: { $regex: new RegExp(lastName, 'i') } },
+            { firstName: { $regex: new RegExp(firstName, "i") } },
+            { lastName: { $regex: new RegExp(lastName, "i") } },
           ],
         },
       });
@@ -59,12 +56,48 @@ const allEmployeeList = async (req, res) => {
 
     const userRoles = req.query.userRole;
     if (userRoles && userRoles.length > 0) {
-      const roleMatches = userRoles.map(role => ({ userRole: role }));
+      const roleMatches = userRoles.map((role) => ({ userRole: role }));
       aggregationPipeline.push({
         $match: {
-          $and: roleMatches
-        }
+          $and: roleMatches,
+        },
       });
+    }
+
+    const startDateStr = req.query.startDate;
+    const endDateStr = req.query.endDate;
+
+    if (startDateStr && endDateStr) {
+      const startDate = new Date(startDateStr).toISOString();
+      const endDate = new Date(endDateStr).toISOString();
+      aggregationPipeline.push(
+        { $unwind: "$pastExperience" },
+        {
+          $match: {
+            "pastExperience.startDate": {
+              $gte: startDate,
+              $lte: endDate,
+            },
+          },
+        },
+        {
+          $group: {
+            _id: "$_id",
+            firstName: { $first: "$firstName" },
+            lastName: { $first: "$lastName" },
+            email: { $first: "$email" },
+            address: { $first: "$address" },
+            state: { $first: "$state" },
+            city: { $first: "$city" },
+            zip: { $first: "$zip" },
+            jobRole: { $first: "$jobRole" },
+            userRole: { $first: "$userRole" },
+            color: { $first: "$color" },
+            loginEmployeeId: { $first: "$loginEmployeeId" },
+            pastExperience: { $push: "$pastExperience" },
+          },
+        }
+      );
     }
 
     aggregationPipeline.push(
@@ -76,14 +109,13 @@ const allEmployeeList = async (req, res) => {
       }
     );
 
-
     const employees = await Employee.aggregate(aggregationPipeline).exec();
     const data = {
-      "data": employees
-    }
+      data: employees,
+    };
     res.status(200).json(data);
-
   } catch (error) {
+    console.error(error);
     res.status(400).send({ success: false, msg: error.message });
   }
 };
@@ -128,8 +160,8 @@ const updateEmployee = async (req, res) => {
           zip: req.body.zip,
           jobRole: req.body.jobRole,
           userRole: req.body.userRole,
-          loginEmployeeID: getCurrentEmployeeLoggeedinId(req.headers.authorization),
-          pastExperience: req.body.pastExperience
+          loginEmployeeID: req.loginEmployeeId,
+          pastExperience: req.body.pastExperience,
         },
         { new: true }
       );
@@ -139,13 +171,6 @@ const updateEmployee = async (req, res) => {
     res.status(400).send({ success: false, msg: error.message });
   }
 };
-
-function getCurrentEmployeeLoggeedinId(authorization) {
-  const token = authorization.split(" ")[1];
-  const decodedToken = jwt.verify(token, jwt_secret_key);
-  const loginEmployeeId = decodedToken.loginEmployeeId;
-  return loginEmployeeId;
-}
 
 module.exports = {
   newEmployeeAdd,

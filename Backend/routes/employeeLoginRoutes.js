@@ -8,6 +8,5 @@ loginEmployeeRoutes.use(body_parser.urlencoded({ extended: true }));
 
 loginEmployeeRoutes.post("/register", loginEmployeeController.newLoginEmployee)
 loginEmployeeRoutes.post("/login", loginEmployeeController.verifyEmployeeLogin)
-loginEmployeeRoutes.post("/loggedin", loginEmployeeController.verifyToken)
 
 module.exports = loginEmployeeRoutes

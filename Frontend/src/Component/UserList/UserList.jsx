@@ -94,7 +94,9 @@ function UserData() {
         "fullName": inputValue.userName,
         "page": first,
         "pageSize": rows,
-        "userRole": inputValue.userRole
+        "userRole": inputValue.userRole,
+        "startDate": inputValue.startDate,
+        "endDate": inputValue.endDate
       }
       try {
         const search = await axiosInstance.get("/emp", {
@@ -126,6 +128,7 @@ function UserData() {
   const deleteUser = async (id) => {
     try {
       await axiosInstance.delete(`/emp/${id}`);
+      getData();
       deletenotify();
       await fetchData();
     } catch (error) {

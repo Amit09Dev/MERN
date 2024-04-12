@@ -1,23 +1,24 @@
+<<<<<<< HEAD
 const { Employee } = require("../models/EmployeeModel");
+=======
+const { LoginEmployee, Employee, Role } = require("../models/EmployeeModel");
+>>>>>>> 5604ee7bd2055612e718045e1fbdf86cb62228ae
 const jwt = require("jsonwebtoken");
 
 const newEmployeeAdd = async (req, res) => {
   try {
     const newEmpData = req.body;
-    console.log();
 
     const existingEmail = await Employee.findOne({
       email: newEmpData.email,
       loginEmployeeId: req.loginEmployeeId,
     });
-    console.log("1");
 
     if (existingEmail) {
       res.status(409).json({ message: "Email has already been used" });
     } else {
       newEmpData.loginEmployeeId = req.loginEmployeeId;
       const _newEmpData = await Employee.create(newEmpData);
-      console.log("2");
       res.status(200).json(_newEmpData);
     }
   } catch (error) {
@@ -110,9 +111,13 @@ const allEmployeeList = async (req, res) => {
     );
 
     const employees = await Employee.aggregate(aggregationPipeline).exec();
+    const pages = Math.ceil(employees.length / pageSize)
+    console.log(employees.length / pageSize);
     const data = {
-      data: employees,
-    };
+
+      "data": employees,
+      "pages": pages
+    }
     res.status(200).json(data);
   } catch (error) {
     console.error(error);
@@ -172,10 +177,32 @@ const updateEmployee = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
+=======
+function getCurrentEmployeeLoggeedinId(authorization) {
+  const token = authorization.split(" ")[1];
+  const decodedToken = jwt.verify(token, jwt_secret_key);
+  const loginEmployeeId = decodedToken.loginEmployeeId;
+  return loginEmployeeId;
+}
+
+const getUserRole = async (req, res) => {
+  try {
+    console.log('Fetching roles...')
+    const roles = await Role.find({});
+    console.log("Roles", roles)
+    res.status(200).json(roles);
+  } catch (error) {
+    res.status(400).send({ success: false, msg: error.message });
+  }
+}
+
+>>>>>>> 5604ee7bd2055612e718045e1fbdf86cb62228ae
 module.exports = {
   newEmployeeAdd,
   allEmployeeList,
   employeeById,
   deleteEmployee,
   updateEmployee,
+  getUserRole
 };

@@ -58,11 +58,19 @@ const loginEmployeeSchema = new mongoose.Schema({
   orignalPasswordDemo: { type: String, required: true },
 });
 
+const roleSchema = new mongoose.Schema({
+  role_id: { type: String },
+  role: { type: String },
+})
+
 const LoginEmployee = mongoose.model("LoginEmployee", loginEmployeeSchema);
 
 const Employee = mongoose.model("Employee", employeeSchema);
 
+const Role = mongoose.model("Role", roleSchema)
+
 module.exports = {
   LoginEmployee: LoginEmployee,
   Employee: Employee,
+  Role: Role
 };

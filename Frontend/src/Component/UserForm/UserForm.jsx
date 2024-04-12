@@ -8,9 +8,6 @@ import Select from 'react-select';
 import TopNabvar from "../topNavbar/topNavbar";
 import Sidebar from "../sidebar/Sidebar";
 import axiosInstance from "../../api/Axios";
-import { InputText } from 'primereact/inputtext';
-import { Button } from 'primereact/button';
-import 'primeicons/primeicons.css';
 function UserForm() {
   const userFormData = {
     firstName: "",
@@ -40,6 +37,8 @@ function UserForm() {
   const [errors, setErrors] = useState({});
   const [gridList, setGridList] = useState([initialGridState]);
   const [selectedOption, setSelectedOption] = useState(null);
+  const [isEmailValid, setIsEmailValid] = useState(false);
+  const [touched, setTouched] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams();
   const animatedComponents = makeAnimated();
@@ -52,6 +51,30 @@ function UserForm() {
       userRole: selectedValues,
     });
   };
+
+  const handleEmailCheck = async (e) => {
+    const email = e.target.value;
+    const emailElm = document.getElementById("email");
+    const isValid = isValidEmail(email);
+    setIsEmailValid(isValid);
+    if (email === "") {
+      emailElm.classList.remove("is-invalid", "is-valid");
+    } else {
+      try {
+        const { data } = await axiosInstance.get("/checkEmail", {
+          params: { email }
+        });
+        const errorMessage = data.status ? '' : data.msg;
+        setErrors({ ...errors, email: errorMessage });
+        setTouched(true);
+        emailElm.classList.toggle("is-invalid", !data.status);
+        emailElm.classList.toggle("is-valid", data.status);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
 
   useEffect(() => {
     if (id) {
@@ -71,7 +94,6 @@ function UserForm() {
             color: data.color,
           });
           const selectedRoles = data.userRole.map(role => RoleList.find(r => r.value === role));
-
           setSelectedOption(selectedRoles);
           const pastExperiences = data.pastExperience.map(experience => ({
             id: experience.id,
@@ -122,15 +144,14 @@ function UserForm() {
         const updatedFormData = {
           ...formData,
         };
-        console.log(updatedFormData);
         if (id === undefined) {
           await axiosInstance.post("/addEmp", updatedFormData);
           insertnotify();
           resetForm();
-          console.log("Form data is valid:", updatedFormData);
         } else {
-          console.log("Form data is valid:", updatedFormData);
+          console.log("Update Function data is valid:", updatedFormData);
           const response = await axiosInstance.patch(`/emp/${id}`, updatedFormData);
+          console.log(response.data);
           updatenotify();
           resetForm();
           navigate("/userlist");
@@ -154,8 +175,13 @@ function UserForm() {
   };
   const handleGridInputChange = (index, e) => {
     const { name, value } = e.target;
-    const updatedGridList = [...gridList];
-    updatedGridList[index][name] = value;
+    const updatedGridList = gridList.map((item, i) => {
+      if (index === i) {
+        return { ...item, [name]: value };
+      }
+      return item;
+    });
+
     setGridList(updatedGridList);
     const updatedFormData = {
       ...formData,
@@ -167,7 +193,12 @@ function UserForm() {
   const handleRemoveGrid = (index) => {
     const updatedGridList = [...gridList];
     updatedGridList.splice(index, 1);
-    setGridList(updatedGridList);
+    setGridList(updatedGridList)
+    const updatedFormData = {
+      ...formData,
+      pastExperience: updatedGridList
+    };
+    setFormData(updatedFormData);
   };
 
 
@@ -207,9 +238,7 @@ function UserForm() {
     }
     setFormData(userFormData);
     setErrors({});
-    setGridList([
-      
-    ]);
+    setGridList([initialGridState]);
 
   };
   const insertnotify = () => toast.success("Data insert Successfully");
@@ -290,6 +319,7 @@ function UserForm() {
                   id="email"
                   value={formData.email}
                   onChange={handleInputChange}
+                  onInput={handleEmailCheck}
                   placeholder="name@example.com"
                 />
                 {errors.email && <span className="error">{errors.email}</span>}
@@ -307,7 +337,6 @@ function UserForm() {
                   id="userRole"
                   components={animatedComponents}
                   options={RoleList}
-                  defaultValue={[RoleList[0], RoleList[1]]}
                   className="basic-multi-select"
                   classNamePrefix="select"
                   value={selectedOption}
@@ -478,9 +507,8 @@ function UserForm() {
               </div>
 
             </div>
-            <div className="row mt-4">
-              <div className="col-10"></div>
-              <div className="col-2 d-flex justify-content-end">
+            <div className="d-flex justify-content-end mt-4">
+              <div className="d-flex justify-content-end">
                 <button type="button" className="btn btn-primary me-2"
                   onClick={resetForm}>
                   Reset Form
@@ -488,8 +516,7 @@ function UserForm() {
                 <button
                   type="button"
                   className="btn btn-success"
-                  onClick={handleSave}
-                >
+                  onClick={handleSave}>
                   Submit
                 </button>
               </div>

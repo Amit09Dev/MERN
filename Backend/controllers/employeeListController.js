@@ -1,8 +1,6 @@
-<<<<<<< HEAD
+
 const { Employee } = require("../models/EmployeeModel");
-=======
-const { LoginEmployee, Employee, Role } = require("../models/EmployeeModel");
->>>>>>> 5604ee7bd2055612e718045e1fbdf86cb62228ae
+
 const jwt = require("jsonwebtoken");
 
 const newEmployeeAdd = async (req, res) => {
@@ -177,27 +175,6 @@ const updateEmployee = async (req, res) => {
   }
 };
 
-<<<<<<< HEAD
-=======
-function getCurrentEmployeeLoggeedinId(authorization) {
-  const token = authorization.split(" ")[1];
-  const decodedToken = jwt.verify(token, jwt_secret_key);
-  const loginEmployeeId = decodedToken.loginEmployeeId;
-  return loginEmployeeId;
-}
-
-const getUserRole = async (req, res) => {
-  try {
-    console.log('Fetching roles...')
-    const roles = await Role.find({});
-    console.log("Roles", roles)
-    res.status(200).json(roles);
-  } catch (error) {
-    res.status(400).send({ success: false, msg: error.message });
-  }
-}
-
->>>>>>> 5604ee7bd2055612e718045e1fbdf86cb62228ae
 module.exports = {
   newEmployeeAdd,
   allEmployeeList,

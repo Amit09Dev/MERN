@@ -1,5 +1,4 @@
-
-const { Employee } = require("../models/EmployeeModel");
+const { Employee, Role } = require("../models/EmployeeModel");
 
 const jwt = require("jsonwebtoken");
 
@@ -26,10 +25,7 @@ const newEmployeeAdd = async (req, res) => {
 
 const allEmployeeList = async (req, res) => {
   try {
-    const page = parseInt(req.query.page);
     const pageSize = parseInt(req.query.pageSize);
-    const startIndex = page * pageSize - pageSize;
-
     const _loginEmployeeId = req.loginEmployeeId;
 
     let aggregationPipeline = [
@@ -40,10 +36,12 @@ const allEmployeeList = async (req, res) => {
       },
     ];
 
+    const filters = [];
+
     const fullName = req.query.fullName;
     if (fullName) {
       const [firstName, lastName] = fullName.split(" ");
-      aggregationPipeline.push({
+      filters.push({
         $match: {
           $and: [
             { firstName: { $regex: new RegExp(firstName, "i") } },
@@ -56,48 +54,47 @@ const allEmployeeList = async (req, res) => {
     const userRoles = req.query.userRole;
     if (userRoles && userRoles.length > 0) {
       const roleMatches = userRoles.map((role) => ({ userRole: role }));
-      aggregationPipeline.push({
+      filters.push({
         $match: {
           $and: roleMatches,
         },
       });
     }
-
     const startDateStr = req.query.startDate;
     const endDateStr = req.query.endDate;
 
     if (startDateStr && endDateStr) {
       const startDate = new Date(startDateStr).toISOString();
       const endDate = new Date(endDateStr).toISOString();
-      aggregationPipeline.push(
+      filters.push(
         { $unwind: "$pastExperience" },
         {
           $match: {
             "pastExperience.startDate": {
               $gte: startDate,
-              $lte: endDate,
+              $lt: endDate,
             },
-          },
-        },
-        {
-          $group: {
-            _id: "$_id",
-            firstName: { $first: "$firstName" },
-            lastName: { $first: "$lastName" },
-            email: { $first: "$email" },
-            address: { $first: "$address" },
-            state: { $first: "$state" },
-            city: { $first: "$city" },
-            zip: { $first: "$zip" },
-            jobRole: { $first: "$jobRole" },
-            userRole: { $first: "$userRole" },
-            color: { $first: "$color" },
-            loginEmployeeId: { $first: "$loginEmployeeId" },
-            pastExperience: { $push: "$pastExperience" },
           },
         }
       );
     }
+
+    const countPipeline = [
+      { $match: { loginEmployeeId: _loginEmployeeId } },
+      ...filters,
+      { $count: "total" },
+    ];
+
+    const totalEmployees = await Employee.aggregate(countPipeline).exec();
+
+    const totalDocuments =
+      totalEmployees.length > 0 ? totalEmployees[0].total : 0;
+    const totalPages = Math.ceil(totalDocuments / pageSize);
+
+    const page = parseInt(req.query.page) || 1;
+    const startIndex = page * pageSize - pageSize;
+
+    aggregationPipeline.push(...filters);
 
     aggregationPipeline.push(
       {
@@ -109,19 +106,116 @@ const allEmployeeList = async (req, res) => {
     );
 
     const employees = await Employee.aggregate(aggregationPipeline).exec();
-    const pages = Math.ceil(employees.length / pageSize)
-    console.log(employees.length / pageSize);
     const data = {
-
-      "data": employees,
-      "pages": pages
-    }
+      data: employees,
+      totalPages: totalPages,
+    };
+    console.log(totalPages);
     res.status(200).json(data);
   } catch (error) {
-    console.error(error);
+    console.error(error); // Log the error for debugging purposes
     res.status(400).send({ success: false, msg: error.message });
   }
 };
+
+// const allEmployeeList = async (req, res) => {
+//   try {
+//     const page = parseInt(req.query.page);
+//     const pageSize = parseInt(req.query.pageSize);
+//     const startIndex = page * pageSize - pageSize;
+
+//     const _loginEmployeeId = req.loginEmployeeId;
+
+//     let aggregationPipeline = [
+//       {
+//         $match: {
+//           loginEmployeeId: _loginEmployeeId,
+//         },
+//       },
+//     ];
+
+//     const fullName = req.query.fullName;
+//     if (fullName) {
+//       const [firstName, lastName] = fullName.split(" ");
+//       aggregationPipeline.push({
+//         $match: {
+//           $and: [
+//             { firstName: { $regex: new RegExp(firstName, "i") } },
+//             { lastName: { $regex: new RegExp(lastName, "i") } },
+//           ],
+//         },
+//       });
+//     }
+
+//     const userRoles = req.query.userRole;
+//     if (userRoles && userRoles.length > 0) {
+//       const roleMatches = userRoles.map((role) => ({ userRole: role }));
+//       aggregationPipeline.push({
+//         $match: {
+//           $and: roleMatches,
+//         },
+//       });
+//     }
+
+//     const startDateStr = req.query.startDate;
+//     const endDateStr = req.query.endDate;
+
+//     if (startDateStr && endDateStr) {
+//       const startDate = new Date(startDateStr).toISOString();
+//       const endDate = new Date(endDateStr).toISOString();
+//       aggregationPipeline.push(
+//         { $unwind: "$pastExperience" },
+//         {
+//           $match: {
+//             "pastExperience.startDate": {
+//               $gte: startDate,
+//               $lte: endDate,
+//             },
+//           },
+//         },
+//         {
+//           $group: {
+//             _id: "$_id",
+//             firstName: { $first: "$firstName" },
+//             lastName: { $first: "$lastName" },
+//             email: { $first: "$email" },
+//             address: { $first: "$address" },
+//             state: { $first: "$state" },
+//             city: { $first: "$city" },
+//             zip: { $first: "$zip" },
+//             jobRole: { $first: "$jobRole" },
+//             userRole: { $first: "$userRole" },
+//             color: { $first: "$color" },
+//             loginEmployeeId: { $first: "$loginEmployeeId" },
+//             pastExperience: { $push: "$pastExperience" },
+//           },
+//         }
+//       );
+//     }
+
+//     aggregationPipeline.push(
+//       {
+//         $skip: startIndex,
+//       },
+//       {
+//         $limit: pageSize,
+//       }
+//     );
+
+//     const employees = await Employee.aggregate(aggregationPipeline).exec();
+//     const pages = Math.ceil(employees.length / pageSize)
+//     console.log(employees.length / pageSize);
+//     const data = {
+
+//       "data": employees,
+//       "pages": pages
+//     }
+//     res.status(200).json(data);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(400).send({ success: false, msg: error.message });
+//   }
+// };
 
 const employeeById = async (req, res) => {
   try {
@@ -175,11 +269,22 @@ const updateEmployee = async (req, res) => {
   }
 };
 
+const getUserRole = async (req, res) => {
+  try {
+    console.log("Fetching roles...");
+    const roles = await Role.find({});
+    console.log("Roles", roles);
+    res.status(200).json(roles);
+  } catch (error) {
+    res.status(400).send({ success: false, msg: error.message });
+  }
+};
+
 module.exports = {
   newEmployeeAdd,
   allEmployeeList,
   employeeById,
   deleteEmployee,
   updateEmployee,
-  getUserRole
+  getUserRole,
 };

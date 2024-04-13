@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import makeAnimated from 'react-select/animated';
-import Select from 'react-select';
+import makeAnimated from "react-select/animated";
+import Select from "react-select";
 import TopNabvar from "../topNavbar/topNavbar";
 import Sidebar from "../sidebar/Sidebar";
 import axiosInstance from "../../api/Axios";
@@ -20,19 +20,15 @@ function UserForm() {
     jobRole: "",
     userRole: [],
     color: "#000000",
-    pastExperience: []
+    pastExperience: [],
   };
   const initialGridState = {
     id: 0,
-    companyName: '',
-    startDate: '',
-    endDate: ''
+    companyName: "",
+    startDate: "",
+    endDate: "",
   };
-  const RoleList = [
-    { id: 0, value: 'User', label: 'User' },
-    { id: 1, value: 'Admin', label: 'Admin' },
-    { id: 2, value: 'Super Admin', label: 'Super Admin' }
-  ]
+  const [RoleList, setRoleList] = useState([]);
   const [formData, setFormData] = useState(userFormData);
   const [errors, setErrors] = useState({});
   const [gridList, setGridList] = useState([initialGridState]);
@@ -45,7 +41,9 @@ function UserForm() {
 
   const handleChange = (selectedOption) => {
     setSelectedOption(selectedOption);
-    const selectedValues = selectedOption ? selectedOption.map(option => option.value) : [];
+    const selectedValues = selectedOption
+      ? selectedOption.map((option) => option.value)
+      : [];
     setFormData({
       ...formData,
       userRole: selectedValues,
@@ -59,12 +57,18 @@ function UserForm() {
     setIsEmailValid(isValid);
     if (email === "") {
       emailElm.classList.remove("is-invalid", "is-valid");
+      return
+    }
+    if (!isValid && touched) {
+      emailElm.classList.add("is-invalid");
+      emailElm.classList.remove("is-valid");
+      return;
     } else {
       try {
         const { data } = await axiosInstance.get("/checkEmail", {
-          params: { email }
+          params: { email },
         });
-        const errorMessage = data.status ? '' : data.msg;
+        const errorMessage = data.status ? "" : data.msg;
         setErrors({ ...errors, email: errorMessage });
         setTouched(true);
         emailElm.classList.toggle("is-invalid", !data.status);
@@ -74,11 +78,26 @@ function UserForm() {
       }
     }
   };
-
+  const RoleData = async () => {
+    try {
+      const response = await axiosInstance.get("/role");
+      console.log(response.data);
+      const formattedRoles = response.data.map((role) => ({
+        value: role.role_id,
+        label: role.role,
+      }));
+      console.log(response.data);
+      setRoleList([...formattedRoles]);
+    } catch (error) {
+      console.error("Error fetching role data:", error);
+    }
+  };
 
   useEffect(() => {
+    RoleData();
     if (id) {
-      axiosInstance.get(`/emp/${id}`)
+      axiosInstance
+        .get(`/emp/${id}`)
         .then((response) => {
           const data = response.data;
           console.log("updated data ", data);
@@ -93,13 +112,15 @@ function UserForm() {
             jobRole: data.jobRole || "",
             color: data.color,
           });
-          const selectedRoles = data.userRole.map(role => RoleList.find(r => r.value === role));
+          const selectedRoles = data.userRole.map((role) =>
+            RoleList.find((r) => r.value === role)
+          );
           setSelectedOption(selectedRoles);
-          const pastExperiences = data.pastExperience.map(experience => ({
+          const pastExperiences = data.pastExperience.map((experience) => ({
             id: experience.id,
             companyName: experience.companyName || "",
             startDate: experience.startDate || "",
-            endDate: experience.endDate || ""
+            endDate: experience.endDate || "",
           }));
           setGridList(pastExperiences);
         })
@@ -109,7 +130,6 @@ function UserForm() {
     }
   }, [id]);
 
-
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     setFormData({
@@ -117,7 +137,7 @@ function UserForm() {
       [id]: value,
     });
     setErrors((old) => {
-      return { ...old, [id]: "" }
+      return { ...old, [id]: "" };
     });
   };
   const handleSelectChange = (e) => {
@@ -127,7 +147,7 @@ function UserForm() {
       [id]: value,
     });
     setErrors((old) => {
-      return { ...old, [id]: "" }
+      return { ...old, [id]: "" };
     });
   };
   const handleColorChange = (e) => {
@@ -150,7 +170,10 @@ function UserForm() {
           resetForm();
         } else {
           console.log("Update Function data is valid:", updatedFormData);
-          const response = await axiosInstance.patch(`/emp/${id}`, updatedFormData);
+          const response = await axiosInstance.patch(
+            `/emp/${id}`,
+            updatedFormData
+          );
           console.log(response.data);
           updatenotify();
           resetForm();
@@ -169,7 +192,7 @@ function UserForm() {
       id: gridList.length,
       companyName: "",
       startDate: "",
-      endDate: ""
+      endDate: "",
     };
     setGridList([...gridList, newGrid]);
   };
@@ -185,7 +208,7 @@ function UserForm() {
     setGridList(updatedGridList);
     const updatedFormData = {
       ...formData,
-      pastExperience: updatedGridList
+      pastExperience: updatedGridList,
     };
     setFormData(updatedFormData);
   };
@@ -193,24 +216,38 @@ function UserForm() {
   const handleRemoveGrid = (index) => {
     const updatedGridList = [...gridList];
     updatedGridList.splice(index, 1);
-    setGridList(updatedGridList)
+    setGridList(updatedGridList);
     const updatedFormData = {
       ...formData,
-      pastExperience: updatedGridList
+      pastExperience: updatedGridList,
     };
     setFormData(updatedFormData);
   };
 
-
-
   const validateForm = (data) => {
     const errors = {};
 
-    const requiredFields = ['firstName', 'lastName', 'email', 'jobRole', 'address', 'city', 'state', 'zip'];
-    requiredFields.forEach(field => {
+    const requiredFields = [
+      "firstName",
+      "lastName",
+      "email",
+      "jobRole",
+      "address",
+      "city",
+      "state",
+      "zip",
+    ];
+    requiredFields.forEach((field) => {
       if (!data[field]) {
-        const fieldName = field === 'firstName' ? 'First name' : field === 'lastName' ? 'Last name' : field;
-        errors[field] = `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is required`;
+        const fieldName =
+          field === "firstName"
+            ? "First name"
+            : field === "lastName"
+            ? "Last name"
+            : field;
+        errors[field] = `${
+          fieldName.charAt(0).toUpperCase() + fieldName.slice(1)
+        } is required`;
       }
     });
 
@@ -239,7 +276,6 @@ function UserForm() {
     setFormData(userFormData);
     setErrors({});
     setGridList([initialGridState]);
-
   };
   const insertnotify = () => toast.success("Data insert Successfully");
   const updatenotify = () => toast.info("Data updated Successfully");
@@ -263,9 +299,8 @@ function UserForm() {
         </div>
         <form autoComplete="off">
           <div className="row mx-3 mt-2 shadow-lg p-3">
-
             <div className="col-6">
-              <div className={`mb-3 ${errors.firstName ? 'has-error' : ''}`}>
+              <div className={`mb-3 ${errors.firstName ? "has-error" : ""}`}>
                 <label htmlFor="FName" className="form-label">
                   First Name
                 </label>{" "}
@@ -285,7 +320,7 @@ function UserForm() {
             </div>
 
             <div className="col-6">
-              <div className={`mb-3 ${errors.lastName ? 'has-error' : ''}`}>
+              <div className={`mb-3 ${errors.lastName ? "has-error" : ""}`}>
                 <label htmlFor="LName" className="form-label">
                   Last Name
                 </label>{" "}
@@ -305,7 +340,7 @@ function UserForm() {
             </div>
 
             <div className="col-6">
-              <div className={`mb-3 ${errors.email ? 'has-error' : ''}`}>
+              <div className={`mb-3 ${errors.email ? "has-error" : ""}`}>
                 <label
                   htmlFor="exampleFormControlInput1"
                   className="form-label"
@@ -327,7 +362,7 @@ function UserForm() {
             </div>
 
             <div className="col-6">
-              <div className={`mb-3 ${errors.userRole ? 'has-error' : ''}`}>
+              <div className={`mb-3 ${errors.userRole ? "has-error" : ""}`}>
                 <label htmlFor="userRole" className="form-label">
                   User Role
                 </label>
@@ -348,9 +383,8 @@ function UserForm() {
               </div>
             </div>
 
-
             <div className="col-6">
-              <div className={`mb-3 ${errors.address ? 'has-error' : ''}`}>
+              <div className={`mb-3 ${errors.address ? "has-error" : ""}`}>
                 <label htmlFor="address" className="form-label">
                   Address
                 </label>
@@ -362,12 +396,14 @@ function UserForm() {
                   onChange={handleInputChange}
                   placeholder="Enter Address"
                 ></input>
-                {errors.address && <span className="error">{errors.address}</span>}
+                {errors.address && (
+                  <span className="error">{errors.address}</span>
+                )}
               </div>
             </div>
 
             <div className="col-6">
-              <div className={`mb-3 ${errors.city ? 'has-error' : ''}`}>
+              <div className={`mb-3 ${errors.city ? "has-error" : ""}`}>
                 <label htmlFor="city" className="form-label">
                   City
                 </label>
@@ -379,13 +415,11 @@ function UserForm() {
                   onChange={handleInputChange}
                   placeholder="enter City"
                 ></input>
-                {errors.city && (
-                  <span className="error">{errors.city}</span>
-                )}
+                {errors.city && <span className="error">{errors.city}</span>}
               </div>
             </div>
             <div className="col-6">
-              <div className={`mb-3 ${errors.state ? 'has-error' : ''}`}>
+              <div className={`mb-3 ${errors.state ? "has-error" : ""}`}>
                 <label htmlFor="state" className="form-label">
                   State
                 </label>
@@ -397,13 +431,11 @@ function UserForm() {
                   onChange={handleInputChange}
                   placeholder="Enter the State"
                 ></input>
-                {errors.state && (
-                  <span className="error">{errors.state}</span>
-                )}
+                {errors.state && <span className="error">{errors.state}</span>}
               </div>
             </div>
             <div className="col-6">
-              <div className={`mb-3 ${errors.zip ? 'has-error' : ''}`}>
+              <div className={`mb-3 ${errors.zip ? "has-error" : ""}`}>
                 <label htmlFor="zip" className="form-label">
                   Zip Code
                 </label>
@@ -415,19 +447,19 @@ function UserForm() {
                   onChange={handleInputChange}
                   placeholder="Enter Zip"
                 ></input>
-                {errors.zip && (
-                  <span className="error">{errors.zip}</span>
-                )}
+                {errors.zip && <span className="error">{errors.zip}</span>}
               </div>
             </div>
             <div className="col-6">
-              <div className={`mb-3 ${errors.jobRole ? 'has-error' : ''}`}>
+              <div className={`mb-3 ${errors.jobRole ? "has-error" : ""}`}>
                 <label htmlFor="jobRole" className="form-label">
                   Job Role
                 </label>{" "}
                 <span>*</span>
                 <select
-                  className={`form-select ${errors.jobRole ? 'is-invalid' : ''}`}
+                  className={`form-select ${
+                    errors.jobRole ? "is-invalid" : ""
+                  }`}
                   id="jobRole"
                   value={formData.jobRole}
                   onChange={handleSelectChange}
@@ -456,29 +488,46 @@ function UserForm() {
                     onChange={handleColorChange}
                   />
                 </div>
-                <button type="button" className="btn btn-primary" id="addCompany" onClick={handleAddGrid}>Add Experience</button>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  id="addCompany"
+                  onClick={handleAddGrid}
+                >
+                  Add Experience
+                </button>
               </div>
             </div>
             <div>
               <div>
                 {gridList.map((grid, index) => (
-                  <div key={index} className='row'>
+                  <div key={index} className="row">
                     <div className="col-4">
-                      <label className='form-label' htmlFor={`companyName-${index}`}>Company Name:</label>
+                      <label
+                        className="form-label"
+                        htmlFor={`companyName-${index}`}
+                      >
+                        Company Name:
+                      </label>
                       <input
-                        className='form-control'
+                        className="form-control"
                         type="text"
                         id={`companyName-${index}`}
                         name={`companyName`}
-                        placeholder='Enter Company name'
+                        placeholder="Enter Company name"
                         value={grid.companyName}
                         onChange={(e) => handleGridInputChange(index, e)}
                       />
                     </div>
                     <div className="col-3">
-                      <label className='form-label' htmlFor={`startDate-${index}`}>Start Job Date:</label>
+                      <label
+                        className="form-label"
+                        htmlFor={`startDate-${index}`}
+                      >
+                        Start Job Date:
+                      </label>
                       <input
-                        className='form-control'
+                        className="form-control"
                         type="date"
                         id={`startDate-${index}`}
                         name={`startDate`}
@@ -487,9 +536,14 @@ function UserForm() {
                       />
                     </div>
                     <div className="col-3">
-                      <label className='form-label' htmlFor={`endDate-${index}`}>End Job Date:</label>
+                      <label
+                        className="form-label"
+                        htmlFor={`endDate-${index}`}
+                      >
+                        End Job Date:
+                      </label>
                       <input
-                        className='form-control'
+                        className="form-control"
                         type="date"
                         id={`endDate-${index}`}
                         name={`endDate`}
@@ -499,29 +553,35 @@ function UserForm() {
                     </div>
                     {gridList.length > 1 && (
                       <div className="col-2 mt-1 d-flex justify-content-end">
-                        <i type="button" className="fa-solid fa-xmark remove" onClick={() => handleRemoveGrid(index)}></i>
+                        <i
+                          type="button"
+                          className="fa-solid fa-xmark remove"
+                          onClick={() => handleRemoveGrid(index)}
+                        ></i>
                       </div>
                     )}
                   </div>
                 ))}
               </div>
-
             </div>
             <div className="d-flex justify-content-end mt-4">
               <div className="d-flex justify-content-end">
-                <button type="button" className="btn btn-primary me-2"
-                  onClick={resetForm}>
+                <button
+                  type="button"
+                  className="btn btn-primary me-2"
+                  onClick={resetForm}
+                >
                   Reset Form
                 </button>
                 <button
                   type="button"
                   className="btn btn-success"
-                  onClick={handleSave}>
+                  onClick={handleSave}
+                >
                   Submit
                 </button>
               </div>
             </div>
-
           </div>
         </form>
       </main>

@@ -4,7 +4,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const employeeListRoutes = require("./routes/employeeListRoutes");
 const employeeLoginRoutes = require("./routes/employeeLoginRoutes");
-const {checkEmail} = require("./controllers/emailExistCheck");
+const {checkEmail} = require("./controllers/emailExistController");
 const {authenticateEmployee, verifyToken} = require("./middleWare/employeeAuthentication");
 
 app.use(cors());

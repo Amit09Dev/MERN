@@ -2,8 +2,9 @@ const jwt = require("jsonwebtoken");
 const jwt_secret_key = "YJDRetsrtcdyutoiUtv!cyuzsterQWerqwsrtxcyuvuiRyuoitxsERTwirytuev";
 
 const authenticateEmployee = (req, res, next) => {
-  const token = req.headers.authorization.split(" ")[1];
-  if (token) {
+  const tokenHeader = req.headers.authorization;
+  if (tokenHeader) {
+    const token = req.headers.authorization.split(" ")[1];
     const decodedToken = jwt.verify(token, jwt_secret_key);
     const loginEmployeeId = decodedToken.loginEmployeeId;
     req.loginEmployeeId = loginEmployeeId;

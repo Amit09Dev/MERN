@@ -6,21 +6,20 @@ import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import axiosInstance from "../../api/Axios";
 import TopNabvar from "../topNavbar/topNavbar";
 import Sidebar from "../sidebar/Sidebar";
-import makeAnimated from 'react-select/animated';
-import Select from 'react-select';
+import makeAnimated from "react-select/animated";
+import Select from "react-select";
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 import { PrimeReactProvider } from "primereact/api";
-import { Paginator } from 'primereact/paginator';
-import "./UserList.css"
+import { Paginator } from "primereact/paginator";
 
 function UserData() {
   const deletenotify = () => toast.error("Data delete Successfully");
   const [users, setUsers] = useState([]);
   const [first, setFirst] = useState(1);
-  const [rows, setRows] = useState(5);
+  const [rows, setRows] = useState(10);
 
   const onPageChange = (event) => {
-    setFirst((event.first / event.rows) + 1);
+    setFirst(event.first / event.rows + 1);
     setRows(event.rows);
   };
 
@@ -35,27 +34,25 @@ function UserData() {
 
   const getData = async () => {
     const data = {
-      "page": first,
-      "pageSize": rows
-    }
+      page: first,
+      pageSize: rows,
+    };
     try {
-      const result = await axiosInstance.get('/emp', {
-        params: data
+      const result = await axiosInstance.get("/emp", {
+        params: data,
       });
       const elems = document.querySelectorAll(".p-highlight");
       elems.forEach.call(elems, function (el) {
         el.classList.remove("p-highlight");
       });
       var activeElem = document.querySelector(`[aria-label= "Page ${first}" ]`);
-      activeElem.classList.add("p-highlight")
-      console.log(result.data)
-      console.log(result.data.pages)
+      activeElem.classList.add("p-highlight");
+      console.log(result.data.page);
       setUsers(result.data.data);
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   useEffect(() => {
     getData();
@@ -63,10 +60,10 @@ function UserData() {
 
   const animatedComponents = makeAnimated();
   const RoleList = [
-    { value: 'User', label: 'User' },
-    { value: 'Admin', label: 'Admin' },
-    { value: 'Super Admin', label: 'Super Admin' }
-  ]
+    { value: "User", label: "User" },
+    { value: "Admin", label: "Admin" },
+    { value: "Super Admin", label: "Super Admin" },
+  ];
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
@@ -74,12 +71,14 @@ function UserData() {
       ...inputValue,
       [id]: value,
     });
-    console.log(inputValue)
+    console.log(inputValue);
   };
 
   const handleChange = (selectedOption) => {
     setSelectedOption(selectedOption);
-    const selectedValues = selectedOption ? selectedOption.map(option => option.value) : [];
+    const selectedValues = selectedOption
+      ? selectedOption.map((option) => option.value)
+      : [];
     setInputValue({
       ...inputValue,
       userRole: selectedValues,
@@ -87,26 +86,29 @@ function UserData() {
   };
 
   const SearchResults = async () => {
-    if (inputValue.firstName === "" && inputValue.email === "" && inputValue.startDate === "" && inputValue.endDate === "") {
+    if (
+      inputValue.firstName === "" &&
+      inputValue.email === "" &&
+      inputValue.startDate === "" &&
+      inputValue.endDate === ""
+    ) {
       toast.warn("Enter Some Value to Search");
-      return
-    }
-    else {
+      return;
+    } else {
       const data = {
-        "fullName": inputValue.userName,
-        "page": first,
-        "pageSize": rows,
-        "userRole": inputValue.userRole,
-        "startDate": inputValue.startDate,
-        "endDate": inputValue.endDate
-      }
+        fullName: inputValue.userName,
+        page: first,
+        pageSize: rows,
+        userRole: inputValue.userRole,
+        startDate: inputValue.startDate,
+        endDate: inputValue.endDate,
+      };
       try {
         const search = await axiosInstance.get("/emp", {
-          params: data
-        })
+          params: data,
+        });
         setUsers(search.data.data);
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
       }
 
@@ -115,7 +117,7 @@ function UserData() {
       };
       console.log(updatedFormData);
     }
-  }
+  };
 
   const fetchData = async () => {
     try {
@@ -143,14 +145,18 @@ function UserData() {
   };
 
   return (
-    <PrimeReactProvider value={{ unstyled: false }} >
+    <PrimeReactProvider value={{ unstyled: false }}>
       <TopNabvar />
       <Sidebar />
       <div className="MainContainer">
         <div className="container-fluid">
           <div className="row my-3">
             <div className="col-3">
-              <input type="text" className="form-control" id="userName" placeholder="Full Name"
+              <input
+                type="text"
+                className="form-control"
+                id="userName"
+                placeholder="Full Name"
                 value={inputValue.firstName}
                 onChange={handleInputChange}
               />
@@ -169,17 +175,31 @@ function UserData() {
               />
             </div>
             <div className="col-2">
-              <input type="date" className="form-control" id="startDate" value={inputValue.startDate}
-                onChange={(e) => handleInputChange(e)} />
+              <input
+                type="date"
+                className="form-control"
+                id="startDate"
+                value={inputValue.startDate}
+                onChange={(e) => handleInputChange(e)}
+              />
             </div>
             <div className="col-2">
-              <input type="date" className="form-control" id="endDate"
+              <input
+                type="date"
+                className="form-control"
+                id="endDate"
                 value={inputValue.endDate}
                 onChange={(e) => handleInputChange(e)}
               />
             </div>
             <div className="col-2">
-              <button type="button" className="btn btn-outline-primary w-100" onClick={SearchResults}>Search</button>
+              <button
+                type="button"
+                className="btn btn-outline-primary w-100"
+                onClick={SearchResults}
+              >
+                Search
+              </button>
             </div>
           </div>
         </div>
@@ -198,8 +218,7 @@ function UserData() {
                 </ol>
               </div>
               <div className="col-4"></div>
-              <div className="col-4">
-              </div>
+              <div className="col-4"></div>
             </div>
           </nav>
         </div>
@@ -218,13 +237,14 @@ function UserData() {
               <th scope="col">Job Role</th>
               <th scope="col">User Role</th>
               <th scope="col">Action</th>
-            </tr >
-          </thead >
+            </tr>
+          </thead>
           <tbody>
             {users.length === 0 ? (
               <tr>
-                <td colSpan="12" className="fs-5 text-center">No records found </td>
-
+                <td colSpan="12" className="fs-5 text-center">
+                  No records found{" "}
+                </td>
               </tr>
             ) : (
               users.map((user, index) => (
@@ -235,19 +255,22 @@ function UserData() {
                   <td>{user.state}</td>
                   <td>{user.city}</td>
                   <td>
-                    {user.pastExperience.map((experience, expIndex) => (
-                      <div key={expIndex}>{experience.companyName}</div>
-                    ))}
+                    {Array.isArray(user.pastExperience) &&
+                      user.pastExperience.map((experience, expIndex) => (
+                        <div key={expIndex}>{experience.companyName}</div>
+                      ))}
                   </td>
                   <td>
-                    {user.pastExperience.map((experience, expIndex) => (
-                      <div key={expIndex}>{experience.startDate}</div>
-                    ))}
+                    {Array.isArray(user.pastExperience) &&
+                      user.pastExperience.map((experience, expIndex) => (
+                        <div key={expIndex}>{experience.startDate}</div>
+                      ))}
                   </td>
                   <td>
-                    {user.pastExperience.map((experience, expIndex) => (
-                      <div key={expIndex}>{experience.endDate}</div>
-                    ))}
+                    {Array.isArray(user.pastExperience) &&
+                      user.pastExperience.map((experience, expIndex) => (
+                        <div key={expIndex}>{experience.endDate}</div>
+                      ))}
                   </td>
                   <td>{user.jobRole}</td>
                   <td>
@@ -272,17 +295,21 @@ function UserData() {
                       />
                     </div>
                   </td>
-                </tr >
+                </tr>
               ))
-            )
-            }
-          </tbody >
-        </table >
-        <div className="position-absolute top-100 start-50 translate-middle">
-          <Paginator first={first} rows={rows} totalRecords={100} 
-            rowsPerPageOptions={[5, 10, 20]} onPageChange={onPageChange} />
+            )}
+          </tbody>
+        </table>
+        <div className="position-absolute bottom-0 start-50 translate-middle">
+          <Paginator
+            first={first}
+            rows={rows}
+            totalRecords={100}
+            rowsPerPageOptions={[5, 10, 20]}
+            onPageChange={onPageChange}
+          />
         </div>
-      </div >
+      </div>
     </PrimeReactProvider>
   );
 }

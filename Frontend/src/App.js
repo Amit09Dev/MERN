@@ -8,6 +8,7 @@ import BasicDemo from './Component/test';
 
 
 function App() {
+
   return (
     <Router>
       <div className="app">
@@ -19,7 +20,7 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/test" element={<BasicDemo />} />
             <Route path="/userForm/:id" element={<UserForm />} />
-            <Route path="/" element={<Signup />} />
+            <Route path="/" element={<Login />} />
           </Routes>
         </div>
       </div>

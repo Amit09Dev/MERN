@@ -1,3 +1,11 @@
-.p-dropdown-items{
-    padding-left: 0 !important;
+.table-container {
+    overflow-y: auto;
+    max-height: calc(100vh - 200px);
+  }ul.p-dropdown-items{
+    padding-left: 0px !important;
+}
+
+.p-highlight{
+    background-color: #06b6d4 !important;
+    color: #ffff !important;
 }

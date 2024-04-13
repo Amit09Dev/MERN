@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -11,17 +11,20 @@ import Select from "react-select";
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 import { PrimeReactProvider } from "primereact/api";
 import { Paginator } from "primereact/paginator";
+import "./UserList.css"
+
 
 function UserData() {
-  const deletenotify = () => toast.error("Data delete Successfully");
+
   const [users, setUsers] = useState([]);
   const [first, setFirst] = useState(1);
-  const [rows, setRows] = useState(10);
+  const [rows, setRows] = useState(5);
+  const [totalRecords, setTotalRecords] = useState(1);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const animatedComponents = makeAnimated();
+  const navigate = useNavigate();
+  const [RoleList, setRoleList] = useState([]);
 
-  const onPageChange = (event) => {
-    setFirst(event.first / event.rows + 1);
-    setRows(event.rows);
-  };
 
   const [inputValue, setInputValue] = useState({
     userName: "",
@@ -29,41 +32,34 @@ function UserData() {
     startDate: "",
     endDate: "",
   });
-  const [selectedOption, setSelectedOption] = useState(null);
-  const navigate = useNavigate();
+
+  const onPageChange = (event) => {
+    setFirst(event.first);
+    setRows(event.rows);
+  };
+
 
   const getData = async () => {
     const data = {
-      page: first,
+      page: (first / rows + 1),
       pageSize: rows,
+      ...inputValue
     };
     try {
       const result = await axiosInstance.get("/emp", {
         params: data,
       });
-      const elems = document.querySelectorAll(".p-highlight");
-      elems.forEach.call(elems, function (el) {
-        el.classList.remove("p-highlight");
-      });
-      var activeElem = document.querySelector(`[aria-label= "Page ${first}" ]`);
-      activeElem.classList.add("p-highlight");
-      console.log(result.data.page);
       setUsers(result.data.data);
+      setTotalRecords(result.data.totalRecords);
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
+    RoleData();
     getData();
   }, [first, rows]);
-
-  const animatedComponents = makeAnimated();
-  const RoleList = [
-    { value: "User", label: "User" },
-    { value: "Admin", label: "Admin" },
-    { value: "Super Admin", label: "Super Admin" },
-  ];
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
@@ -71,9 +67,20 @@ function UserData() {
       ...inputValue,
       [id]: value,
     });
-    console.log(inputValue);
   };
-
+  const RoleData = async () => {
+    try {
+      const response = await axiosInstance.get("/role");
+      const formattedRoles = response.data.map(role => ({
+        value: role.role_id,
+        label: role.role
+      }));
+      console.log(response.data);
+      setRoleList([...formattedRoles]);
+    } catch (error) {
+      console.error("Error fetching role data:", error);
+    }
+  }
   const handleChange = (selectedOption) => {
     setSelectedOption(selectedOption);
     const selectedValues = selectedOption
@@ -92,16 +99,14 @@ function UserData() {
       inputValue.startDate === "" &&
       inputValue.endDate === ""
     ) {
-      toast.warn("Enter Some Value to Search");
+      toast.warn("Enter Value to Search");
       return;
     } else {
       const data = {
         fullName: inputValue.userName,
-        page: first,
+        page: (first / rows + 1),
         pageSize: rows,
-        userRole: inputValue.userRole,
-        startDate: inputValue.startDate,
-        endDate: inputValue.endDate,
+        ...inputValue
       };
       try {
         const search = await axiosInstance.get("/emp", {
@@ -115,7 +120,6 @@ function UserData() {
       const updatedFormData = {
         ...inputValue,
       };
-      console.log(updatedFormData);
     }
   };
 
@@ -123,7 +127,6 @@ function UserData() {
     try {
       const response = await axiosInstance.get("/emp");
       setUsers(response.data);
-      console.log(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -133,7 +136,7 @@ function UserData() {
     try {
       await axiosInstance.delete(`/emp/${id}`);
       getData();
-      deletenotify();
+      toast.success("Data delete Successfully");
       await fetchData();
     } catch (error) {
       console.error("Error deleting user:", error);
@@ -223,92 +226,92 @@ function UserData() {
           </nav>
         </div>
 
-        <table className="table table-striped p-3 shadow-sm">
-          <thead>
-            <tr>
-              <th scope="col">Name</th>
-              <th scope="col">Email</th>
-              <th scope="col">Address</th>
-              <th scope="col">State</th>
-              <th scope="col">City</th>
-              <th scope="col">Company Name</th>
-              <th scope="col">Start Date</th>
-              <th scope="col">End Date</th>
-              <th scope="col">Job Role</th>
-              <th scope="col">User Role</th>
-              <th scope="col">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.length === 0 ? (
+        <div className="table-container">
+          <table className="table table-striped p-3 shadow-sm" id="tableContent">
+            <thead className="">
               <tr>
-                <td colSpan="12" className="fs-5 text-center">
-                  No records found{" "}
-                </td>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Address</th>
+                <th scope="col">State</th>
+                <th scope="col">City</th>
+                <th scope="col">Company Name</th>
+                <th scope="col">Start Date</th>
+                <th scope="col">End Date</th>
+                <th scope="col">Job Role</th>
+                <th scope="col">User Role</th>
+                <th scope="col">Action</th>
               </tr>
-            ) : (
-              users.map((user, index) => (
-                <tr key={index}>
-                  <td>{user.firstName + " " + user.lastName}</td>
-                  <td>{user.email}</td>
-                  <td>{user.address}</td>
-                  <td>{user.state}</td>
-                  <td>{user.city}</td>
-                  <td>
-                    {Array.isArray(user.pastExperience) &&
-                      user.pastExperience.map((experience, expIndex) => (
-                        <div key={expIndex}>{experience.companyName}</div>
-                      ))}
-                  </td>
-                  <td>
-                    {Array.isArray(user.pastExperience) &&
-                      user.pastExperience.map((experience, expIndex) => (
-                        <div key={expIndex}>{experience.startDate}</div>
-                      ))}
-                  </td>
-                  <td>
-                    {Array.isArray(user.pastExperience) &&
-                      user.pastExperience.map((experience, expIndex) => (
-                        <div key={expIndex}>{experience.endDate}</div>
-                      ))}
-                  </td>
-                  <td>{user.jobRole}</td>
-                  <td>
-                    {user.userRole.map((role, roleIndex) => (
-                      <div key={roleIndex}>{role}</div>
-                    ))}
-                  </td>
-
-                  <td>
-                    <div>
-                      <Link to={`/userForm/${user._id}`}>
-                        <FontAwesomeIcon
-                          icon={faEdit}
-                          className="btn mr-2 me-2"
-                          onClick={() => getUserId(user._id)}
-                        />
-                      </Link>
-                      <FontAwesomeIcon
-                        icon={faTrashAlt}
-                        className="btn"
-                        onClick={() => deleteUser(user._id)}
-                      />
-                    </div>
+            </thead>
+            <tbody>
+              {users.length === 0 ? (
+                <tr>
+                  <td colSpan="12" className="fs-5 text-center">
+                    No records found{" "}
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-        <div className="position-absolute bottom-0 start-50 translate-middle">
-          <Paginator
-            first={first}
-            rows={rows}
-            totalRecords={100}
-            rowsPerPageOptions={[5, 10, 20]}
-            onPageChange={onPageChange}
-          />
+              ) : (
+                users.map((user, index) => (
+                  <tr key={index}>
+                    <td>{user.firstName + " " + user.lastName}</td>
+                    <td>{user.email}</td>
+                    <td>{user.address}</td>
+                    <td>{user.state}</td>
+                    <td>{user.city}</td>
+                    <td>
+                      {user.pastExperience.map((experience, expIndex) => (
+                          <div key={expIndex}>{experience.companyName}</div>
+                        ))}
+                    </td>
+                    <td>
+                      {user.pastExperience.map((experience, expIndex) => (
+                          <div key={expIndex}>{experience.startDate}</div>
+                        ))}
+                    </td>
+                    <td>
+                      {user.pastExperience.map((experience, expIndex) => (
+                          <div key={expIndex}>{experience.endDate}</div>
+                        ))}
+                    </td>
+                    <td>{user.jobRole}</td>
+                    <td>
+                      {user.userRole.map((role, roleIndex) => (
+                        <div key={roleIndex}>{role}</div>
+                      ))}
+                    </td>
+
+                    <td>
+                      <div>
+                        <Link to={`/userForm/${user._id}`}>
+                          <FontAwesomeIcon
+                            icon={faEdit}
+                            className="btn mr-2 me-2"
+                            onClick={() => getUserId(user._id)}
+                          />
+                        </Link>
+                        <FontAwesomeIcon
+                          icon={faTrashAlt}
+                          className="btn"
+                          onClick={() => deleteUser(user._id)}
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
+      </div>
+      <div className="position-absolute bottom-0 start-50 translate-middle">
+        <Paginator
+          first={first}
+          rows={rows}
+          totalRecords={totalRecords}
+          rowsPerPageOptions={[5, 10, 20]}
+          onPageChange={onPageChange}
+          template={{ layout: `PrevPageLink PageLinks NextPageLink  RowsPerPageDropdown` }}
+        />
       </div>
     </PrimeReactProvider>
   );

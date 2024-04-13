@@ -48,6 +48,7 @@ function UserForm() {
       ...formData,
       userRole: selectedValues,
     });
+    
   };
 
   const handleEmailCheck = async (e) => {
@@ -146,10 +147,12 @@ function UserForm() {
       ...formData,
       [id]: value,
     });
+
     setErrors((old) => {
       return { ...old, [id]: "" };
     });
   };
+
   const handleColorChange = (e) => {
     const { value } = e.target;
     setFormData({
@@ -243,11 +246,10 @@ function UserForm() {
           field === "firstName"
             ? "First name"
             : field === "lastName"
-            ? "Last name"
-            : field;
-        errors[field] = `${
-          fieldName.charAt(0).toUpperCase() + fieldName.slice(1)
-        } is required`;
+              ? "Last name"
+              : field;
+        errors[field] = `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)
+          } is required`;
       }
     });
 
@@ -457,9 +459,8 @@ function UserForm() {
                 </label>{" "}
                 <span>*</span>
                 <select
-                  className={`form-select ${
-                    errors.jobRole ? "is-invalid" : ""
-                  }`}
+                  className={`form-select ${errors.jobRole ? "is-invalid" : ""
+                    }`}
                   id="jobRole"
                   value={formData.jobRole}
                   onChange={handleSelectChange}

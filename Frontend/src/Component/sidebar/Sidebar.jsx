@@ -22,76 +22,76 @@ function Sidebar() {
                 </li>
                 <li className="d-flex align-items-center my-2">
                     <i className="bi bi-layout-split me-2"></i>
-                    <Link to="/" >Pages</Link>
+                    <Link >Pages</Link>
                     <i className="fa-angle-right fa ms-auto fa-xs fa me-2"></i>
                 </li>
                 <li className="d-flex align-items-center my-2">
                     <i className="bi bi-shield-check me-2"></i>
-                    <Link to="/" >Authentications</Link>
+                    <Link  >Authentications</Link>
                     <i className="fa-angle-right fa ms-auto fa-xs fa me-2"></i>
                 </li>
                 <li className="d-flex align-items-center my-2">
                     <i className="bi bi-layout-text-window me-2"></i>
-                    <Link to="/" >Wizard Examples</Link>
+                    <Link  >Wizard Examples</Link>
                     <i className="fa-angle-right fa ms-auto fa-xs fa me-2"></i>
                 </li>
                 <li className="d-flex align-items-center my-2">
                     <i className="bi bi-box-arrow-in-down me-2"></i>
-                    <Link to="/">Modal Examples</Link>
+                    <Link >Modal Examples</Link>
                 </li>
                 <li className="d-flex align-items-center my-2">
                     <i className="bi bi-card-heading me-2"></i>
-                    <Link to="/" >Cards</Link>
+                    <Link  >Cards</Link>
                     <i className="fa-angle-right fa ms-auto fa-xs fa me-2"></i>
                 </li>
                 <li className="d-flex align-items-center my-2">
                     <i className="bi bi-archive me-2"></i>
-                    <Link to="/" >User Interface</Link>
+                    <Link  >User Interface</Link>
                     <i className="fa-angle-right fa ms-auto fa-xs fa me-2"></i>
                 </li>
                 <li className="d-flex align-items-center my-2">
                     <i className="bi bi-archive me-2"></i>
-                    <Link to="/" >Extended UI</Link>
+                    <Link  >Extended UI</Link>
                     <i className="fa-angle-right fa ms-auto fa-xs fa me-2"></i>
                 </li>
                 <li className="d-flex align-items-center my-2">
                     <i className="bi bi-layout-text-sidebar me-2"></i>
-                    <Link to="/" >Icons</Link>
+                    <Link  >Icons</Link>
                     <i className="fa-angle-right fa ms-auto fa-xs fa me-2"></i>
                 </li>
                 <li className="d-flex align-items-center my-2">
                     <i className="bi bi-archive me-2"></i>
-                    <Link to="/" >Forms Elements</Link>
+                    <Link  >Forms Elements</Link>
                     <i className="fa-angle-right fa ms-auto fa-xs fa me-2"></i>
                 </li>
                 <li className="d-flex align-items-center my-2">
                     <i className="bi bi-file-text me-2"></i>
-                    <Link to="/" >Form Layouts</Link>
+                    <Link  >Form Layouts</Link>
                     <i className="fa-angle-right fa ms-auto fa-xs fa me-2"></i>
                 </li>
                 <li className="d-flex align-items-center my-2">
                     <i className="bi bi-layout-text-sidebar me-2"></i>
-                    <Link to="/" >Form Wizard</Link>
+                    <Link  >Form Wizard</Link>
                     <i className="fa-angle-right fa ms-auto fa-xs fa me-2"></i>
                 </li>
                 <li className="d-flex align-items-center my-2">
                     <i className="bi bi-pencil-square me-2"></i>
-                    <Link to="/" >Form Validation</Link>
+                    <Link  >Form Validation</Link>
                     <i className="fa-angle-right fa ms-auto fa-xs fa me-2"></i>
                 </li>
                 <li className="d-flex align-items-center my-2">
                     <i className="bi bi-table me-2"></i>
-                    <Link to="/" >Tables</Link>
+                    <Link  >Tables</Link>
                     <i className="fa-angle-right fa ms-auto fa-xs fa me-2"></i>
                 </li>
                 <li className="d-flex align-items-center my-2">
                     <i className="bi bi-grid-3x3 me-2"></i>
-                    <Link to="/" >Datatables</Link>
+                    <Link  >Datatables</Link>
                     <i className="fa-angle-right fa ms-auto fa-xs fa me-2"></i>
                 </li>
                 <li className="d-flex align-items-center my-2">
                     <i className="bi bi-graph-up me-2"></i>
-                    <Link to="/" >Charts</Link>
+                    <Link  >Charts</Link>
                     <i className="fa-angle-right fa ms-auto fa-xs fa me-2"></i>
                 </li>
             </ul>

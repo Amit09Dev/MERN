@@ -1,19 +1,17 @@
 import './Signup.css';
-import { Link } from "react-router-dom"
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/Axios";
 
 function Signup() {
     const navigate = useNavigate();
+    const [error, setError] = useState("");
     const [inputValue, setInputValue] = useState({
         email: "",
         password: "",
         confirmPassword: ""
     })
-
-    const [error, setError] = useState("");
 
     const handleInputChange = (e) => {
         const { id, value } = e.target;
@@ -24,19 +22,23 @@ function Signup() {
         setError({})
     };
 
-  useEffect(()=>{
-    clearToken();
-  },[])
     const clearToken = () => {
-        if (localStorage.getItem("token")) {
-            localStorage.removeItem("token");
-        }
+            localStorage.clear();
+
     }
+
+    useEffect(() => {
+        clearToken();
+    }, [])
+
     const verifyRegister = async () => {
         const result = validateInput(inputValue);
+        if (Object.keys(result).length > 0) {
+            return;
+        }
         try {
             const signup = await axiosInstance.post("/register", inputValue);
-            if(signup.status === 200) {
+            if (signup.status === 200) {
                 toast.success("Registered Succesfully")
                 navigate("/login");
             }

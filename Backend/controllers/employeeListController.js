@@ -27,7 +27,6 @@ const allEmployeeList = async (req, res) => {
   try {
     const pageSize = parseInt(req.query.pageSize);
     const _loginEmployeeId = req.loginEmployeeId;
-
     let aggregationPipeline = [
       {
         $match: {
@@ -60,6 +59,7 @@ const allEmployeeList = async (req, res) => {
         },
       });
     }
+
     const startDateStr = req.query.startDate;
     const endDateStr = req.query.endDate;
 
@@ -72,12 +72,59 @@ const allEmployeeList = async (req, res) => {
           $match: {
             "pastExperience.startDate": {
               $gte: startDate,
-              $lt: endDate,
+              $lte: endDate,
             },
+          },
+        },
+        {
+          $group: {
+            _id: "$_id",
+            firstName: { $first: "$firstName" },
+            lastName: { $first: "$lastName" },
+            email: { $first: "$email" },
+            address: { $first: "$address" },
+            state: { $first: "$state" },
+            city: { $first: "$city" },
+            zip: { $first: "$zip" },
+            jobRole: { $first: "$jobRole" },
+            userRole: { $first: "$userRole" },
+            color: { $first: "$color" },
+            loginEmployeeId: { $first: "$loginEmployeeId" },
+            pastExperience: { $push: "$pastExperience" },
           },
         }
       );
     }
+    
+    // Add the $lookup stage to join with the roles collection
+    // aggregationPipeline.push(
+    //   {
+    //     $lookup: {
+    //       from: "roles",
+    //       localField: "userRole",
+    //       foreignField: "_id",
+    //       as: "userRoleDetails"
+    //     }
+    //   },
+    //   {
+    //     $project: {
+    //       _id: 1,
+    //       firstName: 1,
+    //       lastName: 1,
+    //       email: 1,
+    //       address: 1,
+    //       state: 1,
+    //       city: 1,
+    //       zip: 1,
+    //       jobRole: 1,
+    //       color: 1,
+    //       loginEmployeeId: 1,
+    //       pastExperience: 1,
+    //       // Replace userRole with role names from userRoleDetails
+    //       userRole: "$userRoleDetails.role",
+    //     }
+    //   }
+    // );
 
     const countPipeline = [
       { $match: { loginEmployeeId: _loginEmployeeId } },
@@ -86,10 +133,7 @@ const allEmployeeList = async (req, res) => {
     ];
 
     const totalEmployees = await Employee.aggregate(countPipeline).exec();
-
-    const totalDocuments =
-      totalEmployees.length > 0 ? totalEmployees[0].total : 0;
-    const totalPages = Math.ceil(totalDocuments / pageSize);
+    const totalDocuments = totalEmployees.length > 0 ? totalEmployees[0].total : 0;
 
     const page = parseInt(req.query.page) || 1;
     const startIndex = page * pageSize - pageSize;
@@ -97,26 +141,116 @@ const allEmployeeList = async (req, res) => {
     aggregationPipeline.push(...filters);
 
     aggregationPipeline.push(
-      {
-        $skip: startIndex,
-      },
-      {
-        $limit: pageSize,
-      }
+      { $skip: startIndex },
+      { $limit: pageSize }
     );
 
     const employees = await Employee.aggregate(aggregationPipeline).exec();
+    console.log(employees);
     const data = {
       data: employees,
-      totalPages: totalPages,
+      totalRecords: totalDocuments,
     };
-    console.log(totalPages);
     res.status(200).json(data);
   } catch (error) {
-    console.error(error); // Log the error for debugging purposes
+    console.error(error);
     res.status(400).send({ success: false, msg: error.message });
   }
 };
+
+// const allEmployeeList = async (req, res) => {
+//   try {
+//     const pageSize = parseInt(req.query.pageSize);
+//     const _loginEmployeeId = req.loginEmployeeId;
+
+//     let aggregationPipeline = [
+//       {
+//         $match: {
+//           loginEmployeeId: _loginEmployeeId,
+//         },
+//       },
+//     ];
+
+//     const filters = [];
+
+//     const fullName = req.query.fullName;
+//     if (fullName) {
+//       const [firstName, lastName] = fullName.split(" ");
+//       filters.push({
+//         $match: {
+//           $and: [
+//             { firstName: { $regex: new RegExp(firstName, "i") } },
+//             { lastName: { $regex: new RegExp(lastName, "i") } },
+//           ],
+//         },
+//       });
+//     }
+
+//     const userRoles = req.query.userRole;
+//     if (userRoles && userRoles.length > 0) {
+//       const roleMatches = userRoles.map((role) => ({ userRole: role }));
+//       filters.push({
+//         $match: {
+//           $and: roleMatches,
+//         },
+//       });
+//     }
+//     const startDateStr = req.query.startDate;
+//     const endDateStr = req.query.endDate;
+
+//     if (startDateStr && endDateStr) {
+//       const startDate = new Date(startDateStr).toISOString();
+//       const endDate = new Date(endDateStr).toISOString();
+//       filters.push(
+//         { $unwind: "$pastExperience" },
+//         {
+//           $match: {
+//             "pastExperience.startDate": {
+//               $gte: startDate,
+//               $lt: endDate,
+//             },
+//           },
+//         }
+//       );
+//     }
+
+//     const countPipeline = [
+//       { $match: { loginEmployeeId: _loginEmployeeId } },
+//       ...filters,
+//       { $count: "total" },
+//     ];
+
+//     const totalEmployees = await Employee.aggregate(countPipeline).exec();
+
+//     const totalDocuments = totalEmployees.length > 0 ? totalEmployees[0].total : 0;
+//     // const totalPages = Math.ceil(totalDocuments / pageSize);
+
+//     const page = parseInt(req.query.page) || 1;
+//     const startIndex = page * pageSize - pageSize;
+
+//     aggregationPipeline.push(...filters);
+
+//     aggregationPipeline.push(
+//       {
+//         $skip: startIndex,
+//       },
+//       {
+//         $limit: pageSize,
+//       }
+//     );
+
+//     const employees = await Employee.aggregate(aggregationPipeline).exec();
+//     const data = {
+//       data: employees,
+//       totalRecords: totalDocuments,
+//     };
+//     console.log(totalDocuments);
+//     res.status(200).json(data);
+//   } catch (error) {
+//     console.error(error); // Log the error for debugging purposes
+//     res.status(400).send({ success: false, msg: error.message });
+//   }
+// };
 
 // const allEmployeeList = async (req, res) => {
 //   try {

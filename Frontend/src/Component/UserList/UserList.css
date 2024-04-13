@@ -1,8 +1,18 @@
-ul.p-dropdown-items{
+.table-container {
+    overflow-y: auto;
+    max-height: calc(92vh - 200px) !important;
+}
+
+ul.p-dropdown-items {
     padding-left: 0px !important;
 }
 
-.p-highlight{
+.p-highlight {
     background-color: #06b6d4 !important;
     color: #ffff !important;
+}
+
+.table-container th {
+    position: sticky;
+    top: 0;
 }

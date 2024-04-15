@@ -28,7 +28,7 @@ function UserForm() {
     startDate: "",
     endDate: "",
   };
- 
+
   const [RoleList, setRoleList] = useState([]);
   const [formData, setFormData] = useState(userFormData);
   const [errors, setErrors] = useState({});
@@ -110,15 +110,10 @@ function UserForm() {
             zip: data.zip || "",
             jobRole: data.jobRole || "",
             color: data.color
-            
+
           });
-          // console.log(data);
-          const selectedRoles = data.userRole.map((role) =>
-            RoleList.find((r) => r.label === role.label)
-          );
-          console.log(RoleList)
-          console.log(selectedRoles);
-          setSelectedOption(selectedRoles);
+          setSelectedOption(data.userRole);
+          // setRoleList(data.allRoles.map(role => ({ value: role.value, label: role.label })));
           const pastExperiences = data.pastExperience.map((experience) => ({
             id: experience.id,
             companyName: experience.companyName || "",
@@ -129,6 +124,7 @@ function UserForm() {
         })
         .catch((error) => {
           console.error("Error fetching user data:", error);
+          console.log('Error Response:', error.response); 
         });
     }
   }, [id]);
@@ -242,11 +238,10 @@ function UserForm() {
           field === "firstName"
             ? "First name"
             : field === "lastName"
-            ? "Last name"
-            : field;
-        errors[field] = `${
-          fieldName.charAt(0).toUpperCase() + fieldName.slice(1)
-        } is required`;
+              ? "Last name"
+              : field;
+        errors[field] = `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)
+          } is required`;
       }
     });
 
@@ -275,8 +270,9 @@ function UserForm() {
     setFormData(userFormData);
     setErrors({});
     setGridList([initialGridState]);
-    selectedOption("");
+    setSelectedOption('');
     setRoleList("");
+
     document.getElementById("email").classList.remove("is-invalid", "is-valid");
   };
   const insertnotify = () => toast.success("Data insert Successfully");
@@ -459,9 +455,8 @@ function UserForm() {
                 </label>{" "}
                 <span>*</span>
                 <select
-                  className={`form-select ${
-                    errors.jobRole ? "is-invalid" : ""
-                  }`}
+                  className={`form-select ${errors.jobRole ? "is-invalid" : ""
+                    }`}
                   id="jobRole"
                   value={formData.jobRole}
                   onChange={handleSelectChange}

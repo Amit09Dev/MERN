@@ -82,12 +82,10 @@ function UserForm() {
   const RoleData = async () => {
     try {
       const response = await axiosInstance.get("/role");
-      console.log(response.data);
       const formattedRoles = response.data.map((role) => ({
-        value: role.role_id,
-        label: role.role,
+        value: role._id,
+        label: role.role
       }));
-      console.log(response.data);
       setRoleList([...formattedRoles]);
     } catch (error) {
       console.error("Error fetching role data:", error);
@@ -101,7 +99,6 @@ function UserForm() {
         .get(`/emp/${id}`)
         .then((response) => {
           const data = response.data;
-          console.log("updated data ", data);
           setFormData({
             firstName: data.firstName || "",
             lastName: data.lastName || "",
@@ -113,6 +110,7 @@ function UserForm() {
             jobRole: data.jobRole || "",
             color: data.color,
           });
+          console.log(data);
           const selectedRoles = data.userRole.map((role) =>
             RoleList.find((r) => r.value === role)
           );
@@ -172,16 +170,10 @@ function UserForm() {
           insertnotify();
           resetForm();
         } else {
-          console.log("Update Function data is valid:", updatedFormData);
-          const response = await axiosInstance.patch(
-            `/emp/${id}`,
-            updatedFormData
-          );
-          console.log(response.data);
+          await axiosInstance.patch( `/emp/${id}`, updatedFormData);
           updatenotify();
           resetForm();
           navigate("/userlist");
-          console.log("Response:", response.data);
         }
       } catch (error) {
         console.error("Error:", error);

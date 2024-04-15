@@ -75,7 +75,6 @@ function UserData() {
         value: role.role_id,
         label: role.role
       }));
-      console.log(response.data);
       setRoleList([...formattedRoles]);
     } catch (error) {
       console.error("Error fetching role data:", error);

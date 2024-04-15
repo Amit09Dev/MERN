@@ -1,4 +1,5 @@
 const { Employee, Role } = require("../models/EmployeeModel");
+const mongoose = require('mongoose');
 
 const jwt = require("jsonwebtoken");
 
@@ -15,6 +16,7 @@ const newEmployeeAdd = async (req, res) => {
       res.status(409).json({ message: "Email has already been used" });
     } else {
       newEmpData.loginEmployeeId = req.loginEmployeeId;
+      newEmpData.userRole = newEmpData.userRole.map(str => new mongoose.Types.ObjectId(str));
       const _newEmpData = await Employee.create(newEmpData);
       res.status(200).json(_newEmpData);
     }
@@ -33,6 +35,51 @@ const allEmployeeList = async (req, res) => {
           loginEmployeeId: _loginEmployeeId,
         },
       },
+      {
+        $unwind: "$userRole",
+      },
+      {
+        $lookup: {
+          from: "roles",
+          localField: "userRole",
+          foreignField: "_id",
+          as: "Uroles",
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          firstName: { $first: "$firstName" },
+          lastName: { $first: "$lastName" },
+          email: { $first: "$email" },
+          address: { $first: "$address" },
+          state: { $first: "$state" },
+          city: { $first: "$city" },
+          zip: { $first: "$zip" },
+          jobRole: { $first: "$jobRole" },
+          userRole: { $push: "$Uroles.role" },
+          color: { $first: "$color" },
+          loginEmployeeId: { $first: "$loginEmployeeId" },
+          pastExperience: { $first: "$pastExperience" },
+        }
+      }, 
+      {
+        $project: {
+          _id: 1,
+          firstName: 1,
+          lastName: 1,
+          email: 1,
+          address: 1,
+          state: 1,
+          city: 1,
+          zip: 1,
+          jobRole: 1,
+          color: 1,
+          loginEmployeeId: 1,
+          pastExperience: 1,
+          userRole: 1,
+        }
+      }
     ];
 
     const filters = [];
@@ -146,7 +193,6 @@ const allEmployeeList = async (req, res) => {
     );
 
     const employees = await Employee.aggregate(aggregationPipeline).exec();
-    console.log(employees);
     const data = {
       data: employees,
       totalRecords: totalDocuments,
@@ -354,6 +400,8 @@ const allEmployeeList = async (req, res) => {
 const employeeById = async (req, res) => {
   try {
     const employee = await Employee.findById({ _id: req.params.id });
+    employee.userRole = employee.userRole.map((role) => role.toString());
+    console.log(employee);
     res.status(200).json(employee);
   } catch (error) {
     res.status(400).send({ success: false, msg: error.message });
@@ -379,6 +427,7 @@ const updateEmployee = async (req, res) => {
     if (existingEmail) {
       res.status(409).json({ message: "Email has already been used" });
     } else {
+      const newUserRole = req.body.userRole.map(str => new mongoose.Types.ObjectId(str));
       const updatedEmployee = await Employee.findOneAndUpdate(
         { _id: req.params.id },
         {
@@ -390,7 +439,7 @@ const updateEmployee = async (req, res) => {
           city: req.body.city,
           zip: req.body.zip,
           jobRole: req.body.jobRole,
-          userRole: req.body.userRole,
+          userRole: newUserRole,
           loginEmployeeID: req.loginEmployeeId,
           pastExperience: req.body.pastExperience,
         },
@@ -405,9 +454,7 @@ const updateEmployee = async (req, res) => {
 
 const getUserRole = async (req, res) => {
   try {
-    console.log("Fetching roles...");
     const roles = await Role.find({});
-    console.log("Roles", roles);
     res.status(200).json(roles);
   } catch (error) {
     res.status(400).send({ success: false, msg: error.message });

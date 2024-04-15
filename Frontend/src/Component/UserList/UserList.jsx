@@ -71,15 +71,16 @@ function UserData() {
   const RoleData = async () => {
     try {
       const response = await axiosInstance.get("/role");
-      const formattedRoles = response.data.map(role => ({
-        value: role.role_id,
-        label: role.role
+      const formattedRoles = response.data.map((role) => ({
+        value: role._id,
+        label: role.role,
       }));
       setRoleList([...formattedRoles]);
+      console.log(formattedRoles);
     } catch (error) {
       console.error("Error fetching role data:", error);
     }
-  }
+  };
   const handleChange = (selectedOption) => {
     setSelectedOption(selectedOption);
     const selectedValues = selectedOption
@@ -103,10 +104,11 @@ function UserData() {
     } else {
       const data = {
         fullName: inputValue.userName,
-        page: (first / rows + 1),
+        page: Math.floor((first / rows + 1)),
         pageSize: rows,
         ...inputValue
       };
+      console.log(data);
       try {
         const search = await axiosInstance.get("/emp", {
           params: data,

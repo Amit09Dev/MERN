@@ -28,6 +28,7 @@ function UserForm() {
     startDate: "",
     endDate: "",
   };
+ 
   const [RoleList, setRoleList] = useState([]);
   const [formData, setFormData] = useState(userFormData);
   const [errors, setErrors] = useState({});
@@ -48,7 +49,6 @@ function UserForm() {
       ...formData,
       userRole: selectedValues,
     });
-    
   };
 
   const handleEmailCheck = async (e) => {
@@ -58,7 +58,7 @@ function UserForm() {
     setIsEmailValid(isValid);
     if (email === "") {
       emailElm.classList.remove("is-invalid", "is-valid");
-      return
+      return;
     }
     if (!isValid && touched) {
       emailElm.classList.add("is-invalid");
@@ -67,7 +67,7 @@ function UserForm() {
     } else {
       try {
         const { data } = await axiosInstance.get("/checkEmail", {
-          params: { email },
+          params: { email, id },
         });
         const errorMessage = data.status ? "" : data.msg;
         setErrors({ ...errors, email: errorMessage });
@@ -84,9 +84,10 @@ function UserForm() {
       const response = await axiosInstance.get("/role");
       const formattedRoles = response.data.map((role) => ({
         value: role._id,
-        label: role.role
+        label: role.role,
       }));
       setRoleList([...formattedRoles]);
+      console.log(...formattedRoles);
     } catch (error) {
       console.error("Error fetching role data:", error);
     }
@@ -108,12 +109,15 @@ function UserForm() {
             city: data.city || "",
             zip: data.zip || "",
             jobRole: data.jobRole || "",
-            color: data.color,
+            color: data.color
+            
           });
-          console.log(data);
+          // console.log(data);
           const selectedRoles = data.userRole.map((role) =>
-            RoleList.find((r) => r.value === role)
+            RoleList.find((r) => r.label === role.label)
           );
+          console.log(RoleList)
+          console.log(selectedRoles);
           setSelectedOption(selectedRoles);
           const pastExperiences = data.pastExperience.map((experience) => ({
             id: experience.id,
@@ -170,7 +174,7 @@ function UserForm() {
           insertnotify();
           resetForm();
         } else {
-          await axiosInstance.patch( `/emp/${id}`, updatedFormData);
+          await axiosInstance.patch(`/emp/${id}`, updatedFormData);
           updatenotify();
           resetForm();
           navigate("/userlist");
@@ -238,10 +242,11 @@ function UserForm() {
           field === "firstName"
             ? "First name"
             : field === "lastName"
-              ? "Last name"
-              : field;
-        errors[field] = `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)
-          } is required`;
+            ? "Last name"
+            : field;
+        errors[field] = `${
+          fieldName.charAt(0).toUpperCase() + fieldName.slice(1)
+        } is required`;
       }
     });
 
@@ -270,6 +275,9 @@ function UserForm() {
     setFormData(userFormData);
     setErrors({});
     setGridList([initialGridState]);
+    selectedOption("");
+    setRoleList("");
+    document.getElementById("email").classList.remove("is-invalid", "is-valid");
   };
   const insertnotify = () => toast.success("Data insert Successfully");
   const updatenotify = () => toast.info("Data updated Successfully");
@@ -451,8 +459,9 @@ function UserForm() {
                 </label>{" "}
                 <span>*</span>
                 <select
-                  className={`form-select ${errors.jobRole ? "is-invalid" : ""
-                    }`}
+                  className={`form-select ${
+                    errors.jobRole ? "is-invalid" : ""
+                  }`}
                   id="jobRole"
                   value={formData.jobRole}
                   onChange={handleSelectChange}

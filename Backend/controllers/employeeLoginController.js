@@ -71,7 +71,6 @@ const verifyEmployeeLogin = async (req, res) => {
         res.status(409).json({ message: "Either Email or Password is incorrect" });
       }
     } else {
-      console.log("1");
       app.use(authenticateEmployee);
     }
   } catch (error) {

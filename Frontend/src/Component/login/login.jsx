@@ -55,6 +55,7 @@ const LoginForm = () => {
     }
     catch (error) {
       console.log(error);
+      toast.warn(error.response.data.message)
     }
 
     console.log(result);

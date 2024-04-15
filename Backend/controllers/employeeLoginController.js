@@ -63,12 +63,12 @@ const verifyEmployeeLogin = async (req, res) => {
 
               res.status(200).json({ token, msg: "login successful" });
             } else {
-              res.status(409).json({ message: "Incorrect Password" });
+              res.status(409).json({ message: "Either Email or Password is incorrect" });
             }
           }
         );
       } else {
-        res.status(409).json({ message: "Email is not registerd" });
+        res.status(409).json({ message: "Either Email or Password is incorrect" });
       }
     } else {
       console.log("1");
@@ -78,5 +78,4 @@ const verifyEmployeeLogin = async (req, res) => {
     res.status(400).send({ success: false, msg: error.message });
   }
 };
-
 module.exports = { newLoginEmployee, verifyEmployeeLogin };

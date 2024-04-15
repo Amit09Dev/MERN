@@ -27,7 +27,7 @@ function UserData() {
 
 
   const [inputValue, setInputValue] = useState({
-    userName: "",
+    fullName: "",
     userRole: [],
     startDate: "",
     endDate: "",
@@ -51,6 +51,7 @@ function UserData() {
       });
       setUsers(result.data.data);
       setTotalRecords(result.data.totalRecords);
+      console.log(result.data);
     } catch (error) {
       console.log(error);
     }
@@ -76,7 +77,6 @@ function UserData() {
         label: role.role,
       }));
       setRoleList([...formattedRoles]);
-      console.log(formattedRoles);
     } catch (error) {
       console.error("Error fetching role data:", error);
     }
@@ -84,7 +84,7 @@ function UserData() {
   const handleChange = (selectedOption) => {
     setSelectedOption(selectedOption);
     const selectedValues = selectedOption
-      ? selectedOption.map((option) => option.value)
+      ? selectedOption.map((option) => option.label)
       : [];
     setInputValue({
       ...inputValue,
@@ -94,8 +94,8 @@ function UserData() {
 
   const SearchResults = async () => {
     if (
-      inputValue.firstName === "" &&
-      inputValue.email === "" &&
+      inputValue.fullName === "" &&
+      inputValue.userRole === "" &&
       inputValue.startDate === "" &&
       inputValue.endDate === ""
     ) {
@@ -103,17 +103,17 @@ function UserData() {
       return;
     } else {
       const data = {
-        fullName: inputValue.userName,
+        fullName: inputValue.fullName,
         page: Math.floor((first / rows + 1)),
         pageSize: rows,
         ...inputValue
       };
-      console.log(data);
       try {
         const search = await axiosInstance.get("/emp", {
           params: data,
         });
         setUsers(search.data.data);
+      setTotalRecords(search.data.totalRecords);
       } catch (error) {
         console.log(error);
       }
@@ -159,9 +159,9 @@ function UserData() {
               <input
                 type="text"
                 className="form-control"
-                id="userName"
+                id="fullName"
                 placeholder="Full Name"
-                value={inputValue.firstName}
+                value={inputValue.fullName}
                 onChange={handleInputChange}
               />
             </div>

@@ -23,43 +23,6 @@ const newEmployeeAdd = async (req, res) => {
   }
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 const allEmployeeList = async (req, res) => {
   try {
     const pageSize = parseInt(req.query.pageSize);
@@ -112,7 +75,13 @@ const allEmployeeList = async (req, res) => {
           color: 1,
           loginEmployeeId: 1,
           pastExperience: 1,
-          userRole: { $reduce: { input: "$userRole", initialValue: [], in: { $concatArrays: ["$$value", "$$this"] } } }, // Convert array of arrays to a single array
+          userRole: {
+            $reduce: {
+              input: "$userRole",
+              initialValue: [],
+              in: { $concatArrays: ["$$value", "$$this"] },
+            },
+          },
         },
       },
     ];
@@ -132,11 +101,11 @@ const allEmployeeList = async (req, res) => {
 
     const userRoles = req.query.userRole;
     if (userRoles && userRoles.length > 0) {
-
-      const roleMatches = userRoles.map((role) => ({ userRole:role }));
+      const roleMatches = await userRoles.map((role) => ({ userRole: role }));
+      console.log(roleMatches);
       filters.push({
         $match: {
-          $and: roleMatches
+          $and: roleMatches,
         },
       });
     }
@@ -168,7 +137,7 @@ const allEmployeeList = async (req, res) => {
             city: { $first: "$city" },
             zip: { $first: "$zip" },
             jobRole: { $first: "$jobRole" },
-            userRole: { $first: "$userRole" },
+            userRole: { $push: "$userRole" },
             color: { $first: "$color" },
             loginEmployeeId: { $first: "$loginEmployeeId" },
             pastExperience: { $push: "$pastExperience" },
@@ -177,39 +146,33 @@ const allEmployeeList = async (req, res) => {
       );
     }
 
-    const countPipeline = [
-      { $match: { loginEmployeeId: _loginEmployeeId } },
-      ...filters,
-      { $group: { _id: null, total: { $sum: 1 } } },
-    ];
-    
-    const totalEmployees = await Employee.aggregate(countPipeline).exec();
-    const totalDocuments = totalEmployees.length > 0 ? totalEmployees[0].total : 0;
-    
-
-    // const countPipeline = [
-    //   { $match: { loginEmployeeId: _loginEmployeeId } },
-    //   ...filters,
-    //   { $count: "total" },
-    // ];
-
-    // const totalEmployees = await Employee.aggregate(countPipeline).exec();
-    // const totalDocuments =
-    //   totalEmployees.length > 0 ? totalEmployees[0].total : 0;
-
-      console.log(totalEmployees);
-
     const page = parseInt(req.query.page) || 1;
     const startIndex = page * pageSize - pageSize;
 
     aggregationPipeline.push(...filters);
 
-    aggregationPipeline.push({ $skip: startIndex }, { $limit: pageSize });
+    aggregationPipeline.push({
+      $facet: {
+        totalRecords: [
+          {
+            $count: "total",
+          },
+        ],
+        data: [
+          {
+            $skip: startIndex,
+          },
+          {
+            $limit: pageSize,
+          },
+        ],
+      },
+    });
 
     const employees = await Employee.aggregate(aggregationPipeline).exec();
     const data = {
-      data: employees,
-      totalRecords: totalDocuments,
+      data: employees[0].data,
+      totalRecords: employees[0].totalRecords[0].total,
     };
     res.status(200).json(data);
   } catch (error) {
@@ -218,172 +181,13 @@ const allEmployeeList = async (req, res) => {
   }
 };
 
-
-// const allEmployeeList = async (req, res) => {
-//   try {
-//     const pageSize = parseInt(req.query.pageSize);
-//     const _loginEmployeeId = req.loginEmployeeId;
-//     let aggregationPipeline = [
-//       {
-//         $match: {
-//           loginEmployeeId: _loginEmployeeId,
-//         },
-//       },
-//       {
-//         $unwind: "$userRole",
-//       },
-//       {
-//         $lookup: {
-//           from: "roles",
-//           localField: "userRole",
-//           foreignField: "_id",
-//           as: "Uroles",
-//         },
-//       },
-//       {
-//         $group: {
-//           _id: "$_id",
-//           firstName: { $first: "$firstName" },
-//           lastName: { $first: "$lastName" },
-//           email: { $first: "$email" },
-//           address: { $first: "$address" },
-//           state: { $first: "$state" },
-//           city: { $first: "$city" },
-//           zip: { $first: "$zip" },
-//           jobRole: { $first: "$jobRole" },
-//           userRole: { $push: "$Uroles.role" },
-//           color: { $first: "$color" },
-//           loginEmployeeId: { $first: "$loginEmployeeId" },
-//           pastExperience: { $first: "$pastExperience" },
-//         },
-//       },
-//       {
-//         $project: {
-//           _id: 1,
-//           firstName: 1,
-//           lastName: 1,
-//           email: 1,
-//           address: 1,
-//           state: 1,
-//           city: 1,
-//           zip: 1,
-//           jobRole: 1,
-//           color: 1,
-//           loginEmployeeId: 1,
-//           pastExperience: 1,
-//           userRole: 1,
-//         },
-//       },
-//     ];
-
-//     const filters = [];
-
-//     const fullName = req.query.fullName;
-//     if (fullName) {
-//       const [firstName, lastName] = fullName.split(" ");
-//       filters.push({
-//         $match: {
-//           $and: [
-//             { firstName: { $regex: new RegExp(firstName, "i") } },
-//             { lastName: { $regex: new RegExp(lastName, "i") } },
-//           ],
-//         },
-//       });
-//     }
-
-//     const userRoles = req.query.userRole;
-//     console.log(userRoles);
-//     if (userRoles && userRoles.length > 0) {
-
-//       // const roleMatches = userRoles.map((role) => new mongoose.Types.ObjectId(role));
-//       // console.log(roleMatches);
-//       filters.push({
-//         $match: {
-//           $and: [{userRole: { $in: userRoles }}],
-//         },
-//       });
-//     }
-
-//     const startDateStr = req.query.startDate;
-//     const endDateStr = req.query.endDate;
-
-//     if (startDateStr && endDateStr) {
-//       const startDate = new Date(startDateStr).toISOString();
-//       const endDate = new Date(endDateStr).toISOString();
-//       filters.push(
-//         { $unwind: "$pastExperience" },
-//         {
-//           $match: {
-//             "pastExperience.startDate": {
-//               $gte: startDate,
-//               $lte: endDate,
-//             },
-//           },
-//         },
-//         {
-//           $group: {
-//             _id: "$_id",
-//             firstName: { $first: "$firstName" },
-//             lastName: { $first: "$lastName" },
-//             email: { $first: "$email" },
-//             address: { $first: "$address" },
-//             state: { $first: "$state" },
-//             city: { $first: "$city" },
-//             zip: { $first: "$zip" },
-//             jobRole: { $first: "$jobRole" },
-//             userRole: { $first: "$userRole" },
-//             color: { $first: "$color" },
-//             loginEmployeeId: { $first: "$loginEmployeeId" },
-//             pastExperience: { $push: "$pastExperience" },
-//           },
-//         }
-//       );
-//     }
-
-//     const countPipeline = [
-//       { $match: { loginEmployeeId: _loginEmployeeId } },
-//       ...filters,
-//       { $count: "total" },
-//     ];
-
-//     const totalEmployees = await Employee.aggregate(countPipeline).exec();
-//     const totalDocuments =
-//       totalEmployees.length > 0 ? totalEmployees[0].total : 0;
-
-//     const page = parseInt(req.query.page) || 1;
-//     const startIndex = page * pageSize - pageSize;
-
-
-//     // let testEmployees = await Employee.aggregate(aggregationPipeline).exec();
-
-//     // testEmployees.userRole = testEmployees.map((employee) => {
-//     //   employee.userRole = employee.userRole.map((role) => role[0]);
-//     // });
-
-//     aggregationPipeline.push(...filters);
-
-//     aggregationPipeline.push({ $skip: startIndex }, { $limit: pageSize });
-
-
-//     const employees = await Employee.aggregate(aggregationPipeline).exec();
-//     const data = {
-//       data: employees,
-//       totalRecords: totalDocuments,
-//     };
-//     res.status(200).json(data);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(400).send({ success: false, msg: error.message });
-//   }
-// };
-
 const employeeById = async (req, res) => {
   try {
     let employee = await Employee.findById({ _id: req.params.id });
 
     employee = await Employee.aggregate([
       {
-        $match: { _id: employee._id }
+        $match: { _id: employee._id },
       },
       {
         $unwind: "$userRole",
@@ -433,14 +237,13 @@ const employeeById = async (req, res) => {
     ]);
 
     employee[0].userRole = employee[0].userRole.map((role) => {
-      return {value : role.value[0].toString(), label : role.label[0]}
-    })
+      return { value: role.value[0].toString(), label: role.label[0] };
+    });
     res.status(200).json(...employee);
   } catch (error) {
     res.status(400).send({ success: false, msg: error.message });
   }
 };
-
 
 const deleteEmployee = async (req, res) => {
   try {

@@ -23,7 +23,7 @@ function Signup() {
     };
 
     const clearToken = () => {
-            localStorage.clear();
+        localStorage.clear();
 
     }
 
@@ -43,8 +43,8 @@ function Signup() {
                 navigate("/login");
             }
         } catch (error) {
-            console.error("Error:", error);
-            toast.error(error.message);
+            console.error("Error:", error.response);
+            toast.error(error.response.data.message);
         }
 
     }

@@ -11,6 +11,8 @@ import Select from "react-select";
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 import { PrimeReactProvider } from "primereact/api";
 import { Paginator } from "primereact/paginator";
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import ActiviyLog from '../../api/Activitylog'
 import "./UserList.css"
 
 
@@ -54,6 +56,9 @@ function UserData() {
       console.log(result.data);
     } catch (error) {
       console.log(error);
+      if (error.response && error.response.data.includes("jwt expired")) {
+        navigate("/login");
+      }
     }
   };
 
@@ -113,7 +118,7 @@ function UserData() {
           params: data,
         });
         setUsers(search.data.data);
-      setTotalRecords(search.data.totalRecords);
+        setTotalRecords(search.data.totalRecords);
       } catch (error) {
         console.log(error);
       }
@@ -133,9 +138,23 @@ function UserData() {
     }
   };
 
+  const confirmDelete = (id) => {
+    confirmDialog({
+      message: 'Are you sure you want to delete this record?',
+      header: 'Confirmation',
+      icon: 'pi pi-exclamation-triangle',
+      defaultFocus: 'accept',
+      accept: () => deleteUser(id),
+    });
+  };
+
   const deleteUser = async (id) => {
     try {
       await axiosInstance.delete(`/emp/${id}`);
+      ActiviyLog.page = window.location.href;
+      ActiviyLog.action = "user deleted";
+      ActiviyLog.actionOnId = id;
+      await axiosInstance.post("/activityLog", ActiviyLog)
       getData();
       toast.success("Data delete Successfully");
       await fetchData();
@@ -261,18 +280,18 @@ function UserData() {
                     <td>{user.city}</td>
                     <td>
                       {user.pastExperience.map((experience, expIndex) => (
-                          <div key={expIndex}>{experience.companyName}</div>
-                        ))}
+                        <div key={expIndex}>{experience.companyName}</div>
+                      ))}
                     </td>
                     <td>
                       {user.pastExperience.map((experience, expIndex) => (
-                          <div key={expIndex}>{experience.startDate}</div>
-                        ))}
+                        <div key={expIndex}>{experience.startDate}</div>
+                      ))}
                     </td>
                     <td>
                       {user.pastExperience.map((experience, expIndex) => (
-                          <div key={expIndex}>{experience.endDate}</div>
-                        ))}
+                        <div key={expIndex}>{experience.endDate}</div>
+                      ))}
                     </td>
                     <td>{user.jobRole}</td>
                     <td>
@@ -293,7 +312,7 @@ function UserData() {
                         <FontAwesomeIcon
                           icon={faTrashAlt}
                           className="btn"
-                          onClick={() => deleteUser(user._id)}
+                          onClick={() => confirmDelete(user._id)}
                         />
                       </div>
                     </td>
@@ -302,6 +321,7 @@ function UserData() {
               )}
             </tbody>
           </table>
+          <ConfirmDialog />
         </div>
       </div>
       <div className="position-absolute bottom-0 start-50 translate-middle">

@@ -63,14 +63,26 @@ const roleSchema = new mongoose.Schema({
   role: { type: String },
 })
 
+const activityLogSchema = new mongoose.Schema({
+  loginEmployeeId: { type: String },
+  page: { type: String },
+  action: { type: String },
+  actionOnId: { type: String },
+  timeStamp: { type: String, default: new Date().toISOString()},
+})
+
+
 const LoginEmployee = mongoose.model("LoginEmployee", loginEmployeeSchema);
 
 const Employee = mongoose.model("Employee", employeeSchema);
 
-const Role = mongoose.model("Role", roleSchema)
+const Role = mongoose.model("Role", roleSchema);
+
+const ActivityLog = mongoose.model("ActivityLog", activityLogSchema);
 
 module.exports = {
   LoginEmployee: LoginEmployee,
   Employee: Employee,
-  Role: Role
+  Role: Role,
+  ActivityLog: ActivityLog
 };

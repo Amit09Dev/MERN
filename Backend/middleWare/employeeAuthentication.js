@@ -22,7 +22,7 @@ const verifyToken = async (req, res) => {
         if (err) {
           return res.status(403).json({ message: "Invalid token" });
         }
-        res.status(200).json({ msg: "Token validation successful"});
+        res.status(200).json({loginEmployeeId:decoded.loginEmployeeId, msg: "Token validation successful"});
       });
     } catch (error) {
       res.status(400).send({ success: false, msg: error.message });

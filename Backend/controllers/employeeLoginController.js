@@ -61,7 +61,7 @@ const verifyEmployeeLogin = async (req, res) => {
                 { expiresIn: "1h" }
               );
 
-              res.status(200).json({ token, msg: "login successful" });
+              res.status(200).json({ token, loginEmployeeId:existingEmail._id , msg: "login successful" });
             } else {
               res.status(409).json({ message: "Either Email or Password is incorrect" });
             }

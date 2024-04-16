@@ -43,7 +43,7 @@ function Signup() {
                 navigate("/login");
             }
         } catch (error) {
-            console.error("Error:", error.response);
+            console.error("Error:",error.response);
             toast.error(error.response.data.message);
         }
 

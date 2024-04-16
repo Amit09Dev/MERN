@@ -41,7 +41,7 @@ function UserData() {
 
   const getData = async () => {
     const data = {
-      page: (first / rows + 1),
+      page: Math.floor(first / rows + 1),
       pageSize: rows,
       ...inputValue
     };

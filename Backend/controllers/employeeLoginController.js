@@ -58,7 +58,7 @@ const verifyEmployeeLogin = async (req, res) => {
                   loginEmployeeId: existingEmail._id,
                 },
                 jwt_secret_key,
-                { expiresIn: "5h" }
+                { expiresIn: "1h" }
               );
 
               res.status(200).json({ token, msg: "login successful" });
@@ -71,6 +71,7 @@ const verifyEmployeeLogin = async (req, res) => {
         res.status(409).json({ message: "Either Email or Password is incorrect" });
       }
     } else {
+      console.log("11");
       app.use(authenticateEmployee);
     }
   } catch (error) {

@@ -21,9 +21,13 @@ const LoginForm = () => {
         if (result.status === 200) {
           navigate("/UserForm");
         }
+        else{
+          localStorage.clear();
+        }
       }
       catch (error) {
         toast.warn("Please login");
+        localStorage.clear();
       }
     }
     checkToken();

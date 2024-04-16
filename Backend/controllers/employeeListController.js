@@ -29,6 +29,37 @@ const newEmployeeAdd = async (req, res) => {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const allEmployeeList = async (req, res) => {
   try {
     const pageSize = parseInt(req.query.pageSize);
@@ -85,11 +116,8 @@ const allEmployeeList = async (req, res) => {
         },
       },
     ];
-
     const filters = [];
-
     const fullName = req.query.fullName;
-    console.log(req.query);
     if (fullName) {
       const [firstName, lastName] = fullName.split(" ");
       filters.push({
@@ -152,12 +180,24 @@ const allEmployeeList = async (req, res) => {
     const countPipeline = [
       { $match: { loginEmployeeId: _loginEmployeeId } },
       ...filters,
-      { $count: "total" },
+      { $group: { _id: null, total: { $sum: 1 } } },
     ];
-
+    
     const totalEmployees = await Employee.aggregate(countPipeline).exec();
-    const totalDocuments =
-      totalEmployees.length > 0 ? totalEmployees[0].total : 0;
+    const totalDocuments = totalEmployees.length > 0 ? totalEmployees[0].total : 0;
+    
+
+    // const countPipeline = [
+    //   { $match: { loginEmployeeId: _loginEmployeeId } },
+    //   ...filters,
+    //   { $count: "total" },
+    // ];
+
+    // const totalEmployees = await Employee.aggregate(countPipeline).exec();
+    // const totalDocuments =
+    //   totalEmployees.length > 0 ? totalEmployees[0].total : 0;
+
+      console.log(totalEmployees);
 
     const page = parseInt(req.query.page) || 1;
     const startIndex = page * pageSize - pageSize;
@@ -177,15 +217,6 @@ const allEmployeeList = async (req, res) => {
     res.status(400).send({ success: false, msg: error.message });
   }
 };
-
-
-
-
-
-
-
-
-
 
 
 // const allEmployeeList = async (req, res) => {

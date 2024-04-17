@@ -7,6 +7,7 @@ const employeeLoginRoutes = require("./routes/employeeLoginRoutes");
 const activityLogRoutes = require("./routes/activityLogRoutes");
 const companyDataRoutes = require("./routes/companyDataRoutes");
 const {checkEmail} = require("./controllers/emailExistController");
+const {getUserRole} = require("./controllers/getUserRoleController");
 const {authenticateEmployee, verifyToken} = require("./middleWare/employeeAuthentication");
 
 app.use(cors());
@@ -18,6 +19,8 @@ app.use("/api/loggedin", verifyToken);
 app.use("/api", employeeLoginRoutes);
 
 app.use("/api", companyDataRoutes);
+
+app.use("/api/role", getUserRole);
 
 app.use(authenticateEmployee);
 app.use("/api", activityLogRoutes);

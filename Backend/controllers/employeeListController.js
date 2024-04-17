@@ -282,20 +282,10 @@ const updateEmployee = async (req, res) => {
   }
 };
 
-const getUserRole = async (req, res) => {
-  try {
-    const roles = await Role.find({});
-    res.status(200).json(roles);
-  } catch (error) {
-    res.status(400).send({ success: false, msg: error.message });
-  }
-};
-
 module.exports = {
   newEmployeeAdd,
   allEmployeeList,
   employeeById,
   deleteEmployee,
-  updateEmployee,
-  getUserRole,
+  updateEmployee
 };

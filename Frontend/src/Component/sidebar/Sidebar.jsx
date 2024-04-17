@@ -22,7 +22,7 @@ function Sidebar() {
                 </li>
                 <li className="d-flex align-items-center my-2">
                     <i className="bi bi-layout-split me-2"></i>
-                    <Link >Pages</Link>
+                    <Link to="/Form">Form</Link>
                     <i className="fa-angle-right fa ms-auto fa-xs fa me-2"></i>
                 </li>
                 <li className="d-flex align-items-center my-2">

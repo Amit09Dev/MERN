@@ -1,4 +1,5 @@
-const { Employee, ActivityLog } = require("../models/EmployeeModel");
+const { Employee } = require("../models/EmployeeModel");
+const { ActivityLog } = require("../models/activityLog");
 
 const newActivityLog = async (req, res) => {
   try {

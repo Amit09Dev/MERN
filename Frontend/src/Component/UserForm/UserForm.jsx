@@ -169,6 +169,7 @@ function UserForm() {
           updatedFormData = {
             ...updatedFormData,
             userRole: selectedOption.map(option => option.value),
+            pastExperience: [...gridList]
           };
         }
 

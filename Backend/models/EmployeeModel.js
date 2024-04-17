@@ -52,37 +52,8 @@ const employeeSchema = mongoose.Schema({
   },
 });
 
-const loginEmployeeSchema = new mongoose.Schema({
-  email: { type: String, required: true },
-  password: { type: String, required: true },
-  orignalPasswordDemo: { type: String, required: true },
-});
-
-const roleSchema = new mongoose.Schema({
-  role_id: { type: String },
-  role: { type: String },
-})
-
-const activityLogSchema = new mongoose.Schema({
-  loginEmployeeId: { type: String },
-  page: { type: String },
-  action: { type: String },
-  actionOnId: { type: String },
-  timeStamp: { type: String, default: new Date().toISOString()},
-})
-
-
-const LoginEmployee = mongoose.model("LoginEmployee", loginEmployeeSchema);
-
 const Employee = mongoose.model("Employee", employeeSchema);
 
-const Role = mongoose.model("Role", roleSchema);
-
-const ActivityLog = mongoose.model("ActivityLog", activityLogSchema);
-
 module.exports = {
-  LoginEmployee: LoginEmployee,
-  Employee: Employee,
-  Role: Role,
-  ActivityLog: ActivityLog
+  Employee: Employee
 };

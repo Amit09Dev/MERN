@@ -1,4 +1,5 @@
-const { Employee, Role } = require("../models/EmployeeModel");
+const { Employee } = require("../models/EmployeeModel");
+const { Role } = require("../models/userRoleModel");
 const mongoose = require("mongoose");
 
 const newEmployeeAdd = async (req, res) => {
@@ -102,7 +103,6 @@ const allEmployeeList = async (req, res) => {
     const userRoles = req.query.userRole;
     if (userRoles && userRoles.length > 0) {
       const roleMatches = await userRoles.map((role) => ({ userRole: role }));
-      console.log(roleMatches);
       filters.push({
         $match: {
           $and: roleMatches,

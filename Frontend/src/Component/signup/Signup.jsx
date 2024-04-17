@@ -23,7 +23,7 @@ function Signup() {
     };
 
     const clearToken = () => {
-            localStorage.clear();
+        localStorage.clear();
 
     }
 

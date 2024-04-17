@@ -4,6 +4,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const employeeListRoutes = require("./routes/employeeListRoutes");
 const employeeLoginRoutes = require("./routes/employeeLoginRoutes");
+const activityLogRoutes = require("./routes/activityLogRoutes");
 const {checkEmail} = require("./controllers/emailExistController");
 const {authenticateEmployee, verifyToken} = require("./middleWare/employeeAuthentication");
 
@@ -16,6 +17,7 @@ app.use("/api/loggedin", verifyToken);
 app.use("/api", employeeLoginRoutes);
 
 app.use(authenticateEmployee);
+app.use("/api", activityLogRoutes);
 app.use("/api", employeeListRoutes);
 
 // mongoose.connect("mongodb://127.0.0.1:27017/ReactBackend");

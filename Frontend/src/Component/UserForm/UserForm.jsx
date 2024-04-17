@@ -8,6 +8,8 @@ import Select from "react-select";
 import TopNabvar from "../topNavbar/topNavbar";
 import Sidebar from "../sidebar/Sidebar";
 import axiosInstance from "../../api/Axios";
+import ActiviyLog from '../../api/Activitylog'
+
 function UserForm() {
   const userFormData = {
     firstName: "",
@@ -28,7 +30,6 @@ function UserForm() {
     startDate: "",
     endDate: "",
   };
-
   const [RoleList, setRoleList] = useState([]);
   const [formData, setFormData] = useState(userFormData);
   const [errors, setErrors] = useState({});
@@ -87,9 +88,11 @@ function UserForm() {
         label: role.role,
       }));
       setRoleList([...formattedRoles]);
-      console.log(...formattedRoles);
     } catch (error) {
-      console.error("Error fetching role data:", error);
+      console.error("Error fetching role data:", error.response);
+      if (error.response && error.response.data.includes("jwt expired")) {
+        navigate("/login");
+      }
     }
   };
 
@@ -110,10 +113,8 @@ function UserForm() {
             zip: data.zip || "",
             jobRole: data.jobRole || "",
             color: data.color
-
           });
           setSelectedOption(data.userRole);
-          // setRoleList(data.allRoles.map(role => ({ value: role.value, label: role.label })));
           const pastExperiences = data.pastExperience.map((experience) => ({
             id: experience.id,
             companyName: experience.companyName || "",
@@ -124,7 +125,6 @@ function UserForm() {
         })
         .catch((error) => {
           console.error("Error fetching user data:", error);
-          console.log('Error Response:', error.response); 
         });
     }
   }, [id]);
@@ -162,19 +162,44 @@ function UserForm() {
     const validationErrors = validateForm(formData);
     if (Object.keys(validationErrors).length === 0) {
       try {
-        const updatedFormData = {
-          ...formData,
-        };
+        let updatedFormData = { ...formData };
+
+
+        if (JSON.stringify(selectedOption) !== JSON.stringify(formData.userRole)) {
+          updatedFormData = {
+            ...updatedFormData,
+            userRole: selectedOption.map(option => option.value),
+          };
+        }
+
         if (id === undefined) {
-          await axiosInstance.post("/addEmp", updatedFormData);
+          const res = await axiosInstance.post("/addEmp", updatedFormData);
+          if (res.status === 200) {
+            ActiviyLog.page = window.location.href;
+            ActiviyLog.action = "user added";
+            ActiviyLog.actionOnEmail = updatedFormData.email;
+            await axiosInstance.post("/activityLog", ActiviyLog)
+          }
+
+
           insertnotify();
           resetForm();
+          console.log(res, "ActiviyLog", ActiviyLog);
         } else {
-          await axiosInstance.patch(`/emp/${id}`, updatedFormData);
+          let positionOfId = (window.location.href).lastIndexOf("/")
+          ActiviyLog.page = (window.location.href).slice(0, positionOfId);
+          ActiviyLog.action = "user edited";
+          ActiviyLog.actionOnId = id;
+
+          const res = await axiosInstance.patch(`/emp/${id}`, updatedFormData);
+          if (res.status === 200) {
+            await axiosInstance.post("/activityLog", ActiviyLog)
+          }
           updatenotify();
           resetForm();
           navigate("/userlist");
         }
+        console.log(ActiviyLog);
       } catch (error) {
         console.error("Error:", error);
       }

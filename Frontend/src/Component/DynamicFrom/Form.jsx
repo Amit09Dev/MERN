@@ -4,6 +4,7 @@ import Sidebar from "../sidebar/Sidebar";
 import TopNabvar from "../topNavbar/topNavbar";
 import { toast } from "react-toastify";
 import axiosInstance from "src/api/Axios";
+import ActiviyLog from "src/api/Activitylog";
 
 
 const Form = () => {
@@ -51,9 +52,18 @@ const Form = () => {
                     value: company[field.name] || null,
                 })),
             };
-            console.log(data);
-            await axiosInstance.post("/companyData", data)
+            
+           const result= await axiosInstance.post("/companyData", data)
+           if(result.status===200){
+            ActiviyLog.page = window.location.href;
+            ActiviyLog.action = "Company added";
+            ActiviyLog.actionOnEmail = data.companyEmail
+            ActiviyLog.dataType="company"
+           const comanyActivity= await axiosInstance.post("/activityLog", ActiviyLog);
+             console.log(comanyActivity);
+           }
             handleReset();
+            console.log("Comapny Activity",ActiviyLog);
         } catch (error) {
             console.log(error);
         }

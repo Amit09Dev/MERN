@@ -179,6 +179,7 @@ function UserForm() {
             ActiviyLog.page = window.location.href;
             ActiviyLog.action = "user added";
             ActiviyLog.actionOnEmail = updatedFormData.email;
+            ActiviyLog.dataType="Employee"
             await axiosInstance.post("/activityLog", ActiviyLog)
           }
 
@@ -190,6 +191,7 @@ function UserForm() {
           let positionOfId = (window.location.href).lastIndexOf("/")
           ActiviyLog.page = (window.location.href).slice(0, positionOfId);
           ActiviyLog.action = "user edited";
+          ActiviyLog.dataType="Employee";
           ActiviyLog.actionOnId = id;
 
           const res = await axiosInstance.patch(`/emp/${id}`, updatedFormData);

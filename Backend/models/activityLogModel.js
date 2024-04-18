@@ -5,7 +5,7 @@ const activityLogSchema = new mongoose.Schema({
   page: { type: String },
   action: { type: String },
   actionOnId: { type: mongoose.Schema.Types.ObjectId },
-  timeStamp: { type: String, default: new Date().toLocaleString() },
+  timeStamp: { type: String, default: new Date() },
 });
 
 const ActivityLog = mongoose.model("ActivityLog", activityLogSchema);

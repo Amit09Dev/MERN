@@ -6,6 +6,7 @@ import Login from './Component/login/login.jsx';
 import Signup from './Component/signup/Signup.jsx';
 import Form from './Component/DynamicFrom/Form.jsx';
 import Activity from './Component/Activity/Activity';
+import Page404 from './Component/Page404.jsx3';
 
 function App() {
 
@@ -22,6 +23,7 @@ function App() {
             <Route path="/activity" element={<Activity />} />
             <Route path="/userForm/:id" element={<UserForm />} />
             <Route path="/" element={<Login />} />
+            <Route path="*" element={<Page404 />} />
           </Routes>
         </div>
       </div>

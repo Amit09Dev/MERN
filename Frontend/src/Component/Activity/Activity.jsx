@@ -54,7 +54,7 @@ function Activity() {
                                         <td>{elem.page}</td>
                                         <td>{elem.action}</td>
                                         <td>{elem.actionOnId[0]}</td>
-                                        <td>{elem.timeStamp}</td>
+                                        <td>{(elem.timeStamp.split("GMT")[0]).trim()}</td>
                                     </tr>
                                 ))
                             )}

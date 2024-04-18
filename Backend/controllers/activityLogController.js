@@ -1,4 +1,5 @@
 const { Employee } = require("../models/EmployeeModel");
+const { company } = require("../models/companyModel");
 const mongoose = require("mongoose"); 
 
 const { ActivityLog } = require("../models/activityLogModel");
@@ -6,8 +7,9 @@ const { ActivityLog } = require("../models/activityLogModel");
 const newActivityLog = async (req, res) => {
   try {
     const newActivityLogData = req.body;
+    const collectionName = req.body.dataType;
     if (!newActivityLogData.actionOnId) {
-      const newDataAdded = await Employee.findOne({
+      const newDataAdded = await collectionName.findOne({
         email: newActivityLogData.actionOnEmail,
       });
       newActivityLogData.actionOnId = new mongoose.Types.ObjectId(newDataAdded._id);
@@ -23,6 +25,9 @@ const newActivityLog = async (req, res) => {
 
 const showActivityLog = async (req, res) => {
   try {
+
+    // const page = parseInt(req.query.page) || 1;
+    // const startIndex = page * pageSize - pageSize;
     let aggregationPipeline = [
       {
         $match: {
@@ -64,7 +69,18 @@ const showActivityLog = async (req, res) => {
           actionOnId: 1,
           timeStamp: 1
         },
-      }
+      },
+      // {
+      //   $skip: startIndex,
+      // },
+      // {
+      //   $limit: pageSize,
+      // },
+      // {
+      //   $sort: {
+      //     timeStamp:-1
+      //   }
+      // }
     ];
     const logs = await ActivityLog.aggregate(aggregationPipeline).exec();
        

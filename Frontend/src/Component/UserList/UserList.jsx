@@ -154,6 +154,7 @@ function UserData() {
       ActiviyLog.page = window.location.href;
       ActiviyLog.action = "user deleted";
       ActiviyLog.actionOnId = id;
+      ActiviyLog.dataType="Employee";
       await axiosInstance.post("/activityLog", ActiviyLog)
       getData();
       toast.success("Data delete Successfully");

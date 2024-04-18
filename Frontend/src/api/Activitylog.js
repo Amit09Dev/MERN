@@ -2,7 +2,8 @@ const ActiviyLog = {
     "loginEmployeeId": "",
     "page": "",
     "action": "",
-    "actionOnId": ""
+    "actionOnId": "",
+    "dataType":""
 }
 
 export default ActiviyLog

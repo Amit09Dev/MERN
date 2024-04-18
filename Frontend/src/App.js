@@ -5,6 +5,7 @@ import UserList from './Component/UserList/UserList.jsx';
 import Login from './Component/login/login.jsx';
 import Signup from './Component/signup/Signup.jsx';
 import Form from './Component/DynamicFrom/Form.jsx';
+import Activity from './Component/Activity/Activity';
 
 function App() {
 
@@ -15,9 +16,10 @@ function App() {
           <Routes>
             <Route path="/userList" element={<UserList />} />
             <Route path="/userForm" element={<UserForm />} />
-            <Route path="/login" element={<Login />} /> 
-            <Route path="/form" element={<Form />} /> 
+            <Route path="/login" element={<Login />} />
+            <Route path="/form" element={<Form />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/activity" element={<Activity />} />
             <Route path="/userForm/:id" element={<UserForm />} />
             <Route path="/" element={<Login />} />
           </Routes>

@@ -160,6 +160,9 @@ const allEmployeeList = async (req, res) => {
         ],
         data: [
           {
+            $sort: {firstName: 1, _id: 1}
+          },
+          {
             $skip: startIndex,
           },
           {

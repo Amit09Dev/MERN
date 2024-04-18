@@ -7,8 +7,7 @@ const companySchema = mongoose.Schema({
   },
   companyEmail: {
     type: String,
-    required: true,
-    unique: true,
+    required: true
   },
   companyAdditionalDetails: {
     type: Array,

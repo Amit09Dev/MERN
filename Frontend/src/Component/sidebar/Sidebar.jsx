@@ -10,7 +10,7 @@ function Sidebar() {
             </div>
             <ul className="list-unstyled mt-3 px-2">
                 <li className="d-flex align-items-center my-2">
-                    <i className="bi bi-person-check-fill me-2"></i>
+                    <i className="bi bi-layout-text-sidebar me-2"></i>
                     <Link to="/userform">DashBoard</Link>
                     <i className="fa-angle-right fa ms-auto fa-xs fa me-2"></i>
 
@@ -26,8 +26,8 @@ function Sidebar() {
                     <i className="fa-angle-right fa ms-auto fa-xs fa me-2"></i>
                 </li>
                 <li className="d-flex align-items-center my-2">
-                    <i className="bi bi-shield-check me-2"></i>
-                    <Link  >Authentications</Link>
+                    <i className="bi bi-graph-up me-2"></i>
+                    <Link to="/activity">Activity Log</Link>
                     <i className="fa-angle-right fa ms-auto fa-xs fa me-2"></i>
                 </li>
                 <li className="d-flex align-items-center my-2">

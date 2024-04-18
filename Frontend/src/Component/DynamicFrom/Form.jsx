@@ -1,4 +1,4 @@
-import { useState, useEffect, useId } from "react";
+import { useState, useEffect } from "react";
 import { Dialog } from 'primereact/dialog';
 import Sidebar from "../sidebar/Sidebar";
 import TopNabvar from "../topNavbar/topNavbar";
@@ -20,7 +20,6 @@ const Form = () => {
         companyAdditionalDetails: [],
     });
 
-    const uniqueId = useId();
 
     const handleAddOption = () => {
         if (newOption.trim() !== "") {
@@ -54,7 +53,7 @@ const Form = () => {
             };
             console.log(data);
             await axiosInstance.post("/companyData", data)
-            // handleReset();
+            handleReset();
         } catch (error) {
             console.log(error);
         }
@@ -151,12 +150,12 @@ const Form = () => {
                                                         value={company[field.name] || ""}
                                                         onChange={(e) => handleFieldChange(field.name, e.target.value)}>
 
-                                                        <option key={uniqueId} value="null">Select</option>
+                                                        <option value="null">Select</option>
                                                         {selectOptions[field.name] && selectOptions[field.name].map((option, optionIndex) => (
                                                             <option key={optionIndex} value={option}>{option}</option>
                                                         ))}
                                                     </select>
-
+                                                    <i className="bi bi-trash ms-1 fs-5 text-white pointer rounded-2" role="button" onClick={() => handleRemoveField(field.name, index)} style={{ backgroundColor: '#dc3545', padding: '4px 8px' }}></i>
                                                 </div>
                                             ) : (
                                                 <div className="d-flex justify-content-between">
@@ -167,8 +166,8 @@ const Form = () => {
                                                         value={company[field.name] || ""}
                                                         onChange={(e) => handleFieldChange(field.name, e.target.value)}
                                                     />
-                                                    <i className="bi bi-trash ms-1 fs-5 p-1 text-white pointer rounded-2" role="button" onClick={() => handleRemoveField(field.name, index)}
-                                                        style={{ backgroundColor: '#dc3545' }}></i>
+                                                    <i className="bi bi-trash ms-1 fs-5 text-white pointer rounded-2" role="button" onClick={() => handleRemoveField(field.name, index)}
+                                                        style={{ backgroundColor: '#dc3545', padding: '4px 8px' }}></i>
                                                 </div>
                                             )}
                                         </div>
@@ -178,7 +177,7 @@ const Form = () => {
                         </div>
                         <div className="d-flex justify-content-end mt-2">
                             <button type="button" className="btn btn-primary" onClick={() => setVisible(true)}>Add Row</button>
-                            <Dialog visible={visible} style={{ width: '50vw' }} onHide={() => setVisible(false)}>
+                            <Dialog header="Add New Field:" visible={visible} style={{ width: '50vw' }} onHide={() => setVisible(false)}>
                                 <div className="m-0">
                                     <div className="row">
                                         <div className="col-12">

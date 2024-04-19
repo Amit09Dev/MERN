@@ -7,7 +7,7 @@ import Signup from './Component/signup/Signup.jsx';
 import Form from './Component/DynamicFrom/Form.jsx';
 import Activity from './Component/Activity/Activity';
 import Page404 from './Component/Page404.jsx';
-
+import CompanyList from './Component/Company/CompanyList';
 function App() {
 
   return (
@@ -15,6 +15,7 @@ function App() {
       <div className="app">
         <div className="content">
           <Routes>
+          <Route path="/companyList" element={<CompanyList />} />
             <Route path="/userList" element={<UserList />} />
             <Route path="/userForm" element={<UserForm />} />
             <Route path="/login" element={<Login />} />

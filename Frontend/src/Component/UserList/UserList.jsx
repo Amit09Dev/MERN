@@ -54,7 +54,7 @@ function UserData() {
       });
       setUsers(result.data.data);
       setTotalRecords(result.data.totalRecords);
-      console.log(result.data);
+     console.log(result.data.data);
     } catch (error) {
       console.log(error);
       if (error.response && error.response.data.includes("jwt expired")) {
@@ -170,7 +170,7 @@ function UserData() {
   };
 
   return (
-    <PrimeReactProvider value={{ unstyled: false }}>
+    <PrimeReactProvider value={{ unstyled: false   }}>
       <TopNabvar />
       <Sidebar />
       <div className="MainContainer">

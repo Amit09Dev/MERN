@@ -18,7 +18,9 @@ const Form = () => {
     const [formData, setFormData] = useState({
         companyName: "",
         email: "",
+        email: "",
         companyAdditionalDetails: [],
+        companyFieldsName: []
         companyFieldsName: []
     });
 
@@ -48,6 +50,8 @@ const Form = () => {
                 companyName: formData.companyName,
                 email: formData.email,
                 companyFieldsName: [],
+                email: formData.email,
+                companyFieldsName: [],
                 companyAdditionalDetails: fields.map(field => ({
                     name: field.name,
                     type: field.type,
@@ -67,6 +71,7 @@ const Form = () => {
             }
             handleReset();
             console.log("Comapny Activity", ActiviyLog);
+            console.log("Comapny Activity", ActiviyLog);
         } catch (error) {
             console.log(error);
         }
@@ -79,6 +84,7 @@ const Form = () => {
         setCompany({});
         setFormData({
             companyName: "",
+            email: "",
             email: "",
             companyAdditionalDetails: [],
         });
@@ -148,6 +154,8 @@ const Form = () => {
                                 id="email"
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                value={formData.email}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                 placeholder="Company Email"
                             />
                         </div>
@@ -179,6 +187,7 @@ const Form = () => {
                                                         value={company[field.name] || ""}
                                                         onChange={(e) => handleFieldChange(field.name, e.target.value)}
                                                     />
+
 
                                                     <i className="bi bi-trash ms-1 fs-5 text-white pointer rounded-2" role="button" onClick={() => handleRemoveField(field.name, index)}
                                                         style={{ backgroundColor: '#dc3545', padding: '4px 8px' }}></i>

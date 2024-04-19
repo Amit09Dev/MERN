@@ -32,7 +32,7 @@ function Sidebar() {
                 </li>
                 <li className="d-flex align-items-center my-2">
                     <i className="bi bi-layout-text-window me-2"></i>
-                    <Link  >Wizard Examples</Link>
+                    <Link to="/companyList" >Company List</Link>
                     <i className="fa-angle-right fa ms-auto fa-xs fa me-2"></i>
                 </li>
                 <li className="d-flex align-items-center my-2">

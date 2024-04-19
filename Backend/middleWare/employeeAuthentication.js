@@ -8,6 +8,7 @@ const authenticateEmployee = (req, res, next) => {
     const decodedToken = jwt.verify(token, jwt_secret_key);
     const loginEmployeeId = decodedToken.loginEmployeeId;
     req.loginEmployeeId = loginEmployeeId;
+    req.loginEmployeeEmail = decodedToken.loginEmployeeEmail;
     next();
   } else {
     res.status(401).json({ error: "Unauthorized" });

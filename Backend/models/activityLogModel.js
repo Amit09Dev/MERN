@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 
 const activityLogSchema = new mongoose.Schema({
-  loginEmployeeId: { type: mongoose.Schema.Types.ObjectId },
+  loginEmployeeId: { type: String },
   page: { type: String },
   action: { type: String },
-  actionOnId: { type: mongoose.Schema.Types.ObjectId },
+  actionOnId: { type: String },
   timeStamp: { type: String, default: new Date() },
 });
 

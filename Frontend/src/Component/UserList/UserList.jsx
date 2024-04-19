@@ -16,6 +16,7 @@ import ActiviyLog from '../../api/Activitylog'
 import "./UserList.css"
 
 
+
 function UserData() {
 
   const [users, setUsers] = useState([]);
@@ -152,7 +153,7 @@ function UserData() {
     try {
       await axiosInstance.delete(`/emp/${id}`);
       ActiviyLog.page = window.location.href;
-      ActiviyLog.action = "user deleted";
+      ActiviyLog.action = "User Deleted";
       ActiviyLog.actionOnId = id;
       ActiviyLog.dataType="Employee";
       await axiosInstance.post("/activityLog", ActiviyLog)

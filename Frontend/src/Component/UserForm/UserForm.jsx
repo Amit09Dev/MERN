@@ -68,7 +68,7 @@ function UserForm() {
     } else {
       try {
         const { data } = await axiosInstance.get("/checkEmail", {
-          params: { email, id },
+          params: { email, id, modelName: "Employee" },
         });
         const errorMessage = data.status ? "" : data.msg;
         setErrors({ ...errors, email: errorMessage });
@@ -177,7 +177,7 @@ function UserForm() {
           const res = await axiosInstance.post("/addEmp", updatedFormData);
           if (res.status === 200) {
             ActiviyLog.page = window.location.href;
-            ActiviyLog.action = "user added";
+            ActiviyLog.action = "User Added";
             ActiviyLog.actionOnEmail = updatedFormData.email;
             ActiviyLog.dataType="Employee"
             await axiosInstance.post("/activityLog", ActiviyLog)
@@ -190,7 +190,7 @@ function UserForm() {
         } else {
           let positionOfId = (window.location.href).lastIndexOf("/")
           ActiviyLog.page = (window.location.href).slice(0, positionOfId);
-          ActiviyLog.action = "user edited";
+          ActiviyLog.action = "User Edited";
           ActiviyLog.dataType="Employee";
           ActiviyLog.actionOnId = id;
 

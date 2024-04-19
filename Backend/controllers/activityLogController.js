@@ -1,14 +1,13 @@
 const { Employee } = require("../models/EmployeeModel");
 const { company } = require("../models/companyModel");
-const mongoose = require("mongoose"); 
+const mongoose = require("mongoose");
 
 const { ActivityLog } = require("../models/activityLogModel");
 
 const models = {
   Employee,
-  company
+  company,
 };
-
 
 const newActivityLog = async (req, res) => {
   try {
@@ -21,11 +20,13 @@ const newActivityLog = async (req, res) => {
       const newDataAdded = await Model.findOne({
         email: newActivityLogData.actionOnEmail,
       });
-      newActivityLogData.actionOnId = new mongoose.Types.ObjectId(newDataAdded._id);
-    }
-    newActivityLogData.loginEmployeeId = req.loginEmployeeId;
-    const _newActivityLogData = await ActivityLog.create(newActivityLogData);
+      newActivityLogData.actionOnId = newDataAdded.email;
 
+      console.log(newActivityLogData.actionOnId);
+    }
+    newActivityLogData.loginEmployeeId = req.loginEmployeeEmail;
+    const _newActivityLogData = await ActivityLog.create(newActivityLogData);
+    console.log(_newActivityLogData);
     res.status(200).json(_newActivityLogData);
   } catch (error) {
     res.status(400).send({ success: false, msg: error.message });
@@ -34,7 +35,6 @@ const newActivityLog = async (req, res) => {
 
 const showActivityLog = async (req, res) => {
   try {
-
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 5;
     const startIndex = page * pageSize - pageSize;
@@ -103,60 +103,7 @@ const showActivityLog = async (req, res) => {
     // ];
     let aggregationPipeline = [
       {
-        $match: {
-          loginEmployeeId: new mongoose.Types.ObjectId(req.loginEmployeeId),
-        },
-      },
-      {
-        $lookup: {
-          from: "loginemployees",
-          localField: "loginEmployeeId",
-          foreignField: "_id",
-          as: "loginEmployee",
-        }
-      },
-      {
-        $lookup: {
-          from: "employees",
-          localField: "actionOnId",
-          foreignField: "_id",
-          as: "actionOnEmployee",
-        }
-      },
-      {
-        $lookup: {
-          from: "companies",
-          localField: "actionOnId",
-          foreignField: "_id",
-          as: "actionOnCompany",
-        }
-      },
-      {
-        $group: {
-          _id: "$_id",
-          loginEmployee: { $first: "$loginEmployee" },
-          page: { $first: "$page" },
-          action: { $first: "$action" },
-          actionOnEmployee: { $first: "$actionOnEmployee" },
-          actionOnCompany: { $first: "$actionOnCompany" },
-          timeStamp: { $first: "$timeStamp" }
-        },
-      },
-      {
-        $project: {
-          _id: 1,
-          loginEmployeeId: { $arrayElemAt: ["$loginEmployee.email", 0] },
-          page: 1,
-          action: 1,
-          actionOnId: {
-            $cond: {
-              if: { $isArray: "$actionOnEmployee" },
-              then: { $arrayElemAt: ["$actionOnEmployee.email", 0] },
-              else: { $arrayElemAt: ["$actionOnCompany.email", 0] }
-            }
-          },
-          timeStamp: 1
-        },
+        $match: { loginEmployeeId: req.loginEmployeeEmail },
       },
       {
         $facet: {
@@ -167,7 +114,7 @@ const showActivityLog = async (req, res) => {
           ],
           data: [
             {
-              $sort: { timeStamp: 1 } 
+              $sort: { timeStamp: 1 },
             },
             {
               $skip: startIndex,
@@ -177,15 +124,15 @@ const showActivityLog = async (req, res) => {
             },
           ],
         },
-      }
+      },
     ];
     const logs = await ActivityLog.aggregate(aggregationPipeline).exec();
-    console.log(logs[0].data);
-       
+    // console.log(logs[0].data);
+
     const allLogsData = {
       data: logs[0].data,
       totalRecords: logs[0].totalRecords[0].total,
-    };   
+    };
 
     res.status(200).json(allLogsData);
   } catch (error) {

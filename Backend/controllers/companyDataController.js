@@ -6,18 +6,20 @@ const companyData = async (req, res) => {
     const companyData = req.body;
     const companyFieldsName = req.body.companyFieldsName;
     const _companyData = await company.create(companyData);
-    for (let i = 0; i < companyFieldsName.length; i++) {
-      const companyFieldData = {
-        fieldName: companyFieldsName[i],
-      };
-      const checkCompanyField = await companyField.findOne({
-        fieldName: companyFieldData.fieldName,
-      });
-      console.log("companyFieldData", companyFieldData);
-      console.log("checkCompany", checkCompanyField);
-      if (!checkCompanyField) {
-        const _companyFieldData = await companyField.create(companyFieldData);
-      }
+    if (companyFieldsName) {
+      for (let i = 0; i < companyFieldsName.length; i++) {
+        const companyFieldData = {
+          fieldName: companyFieldsName[i],
+        };
+        const checkCompanyField = await companyField.findOne({
+          fieldName: companyFieldData.fieldName,
+        });
+        console.log("companyFieldData", companyFieldData);
+        console.log("checkCompany", checkCompanyField);
+        if (!checkCompanyField) {
+          const _companyFieldData = await companyField.create(companyFieldData);
+        }
+      }      
     }
     res.status(200).json(_companyData);
   } catch (error) {

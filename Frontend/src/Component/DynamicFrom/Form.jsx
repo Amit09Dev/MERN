@@ -54,7 +54,6 @@ const Form = () => {
                     value: company[field.name] || null,
                 })),
             };
-            console.log(data);
             data.companyAdditionalDetails.forEach(elem => data.companyFieldsName.push(elem["name"]))
 
             const result = await axiosInstance.post("/companyData", data)
@@ -66,7 +65,7 @@ const Form = () => {
                 console.log(ActiviyLog);
                 const comanyActivity = await axiosInstance.post("/activityLog", ActiviyLog);
             }
-            // handleReset();
+            handleReset();
             console.log("Comapny Activity", ActiviyLog);
         } catch (error) {
             console.log(error);
@@ -121,6 +120,7 @@ const Form = () => {
             <Sidebar />
             <TopNabvar />
             <main>
+                
                 <div className="row mt-2 mx-3 mb-2">
                     <div className="col-11"></div>
                     <div className="col-1 d-flex justify-content-end">

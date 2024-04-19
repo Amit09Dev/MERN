@@ -12,14 +12,30 @@ function Activity() {
     const [first, setFirst] = useState(1);
     const [rows, setRows] = useState(5);
     const [totalRecords, setTotalRecords] = useState(1);
+    const [searchValue, setSearchValue] = useState({
+        actionOn: "",
+        action: "",
+        startDate: "",
+        endDate: "",
+    });
 
-    const navigate = useNavigate();
+    const handleInputChange = (e) => {
+        const { id, value } = e.target;
+        setSearchValue({
+            ...searchValue,
+            [id]: value,
+        });
+    }
+    const SearchResults = () => {
+        console.log(searchValue);
+    }
 
 
     const onPageChange = (event) => {
         setFirst(event.first);
         setRows(event.rows);
     };
+    const navigate = useNavigate();
 
 
     const getData = async () => {
@@ -61,14 +77,63 @@ function Activity() {
             <Sidebar />
             <TopNabvar />
             <main>
-                <div className="table-container-activity">
+                <div className="table-container-activity p-2">
+                    <div className="container-fluid">
+                        <div className="row my-3">
+                            <div className="col-3">
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    id="actionOn"
+                                    placeholder="Action on"
+                                    value={searchValue.actionOn}
+                                    onChange={handleInputChange}
+                                />
+                            </div>
+                            <div className="col-3">
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    id="action"
+                                    placeholder="Action"
+                                    value={searchValue.action}
+                                    onChange={handleInputChange}
+                                />
+                            </div>
+                            <div className="col-2">
+                                <input
+                                    type="date"
+                                    className="form-control"
+                                    id="startDate"
+                                    value={searchValue.startDate}
+                                    onChange={(e) => handleInputChange(e)}
+                                />
+                            </div>
+                            <div className="col-2">
+                                <input
+                                    type="date"
+                                    className="form-control"
+                                    id="endDate"
+                                    value={searchValue.endDate}
+                                    onChange={(e) => handleInputChange(e)}
+                                />
+                            </div>
+                            <div className="col-2">
+                                <button
+                                    type="button"
+                                    className="btn btn-outline-primary w-100"
+                                    onClick={SearchResults}>
+                                    Search
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                     <table className="table table-striped p-3 shadow-sm" id="tableContent">
                         <thead className="">
                             <tr>
-                                <th scope="col">Action By</th>
+                                <th scope="col">Action On</th>
                                 <th scope="col">Page</th>
                                 <th scope="col">Action</th>
-                                <th scope="col">Action On</th>
                                 <th scope="col">Time</th>
                             </tr>
                         </thead>
@@ -82,10 +147,9 @@ function Activity() {
                             ) : (
                                 activityLog.map((elem, index) => (
                                     <tr key={index}>
-                                        <td>{elem.loginEmployeeId}</td>
+                                        <td>{elem.actionOnId}</td>
                                         <td>{elem.page}</td>
                                         <td>{elem.action}</td>
-                                        <td>{elem.actionOnId}</td>
                                         <td>{(elem.timeStamp.split("GMT")[0]).trim()}</td>
                                     </tr>
                                 ))

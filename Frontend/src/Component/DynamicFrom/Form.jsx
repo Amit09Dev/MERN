@@ -17,8 +17,9 @@ const Form = () => {
     const [newOption, setNewOption] = useState("");
     const [formData, setFormData] = useState({
         companyName: "",
-        companyEmail: "",
+        email: "",
         companyAdditionalDetails: [],
+        companyFieldsName: []
     });
 
 
@@ -45,25 +46,28 @@ const Form = () => {
         try {
             const data = {
                 companyName: formData.companyName,
-                companyEmail: formData.companyEmail,
+                email: formData.email,
+                companyFieldsName: [],
                 companyAdditionalDetails: fields.map(field => ({
                     name: field.name,
                     type: field.type,
                     value: company[field.name] || null,
                 })),
             };
-            
-           const result= await axiosInstance.post("/companyData", data)
-           if(result.status===200){
-            ActiviyLog.page = window.location.href;
-            ActiviyLog.action = "Company added";
-            ActiviyLog.actionOnEmail = data.companyEmail
-            ActiviyLog.dataType="company"
-           const comanyActivity= await axiosInstance.post("/activityLog", ActiviyLog);
-             console.log(comanyActivity);
-           }
-            handleReset();
-            console.log("Comapny Activity",ActiviyLog);
+            console.log(data);
+            data.companyAdditionalDetails.forEach(elem => data.companyFieldsName.push(elem["name"]))
+
+            const result = await axiosInstance.post("/companyData", data)
+            if (result.status === 200) {
+                ActiviyLog.page = window.location.href;
+                ActiviyLog.action = "Company added";
+                ActiviyLog.actionOnEmail = data.email
+                ActiviyLog.dataType = "company"
+                console.log(ActiviyLog);
+                const comanyActivity = await axiosInstance.post("/activityLog", ActiviyLog);
+            }
+            // handleReset();
+            console.log("Comapny Activity", ActiviyLog);
         } catch (error) {
             console.log(error);
         }
@@ -76,7 +80,7 @@ const Form = () => {
         setCompany({});
         setFormData({
             companyName: "",
-            companyEmail: "",
+            email: "",
             companyAdditionalDetails: [],
         });
         setSelectOptions("");
@@ -142,8 +146,8 @@ const Form = () => {
                                 type="text"
                                 className="form-control"
                                 id="email"
-                                value={formData.companyEmail}
-                                onChange={(e) => setFormData({ ...formData, companyEmail: e.target.value })}
+                                value={formData.email}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                 placeholder="Company Email"
                             />
                         </div>
@@ -159,7 +163,6 @@ const Form = () => {
                                                         className="form-select"
                                                         value={company[field.name] || ""}
                                                         onChange={(e) => handleFieldChange(field.name, e.target.value)}>
-
                                                         <option value="null">Select</option>
                                                         {selectOptions[field.name] && selectOptions[field.name].map((option, optionIndex) => (
                                                             <option key={optionIndex} value={option}>{option}</option>
@@ -176,6 +179,7 @@ const Form = () => {
                                                         value={company[field.name] || ""}
                                                         onChange={(e) => handleFieldChange(field.name, e.target.value)}
                                                     />
+
                                                     <i className="bi bi-trash ms-1 fs-5 text-white pointer rounded-2" role="button" onClick={() => handleRemoveField(field.name, index)}
                                                         style={{ backgroundColor: '#dc3545', padding: '4px 8px' }}></i>
                                                 </div>

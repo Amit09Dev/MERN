@@ -9,6 +9,8 @@ import TopNabvar from "../topNavbar/topNavbar";
 import Sidebar from "../sidebar/Sidebar";
 import axiosInstance from "../../api/Axios";
 import ActiviyLog from '../../api/Activitylog'
+import { DiffPatcher } from 'jsondiffpatch';
+
 
 function UserForm() {
   const userFormData = {
@@ -37,6 +39,7 @@ function UserForm() {
   const [selectedOption, setSelectedOption] = useState(null);
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [touched, setTouched] = useState(false);
+  const [tempData, setTempData] = useState({});
   const navigate = useNavigate();
   const { id } = useParams();
   const animatedComponents = makeAnimated();
@@ -103,6 +106,7 @@ function UserForm() {
         .get(`/emp/${id}`)
         .then((response) => {
           const data = response.data;
+          setTempData(data);
           setFormData({
             firstName: data.firstName || "",
             lastName: data.lastName || "",
@@ -158,6 +162,15 @@ function UserForm() {
       color: value,
     });
   };
+
+  function calculateChanges(oldData, newData) {
+    const differ = new DiffPatcher();
+    const delta = differ.diff(oldData, newData);
+
+    return delta;
+  }
+
+
   const handleSave = async () => {
     const validationErrors = validateForm(formData);
     if (Object.keys(validationErrors).length === 0) {
@@ -179,20 +192,21 @@ function UserForm() {
             ActiviyLog.page = window.location.href;
             ActiviyLog.action = "User Added";
             ActiviyLog.actionOnEmail = updatedFormData.email;
-            ActiviyLog.dataType="Employee"
+            ActiviyLog.dataType = "Employee"
             await axiosInstance.post("/activityLog", ActiviyLog)
           }
 
-
           insertnotify();
           resetForm();
-          console.log(res, "ActiviyLog", ActiviyLog);
         } else {
+          const diffResult = calculateChanges(tempData, updatedFormData)
+          console.log(diffResult);
           let positionOfId = (window.location.href).lastIndexOf("/")
           ActiviyLog.page = (window.location.href).slice(0, positionOfId);
           ActiviyLog.action = "User Edited";
-          ActiviyLog.dataType="Employee";
+          ActiviyLog.dataType = "Employee";
           ActiviyLog.actionOnId = id;
+          ActiviyLog.actionOnEmail = updatedFormData.email;
 
           const res = await axiosInstance.patch(`/emp/${id}`, updatedFormData);
           if (res.status === 200) {
@@ -202,7 +216,6 @@ function UserForm() {
           resetForm();
           navigate("/userlist");
         }
-        console.log(ActiviyLog);
       } catch (error) {
         console.error("Error:", error);
       }

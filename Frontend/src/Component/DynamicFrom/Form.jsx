@@ -20,7 +20,7 @@ const Form = () => {
         email: "",
         email: "",
         companyAdditionalDetails: [],
-        companyFieldsName: []
+        companyFieldsName: [],
         companyFieldsName: []
     });
 
@@ -62,6 +62,7 @@ const Form = () => {
 
             const result = await axiosInstance.post("/companyData", data)
             if (result.status === 200) {
+                toast.success("Data Saved");
                 ActiviyLog.page = window.location.href;
                 ActiviyLog.action = "Company added";
                 ActiviyLog.actionOnEmail = data.email
@@ -152,8 +153,6 @@ const Form = () => {
                                 type="text"
                                 className="form-control"
                                 id="email"
-                                value={formData.email}
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                 placeholder="Company Email"

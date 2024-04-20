@@ -22,7 +22,7 @@ const newActivityLog = async (req, res) => {
       });
       newActivityLogData.actionOnId = newDataAdded.email;
 
-      console.log(newActivityLogData.actionOnId);
+      console.log(newDataAdded);
     }
     newActivityLogData.loginEmployeeId = req.loginEmployeeEmail;
     const _newActivityLogData = await ActivityLog.create(newActivityLogData);

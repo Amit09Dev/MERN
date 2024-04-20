@@ -13,6 +13,7 @@
     "axios": "^1.6.8",
     "bootstrap": "^5.3.3",
     "formik": "^2.4.5",
+    "jsondiffpatch": "^0.6.0",
     "mdb-react-ui-kit": "^7.2.0",
     "primeicons": "^7.0.0",
     "primereact": "^10.6.3",

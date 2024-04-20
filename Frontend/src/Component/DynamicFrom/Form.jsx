@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
+import { useDispatch } from 'react-redux';
 import { Dialog } from 'primereact/dialog';
 import Sidebar from "../sidebar/Sidebar";
 import TopNabvar from "../topNavbar/topNavbar";
 import { toast } from "react-toastify";
 import axiosInstance from "src/api/Axios";
 import ActiviyLog from "src/api/Activitylog";
+import { addData } from "src/store/FormSlice";
+import { useRef } from "react";
 
 
 const Form = () => {
@@ -15,14 +18,17 @@ const Form = () => {
     const [company, setCompany] = useState({});
     const [selectOptions, setSelectOptions] = useState({});
     const [newOption, setNewOption] = useState("");
+    const dispatch = useDispatch()
+   
     const [formData, setFormData] = useState({
         companyName: "",
         email: "",
         email: "",
         companyAdditionalDetails: [],
-        companyFieldsName: []
+        companyFieldsName: [],
         companyFieldsName: []
     });
+    
 
 
     const handleAddOption = () => {
@@ -45,37 +51,36 @@ const Form = () => {
     };
 
     const handleSubmit = async () => {
-        try {
-            const data = {
-                companyName: formData.companyName,
-                email: formData.email,
-                companyFieldsName: [],
-                email: formData.email,
-                companyFieldsName: [],
-                companyAdditionalDetails: fields.map(field => ({
-                    name: field.name,
-                    type: field.type,
-                    value: company[field.name] || null,
-                })),
-            };
-            data.companyAdditionalDetails.forEach(elem => data.companyFieldsName.push(elem["name"]))
+        // try {
+        //     const data = {
+        //         companyName: formData.companyName,
+        //         email: formData.email,
+        //         companyFieldsName: [],
+        //         email: formData.email,
+        //         companyFieldsName: [],
+        //         companyAdditionalDetails: fields.map(field => ({
+        //             name: field.name,
+        //             type: field.type,
+        //             value: company[field.name] || null,
+        //         })),
+        //     };
+        //     data.companyAdditionalDetails.forEach(elem => data.companyFieldsName.push(elem["name"]))
 
-            const result = await axiosInstance.post("/companyData", data)
-            if (result.status === 200) {
-                ActiviyLog.page = window.location.href;
-                ActiviyLog.action = "Company added";
-                ActiviyLog.actionOnEmail = data.email
-                ActiviyLog.dataType = "company"
-                console.log(ActiviyLog);
-                const comanyActivity = await axiosInstance.post("/activityLog", ActiviyLog);
-            }
+        //     const result = await axiosInstance.post("/companyData", data)
+        //     if (result.status === 200) {
+        //         ActiviyLog.page = window.location.href;
+        //         ActiviyLog.action = "Company added";
+        //         ActiviyLog.actionOnEmail = data.email
+        //         ActiviyLog.dataType = "company"
+        //         console.log(ActiviyLog);
+        //         const comanyActivity = await axiosInstance.post("/activityLog", ActiviyLog);
+        //     }
             handleReset();
             console.log("Comapny Activity", ActiviyLog);
-            console.log("Comapny Activity", ActiviyLog);
-        } catch (error) {
-            console.log(error);
-        }
-    };
+            console.log("Comapny fields", fields);
+            dispatch(addData(fields));
+        } 
+    
 
     const handleReset = () => {
         setFields([]);
@@ -135,29 +140,8 @@ const Form = () => {
                 </div>
                 <form>
                     <div className="row mx-3 mt-2 shadow-lg p-3">
-                        <div className="col-6">
-                            <label htmlFor="fullName" className="form-label">Company Name</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="fullName"
-                                value={formData.companyName}
-                                onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                                placeholder="Company Name"
-                            />
-                        </div>
-                        <div className="col-6">
-                            <label htmlFor="email" className="form-label">Company Email</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="email"
-                                value={formData.email}
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                value={formData.email}
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                placeholder="Company Email"
-                            />
+                        <div className="d-flex justify-content-center">
+                            <h3>Make Dynamic Form</h3>
                         </div>
                         <div className="col-12 mt-2">
                             <div className="row">

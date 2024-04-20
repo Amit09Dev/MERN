@@ -58,7 +58,7 @@ const verifyEmployeeLogin = async (req, res) => {
                   loginEmployeeId: existingEmail._id,
                 },
                 jwt_secret_key,
-                { expiresIn: "5h" }
+                { expiresIn: "10h" }
               );
 
               res.status(200).json({ token, loginEmployeeId:existingEmail._id , msg: "login successful" });

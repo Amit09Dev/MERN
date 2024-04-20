@@ -8,9 +8,13 @@ import Form from './Component/DynamicFrom/Form.jsx';
 import Activity from './Component/Activity/Activity';
 import Page404 from './Component/Page404.jsx';
 import CompanyList from './Component/Company/CompanyList';
+import { store } from './store/FormData';
+import { Provider } from 'react-redux';
+
 function App() {
 
   return (
+    <Provider store={store}>
     <Router>
       <div className="app">
         <div className="content">
@@ -29,6 +33,7 @@ function App() {
         </div>
       </div>
     </Router>
+    </Provider>
   );
 }
 

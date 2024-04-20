@@ -16,12 +16,7 @@ const newActivityLog = async (req, res) => {
     console.log(modelName);
     const Model = models[modelName];
 
-    const modelName = req.body.dataType;
-    console.log(modelName);
-    const Model = models[modelName];
-
     if (!newActivityLogData.actionOnId) {
-      const newDataAdded = await Model.findOne({
       const newDataAdded = await Model.findOne({
         email: newActivityLogData.actionOnEmail,
       });

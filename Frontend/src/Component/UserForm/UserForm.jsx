@@ -9,7 +9,12 @@ import TopNabvar from "../topNavbar/topNavbar";
 import Sidebar from "../sidebar/Sidebar";
 import axiosInstance from "../../api/Axios";
 import ActiviyLog from '../../api/Activitylog'
+import { useSelector } from 'react-redux'
 
+import { TabView, TabPanel } from 'primereact/tabview';
+        
+import "./UserForm.css";
+import { type } from "@testing-library/user-event/dist/type";
 function UserForm() {
   const userFormData = {
     firstName: "",
@@ -38,8 +43,41 @@ function UserForm() {
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [touched, setTouched] = useState(false);
   const navigate = useNavigate();
+  const [company, setCompany] = useState({});
   const { id } = useParams();
+  const [selectOptions, setSelectOptions] = useState({});
   const animatedComponents = makeAnimated();
+  const [fields, setFields] = useState([]);
+  let dynaminData=[]
+  dynaminData = useSelector((state) => state.counter.fields);
+ useEffect(() => {
+  console.log("vghavhvfa",dynaminData);
+  if (dynaminData) {
+
+    const formattedFields = dynaminData.map((field) => ({
+      name: field.name,
+      type:field.type
+    }));
+    setFields(formattedFields);
+  }
+}, [dynaminData]);
+const companyhandleSubmit = async () => {
+  try {
+    const data=fields.map(field=>{
+      return {
+        name: field.name,
+        type: field.type,
+        value: company[field.name] || null,
+      }
+    })
+   console.log(data);    
+       
+  
+  } catch (error) {
+      console.log(error);
+  }
+};
+
 
   const handleChange = (selectedOption) => {
     setSelectedOption(selectedOption);
@@ -95,6 +133,11 @@ function UserForm() {
       }
     }
   };
+  const handleRemoveField = (fieldName, index) => {
+    const updatedFields = [...fields];
+    updatedFields.splice(index, 1);
+    setFields(updatedFields);
+};
 
   useEffect(() => {
     RoleData();
@@ -128,7 +171,9 @@ function UserForm() {
         });
     }
   }, [id]);
-
+  const handleFieldChange = (fieldName, value) => {
+    setCompany({ ...company, [fieldName]: value });
+};
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     setFormData({
@@ -323,6 +368,9 @@ function UserForm() {
             </ol>
           </nav>
         </div>
+        <TabView>
+    <TabPanel header="UserForm">
+        <p className="m-0">
         <form autoComplete="off">
           <div className="row mx-3 mt-2 shadow-lg p-3">
             <div className="col-6">
@@ -609,6 +657,56 @@ function UserForm() {
             </div>
           </div>
         </form>
+        </p>
+    </TabPanel>
+    <TabPanel header="CompanyForm" >
+        <p className="m-0">
+     {fields.length>0 &&   <div className="col-12 mt-2 mx-3 mt-2 shadow-lg p-3">
+                            <div className="row">
+                                {fields.map((field, index) => {
+                                    return (
+                                        <div className="col-6" key={index}>
+                                            <label htmlFor={field.name} className="form-label">{field.name}</label>
+                                            {field.type === "select" ? (
+                                                <div className="d-flex justify-content-between">
+                                                    <select
+                                                        className="form-select"
+                                                        value={company[field.name] || ""}
+                                                        onChange={(e) => handleFieldChange(field.name, e.target.value)}>
+                                                        <option value="null">Select</option>
+                                                        {selectOptions[field.name] && selectOptions[field.name].map((option, optionIndex) => (
+                                                            <option key={optionIndex} value={option}>{option}</option>
+                                                        ))}
+                                                    </select>
+                                                    <i className="bi bi-trash ms-1 fs-5 text-white pointer rounded-2" role="button" onClick={() => handleRemoveField(field.name, index)} style={{ backgroundColor: '#dc3545', padding: '4px 8px' }}></i>
+                                                </div>
+                                            ) : (
+                                                <div className="d-flex justify-content-between">
+                                                    <input
+                                                        type={field.type}
+                                                        className="form-control"
+                                                        placeholder={field.name}
+                                                        value={company[field.name] || ""}
+                                                        onChange={(e) => handleFieldChange(field.name, e.target.value)}
+                                                    />
+
+
+                                                    <i className="bi bi-trash ms-1 fs-5 text-white pointer rounded-2" role="button" onClick={() => handleRemoveField(field.name, index)}
+                                                        style={{ backgroundColor: '#dc3545', padding: '4px 8px' }}></i>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                          {fields.length>0 &&   <div className="d-flex justify-content-end mt-3">
+                              <button className="btn btn-warning " onClick={companyhandleSubmit}>Save</button>
+                            </div>}
+        </div>}
+
+        </p>
+    </TabPanel>
+</TabView>
       </main>
     </>
   );

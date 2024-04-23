@@ -74,7 +74,7 @@ function Activity() {
             "6618dab055f5fd27cc987878": "Admin",
             "6618dae355f5fd27cc98787a": "Super Admin"
         };
-    
+
         const tableRows = Object.keys(data).map((key) => {
             if (key === "pastExperience") {
                 return data[key].old
@@ -82,7 +82,7 @@ function Activity() {
                         const isDifferent = Object.keys(item).some((prop) =>
                             item[prop] !== data[key].new[index]?.[prop]
                         );
-    
+
                         if (isDifferent) {
                             return [
                                 <tr key={`${key}-${index}-header`} className='text-center'>
@@ -127,7 +127,7 @@ function Activity() {
                 );
             }
         });
-    
+
         return (
             <table className="table">
                 <thead>
@@ -141,169 +141,6 @@ function Activity() {
             </table>
         );
     }
-    
-
-    // function generateEditData(data) {
-    //     console.log(data);
-
-    //     const userRole = {
-    //         "6618da9655f5fd27cc987876": "User",
-    //         "6618dab055f5fd27cc987878": "Admin",
-    //         "6618dae355f5fd27cc98787a": "Super Admin"
-    //     }
-    //     const tableRows = Object.keys(data).map((key) => {
-    //         if (key === "pastExperience") {
-    //             return data[key].old
-    //                 .map((item, index) => {
-    //                     const isDifferent = Object.keys(item).some((prop) =>
-    //                         item[prop] !== data[key].new[index]?.[prop]
-    //                     );
-
-    //                     if (isDifferent) {
-    //                         return [
-    //                             <tr key={`${key}-${index}-header`} className='text-center'>
-    //                                 <td colSpan={3}>{key} ({index + 1})</td>
-    //                             </tr>,
-    //                             <tr key={`${key}-${index}-company`}>
-    //                                 <td>Company Name</td>
-    //                                 <td>{item.companyName}</td>
-    //                                 <td>{data[key].new[index]?.companyName ?? <span className='text-danger'>Removed</span>}</td>
-    //                             </tr>,
-    //                             <tr key={`${key}-${index}-start`}>
-    //                                 <td>Start Date</td>
-    //                                 <td>{item.startDate}</td>
-    //                                 <td>{data[key].new[index]?.startDate ?? <span className='text-danger'>Removed</span>}</td>
-    //                             </tr>,
-    //                             <tr key={`${key}-${index}-end`}>
-    //                                 <td>End Date</td>
-    //                                 <td>{item.endDate}</td>
-    //                                 <td>{data[key].new[index]?.endDate ?? <span className='text-danger'>Removed</span>}</td>
-    //                             </tr>
-    //                         ];
-    //                     } else {
-    //                         return [];
-    //                     }
-    //                 })
-    //                 .flat();
-    //         } else {
-    //             return (
-    //                 <tr key={key}>
-    //                     <td>{formatKey(key)}</td>
-    //                     <td>{data[key].old}</td>
-    //                     <td>{data[key].new}</td>
-    //                 </tr>
-    //             );
-    //         }
-    //     });
-
-    //     return (
-    //         <table className="table">
-    //             <thead>
-    //                 <tr>
-    //                     <th scope="col">Values</th>
-    //                     <th>From</th>
-    //                     <th>To</th>
-    //                 </tr>
-    //             </thead>
-    //             <tbody>{tableRows}</tbody>
-    //         </table>
-    //     );
-    // }
-
-    // function generateEditData(data) {
-    //     console.log(data);
-    // const items = [];
-
-    // for (const key in data) {
-    //     if (data.hasOwnProperty(key)) {
-    //         let fromValue = '';
-    //         let toValue = '';
-    //         const value = data[key];
-
-    //         if (Array.isArray(value)) {
-    //             fromValue = value[0] || '';
-    //             toValue = value[1] || '';
-    //         } else if (typeof value === 'object' && value !== null) {
-    //             if (key === 'pastExperience') {
-    //                 // Skip pastExperience key, print Company Name and values directly
-    //                 for (const subKey in value) {
-    //                     const companyNameValues = value[subKey].companyName;
-    //                     if (Array.isArray(companyNameValues) && companyNameValues.length === 2) {
-    //                         items.push(
-    //                             <tr key={`Company-Name`}>
-    //                                 <td>Company Name</td>
-    //                                 <td>{companyNameValues[0]}</td>
-    //                                 <td>{companyNameValues[1]}</td>
-    //                             </tr>
-    //                         );
-    //                     }
-    //                 }
-    //             } else if (key === 'userRole') {
-    //                 // Skip the 0 and _0 keys for userRole
-    //                 items.push(
-    //                     <tr key={key}>
-    //                         <td>{formatKey(key)}</td>
-    //                         <td>{value['_0']}</td>
-    //                         <td>{value['0']}</td>
-    //                     </tr>
-    //                 );
-    //             } else {
-    //                 items.push(...generateEditData(value)); // Recursive call
-    //             }
-    //         } else {
-    //             fromValue = value;
-    //         }
-
-    //         if (key !== 'pastExperience' && key !== 'userRole') {
-    //             const formattedKey = formatKey(key);
-    //             items.push(
-    //                 <tr key={key}>
-    //                     <td>{formattedKey}</td>
-    //                     <td>{fromValue}</td>
-    //                     <td>{toValue}</td>
-    //                 </tr>
-    //             );
-    //         }
-    //     }
-    // }
-    // return (
-    //     <div className="">
-    //         <table className="edit-data-table table">
-    //             <thead>
-    //                 <tr>
-    //                     <th scope="col">Values</th>
-    //                     <th>From</th>
-    //                     <th>To</th>
-    //                 </tr>
-    //             </thead>
-    //             <tbody>
-    //                 {items}
-    //             </tbody>
-    //         </table>
-    //     </div>
-    // );
-    // }
-
-
-    // function generateNestedTableRows(key, data) {
-    //     let subItems = [];
-
-    //     for (let subKey in data) {
-    //         const values = data[subKey];
-    //         const fromValue = values[0] || '';
-    //         const toValue = values[1] || '';
-
-    //         subItems.push(
-    //             <tr key={`${key}-${subKey}`}>
-    //                 <td>{formatKey(subKey)}</td>
-    //                 <td>{fromValue}</td>
-    //                 <td>{toValue}</td>
-    //             </tr>
-    //         );
-    //     }
-
-    //     return subItems;
-    // }
 
     function formatKey(key) {
         const words = key.replace(/_/g, ' ').split(/(?=[A-Z])/);

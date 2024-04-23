@@ -5,20 +5,25 @@ import TopNabvar from '../topNavbar/topNavbar';
 import './Activity.css'
 import axiosInstance from "src/api/Axios";
 import { Paginator } from "primereact/paginator";
-
+import { Dialog } from 'primereact/dialog';
 
 function Activity() {
     const [activityLog, setActivityLog] = useState([]);
     const [first, setFirst] = useState(1);
     const [rows, setRows] = useState(5);
     const [totalRecords, setTotalRecords] = useState(1);
+    const [visible, setVisible] = useState(Array(activityLog.length).fill(false));
     const [searchValue, setSearchValue] = useState({
         actionOn: "",
         action: "",
         startDate: "",
         endDate: "",
     });
-
+    const handleDialogVisibility = (index, visibility) => {
+        const updatedVisible = [...visible];
+        updatedVisible[index] = visibility;
+        setVisible(updatedVisible);
+    }
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         setSearchValue({
@@ -44,15 +49,15 @@ function Activity() {
             pageSize: rows
         };
         try {
-            const result = await axiosInstance.get("/allLogs", {
-                params: data,
-            });
+            const result = await axiosInstance.get("/allLogs", { params: data, });
             setActivityLog(result.data.data);
-            setTotalRecords(result.data.totalRecords);
+            result.data.totalRecords ? setTotalRecords(result.data.totalRecords) : setTotalRecords(1)
         } catch (error) {
-            console.log(error);
             if (error.response && error.response.data.includes("jwt expired")) {
                 navigate("/login");
+            }
+            else {
+                console.log(error);
             }
         }
     };
@@ -62,44 +67,251 @@ function Activity() {
     }, [first, rows]);
 
 
+
     function generateEditData(data) {
-        const items = [];
-
-        for (const key in data) {
-            if (data.hasOwnProperty(key)) {
-                let renderedValue = '';
-                const value = data[key];
-
-                if (Array.isArray(value)) {
-                    if (value.length >= 2) {
-                        renderedValue = value[0] + ' --> ' + value[1];
-                    } else {
-                        renderedValue = value.join(', ');
-                    }
-                } else if (typeof value === 'object' && value !== null) {
-                    renderedValue = generateEditData(value);
-                } else {
-                    renderedValue = value;
-                }
-
-                const formattedKey = formatKey(key);
-                items.push(
-                    <li key={key}>
-                        <b style={{marginRight: '8px' }}>{formattedKey}: </b> {renderedValue}
-                    </li>
+        const userRole = {
+            "6618da9655f5fd27cc987876": "User",
+            "6618dab055f5fd27cc987878": "Admin",
+            "6618dae355f5fd27cc98787a": "Super Admin"
+        };
+    
+        const tableRows = Object.keys(data).map((key) => {
+            if (key === "pastExperience") {
+                return data[key].old
+                    .map((item, index) => {
+                        const isDifferent = Object.keys(item).some((prop) =>
+                            item[prop] !== data[key].new[index]?.[prop]
+                        );
+    
+                        if (isDifferent) {
+                            return [
+                                <tr key={`${key}-${index}-header`} className='text-center'>
+                                    <td colSpan={3}>{key} ({index + 1})</td>
+                                </tr>,
+                                <tr key={`${key}-${index}-company`}>
+                                    <td>Company Name</td>
+                                    <td>{item.companyName}</td>
+                                    <td>{data[key].new[index]?.companyName ?? <span className='text-danger'>Removed</span>}</td>
+                                </tr>,
+                                <tr key={`${key}-${index}-start`}>
+                                    <td>Start Date</td>
+                                    <td>{item.startDate}</td>
+                                    <td>{data[key].new[index]?.startDate ?? <span className='text-danger'>Removed</span>}</td>
+                                </tr>,
+                                <tr key={`${key}-${index}-end`}>
+                                    <td>End Date</td>
+                                    <td>{item.endDate}</td>
+                                    <td>{data[key].new[index]?.endDate ?? <span className='text-danger'>Removed</span>}</td>
+                                </tr>
+                            ];
+                        } else {
+                            return [];
+                        }
+                    })
+                    .flat();
+            } else if (key === "userRole") {
+                return (
+                    <tr key={key}>
+                        <td>{formatKey(key)}</td>
+                        <td>{userRole[data[key].old]}</td>
+                        <td>{userRole[data[key].new]}</td>
+                    </tr>
+                );
+            } else {
+                return (
+                    <tr key={key}>
+                        <td>{formatKey(key)}</td>
+                        <td>{data[key].old}</td>
+                        <td>{data[key].new}</td>
+                    </tr>
                 );
             }
-        }
-        return <ul className='p-0'>{items}</ul>;
+        });
+    
+        return (
+            <table className="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Values</th>
+                        <th>From</th>
+                        <th>To</th>
+                    </tr>
+                </thead>
+                <tbody>{tableRows}</tbody>
+            </table>
+        );
     }
+    
+
+    // function generateEditData(data) {
+    //     console.log(data);
+
+    //     const userRole = {
+    //         "6618da9655f5fd27cc987876": "User",
+    //         "6618dab055f5fd27cc987878": "Admin",
+    //         "6618dae355f5fd27cc98787a": "Super Admin"
+    //     }
+    //     const tableRows = Object.keys(data).map((key) => {
+    //         if (key === "pastExperience") {
+    //             return data[key].old
+    //                 .map((item, index) => {
+    //                     const isDifferent = Object.keys(item).some((prop) =>
+    //                         item[prop] !== data[key].new[index]?.[prop]
+    //                     );
+
+    //                     if (isDifferent) {
+    //                         return [
+    //                             <tr key={`${key}-${index}-header`} className='text-center'>
+    //                                 <td colSpan={3}>{key} ({index + 1})</td>
+    //                             </tr>,
+    //                             <tr key={`${key}-${index}-company`}>
+    //                                 <td>Company Name</td>
+    //                                 <td>{item.companyName}</td>
+    //                                 <td>{data[key].new[index]?.companyName ?? <span className='text-danger'>Removed</span>}</td>
+    //                             </tr>,
+    //                             <tr key={`${key}-${index}-start`}>
+    //                                 <td>Start Date</td>
+    //                                 <td>{item.startDate}</td>
+    //                                 <td>{data[key].new[index]?.startDate ?? <span className='text-danger'>Removed</span>}</td>
+    //                             </tr>,
+    //                             <tr key={`${key}-${index}-end`}>
+    //                                 <td>End Date</td>
+    //                                 <td>{item.endDate}</td>
+    //                                 <td>{data[key].new[index]?.endDate ?? <span className='text-danger'>Removed</span>}</td>
+    //                             </tr>
+    //                         ];
+    //                     } else {
+    //                         return [];
+    //                     }
+    //                 })
+    //                 .flat();
+    //         } else {
+    //             return (
+    //                 <tr key={key}>
+    //                     <td>{formatKey(key)}</td>
+    //                     <td>{data[key].old}</td>
+    //                     <td>{data[key].new}</td>
+    //                 </tr>
+    //             );
+    //         }
+    //     });
+
+    //     return (
+    //         <table className="table">
+    //             <thead>
+    //                 <tr>
+    //                     <th scope="col">Values</th>
+    //                     <th>From</th>
+    //                     <th>To</th>
+    //                 </tr>
+    //             </thead>
+    //             <tbody>{tableRows}</tbody>
+    //         </table>
+    //     );
+    // }
+
+    // function generateEditData(data) {
+    //     console.log(data);
+    // const items = [];
+
+    // for (const key in data) {
+    //     if (data.hasOwnProperty(key)) {
+    //         let fromValue = '';
+    //         let toValue = '';
+    //         const value = data[key];
+
+    //         if (Array.isArray(value)) {
+    //             fromValue = value[0] || '';
+    //             toValue = value[1] || '';
+    //         } else if (typeof value === 'object' && value !== null) {
+    //             if (key === 'pastExperience') {
+    //                 // Skip pastExperience key, print Company Name and values directly
+    //                 for (const subKey in value) {
+    //                     const companyNameValues = value[subKey].companyName;
+    //                     if (Array.isArray(companyNameValues) && companyNameValues.length === 2) {
+    //                         items.push(
+    //                             <tr key={`Company-Name`}>
+    //                                 <td>Company Name</td>
+    //                                 <td>{companyNameValues[0]}</td>
+    //                                 <td>{companyNameValues[1]}</td>
+    //                             </tr>
+    //                         );
+    //                     }
+    //                 }
+    //             } else if (key === 'userRole') {
+    //                 // Skip the 0 and _0 keys for userRole
+    //                 items.push(
+    //                     <tr key={key}>
+    //                         <td>{formatKey(key)}</td>
+    //                         <td>{value['_0']}</td>
+    //                         <td>{value['0']}</td>
+    //                     </tr>
+    //                 );
+    //             } else {
+    //                 items.push(...generateEditData(value)); // Recursive call
+    //             }
+    //         } else {
+    //             fromValue = value;
+    //         }
+
+    //         if (key !== 'pastExperience' && key !== 'userRole') {
+    //             const formattedKey = formatKey(key);
+    //             items.push(
+    //                 <tr key={key}>
+    //                     <td>{formattedKey}</td>
+    //                     <td>{fromValue}</td>
+    //                     <td>{toValue}</td>
+    //                 </tr>
+    //             );
+    //         }
+    //     }
+    // }
+    // return (
+    //     <div className="">
+    //         <table className="edit-data-table table">
+    //             <thead>
+    //                 <tr>
+    //                     <th scope="col">Values</th>
+    //                     <th>From</th>
+    //                     <th>To</th>
+    //                 </tr>
+    //             </thead>
+    //             <tbody>
+    //                 {items}
+    //             </tbody>
+    //         </table>
+    //     </div>
+    // );
+    // }
+
+
+    // function generateNestedTableRows(key, data) {
+    //     let subItems = [];
+
+    //     for (let subKey in data) {
+    //         const values = data[subKey];
+    //         const fromValue = values[0] || '';
+    //         const toValue = values[1] || '';
+
+    //         subItems.push(
+    //             <tr key={`${key}-${subKey}`}>
+    //                 <td>{formatKey(subKey)}</td>
+    //                 <td>{fromValue}</td>
+    //                 <td>{toValue}</td>
+    //             </tr>
+    //         );
+    //     }
+
+    //     return subItems;
+    // }
 
     function formatKey(key) {
         const words = key.replace(/_/g, ' ').split(/(?=[A-Z])/);
         return words.map(word => {
-            return word ? word[0].toUpperCase() + word.slice(1) : word; 
+            return word ? word[0].toUpperCase() + word.slice(1) : word;
         }).join(' ');
     }
-    
+
 
     return (
         <>
@@ -161,7 +373,7 @@ function Activity() {
                         <thead className="">
                             <tr>
                                 <th scope="col">Action On</th>
-                                <th scope="col">Page</th>
+                                {/* <th scope="col">Page</th> */}
                                 <th scope="col">Action</th>
                                 <th scope="col">Time</th>
                             </tr>
@@ -177,13 +389,29 @@ function Activity() {
                                 activityLog.map((elem, index) => (
                                     <tr key={index}>
                                         <td>{elem.actionOnEmail}</td>
-                                        <td>{elem.page}</td>
-                                        <td>{elem.action === "User Edited" ? generateEditData(elem.data) : elem.action}</td>
+                                        {/* <td>{elem.page}</td> */}
+                                        <td>
+                                            {elem.action === "Employe Edited" ? (
+                                                <>
+                                                    <div className='d-flex align-items-center'>
+                                                        <p className='m-0'>Employe Edited </p>
+                                                        <i className="bi bi-box-arrow-up-right cursor-pointer ms-2 text-white py-1 px-2 rounded-2" style={{ backgroundColor: "#06b6d4" }} role='button'
+                                                            onClick={() => handleDialogVisibility(index, true)}></i>
+                                                    </div>
+                                                    <Dialog key={index} header="User Edited" visible={visible[index]} style={{ width: '50vw' }} onHide={() => handleDialogVisibility(index, false)}>
+                                                        {generateEditData(elem.data)}
+                                                    </Dialog>
+                                                </>
+                                            ) : (
+                                                <p>{elem.action}</p>
+                                            )}
+                                        </td>
                                         <td>{(elem.timeStamp.split("GMT")[0]).trim()}</td>
                                     </tr>
                                 ))
                             )}
                         </tbody>
+
                     </table>
                     <Paginator
                         className='position-absolute bottom-0 start-50 translate-middle'

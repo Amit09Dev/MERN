@@ -151,11 +151,6 @@ function UserData() {
   const deleteUser = async (id) => {
     try {
       await axiosInstance.delete(`/emp/${id}`);
-      ActiviyLog.page = window.location.href;
-      ActiviyLog.action = "User Deleted";
-      ActiviyLog.actionOnId = id;
-      ActiviyLog.dataType="Employee";
-      await axiosInstance.post("/activityLog", ActiviyLog)
       getData();
       toast.success("Data delete Successfully");
       await fetchData();

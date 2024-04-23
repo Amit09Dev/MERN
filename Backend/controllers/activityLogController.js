@@ -103,7 +103,7 @@ const showActivityLog = async (req, res) => {
     // ];
     let aggregationPipeline = [
       {
-        $match: { loginEmployeeId: req.loginEmployeeEmail },
+        $match: { loginEmployeeEmail: req.loginEmployeeEmail },
       },
       {
         $facet: {
@@ -128,7 +128,11 @@ const showActivityLog = async (req, res) => {
     ];
     const logs = await ActivityLog.aggregate(aggregationPipeline).exec();
     // console.log(logs[0].data);
+    if (logs[0].totalRecords.length == 0) {
+      logs[0].totalRecords[0] = 1
+    }
 
+    console.log(logs);
     const allLogsData = {
       data: logs[0].data,
       totalRecords: logs[0].totalRecords[0].total,

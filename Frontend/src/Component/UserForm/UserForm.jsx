@@ -13,7 +13,6 @@ import { useSelector } from 'react-redux'
 import { TabView, TabPanel } from 'primereact/tabview';
 import { DiffPatcher } from 'jsondiffpatch';
 import "./UserForm.css";
-// import { type } from "@testing-library/user-event/dist/type";
 function UserForm() {
   const userFormData = {
     firstName: "",
@@ -236,30 +235,7 @@ function UserForm() {
           resetForm();
         }
         else {
-          const tempCompareData = { ...updatedFormData };
-          delete tempData._id;
-          delete tempData.loginEmployeeId;
-          tempData.userRole = tempData.userRole.map(role => role.value);
-          const diffResult = calculateChanges(tempData, tempCompareData);
-          delete diffResult.userRole._t;
-          delete diffResult.pastExperience._t;
-          for (let i = 0; i < 3; i++) {
-            if (diffResult.userRole[`_${i}`]) {
-              diffResult.userRole[`_${i}`] = [diffResult.userRole[`_${i}`][0]]
-            }
-          }
-          let positionOfId = (window.location.href).lastIndexOf("/")
-          ActiviyLog.page = (window.location.href).slice(0, positionOfId);
-          ActiviyLog.action = "User Edited";
-          ActiviyLog.data = diffResult;
-          ActiviyLog.actionOnId = id;
-          ActiviyLog.dataType = "Employee";
-          ActiviyLog.actionOnEmail = updatedFormData.email;
-          console.log(ActiviyLog);
-          const res = await axiosInstance.patch(`/emp/${id}`, updatedFormData);
-          if (res.status === 200) {
-            await axiosInstance.post("/activityLog", ActiviyLog)
-          }
+          await axiosInstance.patch(`/emp/${id}`, updatedFormData);
           updatenotify();
           resetForm();
           navigate("/userlist");

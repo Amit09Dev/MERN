@@ -20,9 +20,9 @@ const newActivityLog = async (req, res) => {
       const newDataAdded = await Model.findOne({
         email: newActivityLogData.actionOnEmail,
       });
-      newActivityLogData.actionOnId = newDataAdded.email;
-
       console.log(newDataAdded);
+      newActivityLogData.actionOnId = newDataAdded._id;
+
     }
     newActivityLogData.loginEmployeeId = req.loginEmployeeEmail;
     const _newActivityLogData = await ActivityLog.create(newActivityLogData);

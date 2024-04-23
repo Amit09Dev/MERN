@@ -74,7 +74,7 @@ const verifyEmployeeLogin = async (req, res) => {
       app.use(authenticateEmployee);
     }
   } catch (error) {
-    res.status(400).send({ success: false, msg: error.message });
+    res.status(400).send({ success: false, message: "Email or Password is incorrect" });
   }
 };
 module.exports = { newLoginEmployee, verifyEmployeeLogin };

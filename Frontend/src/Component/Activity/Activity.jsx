@@ -47,7 +47,6 @@ function Activity() {
             const result = await axiosInstance.get("/allLogs", {
                 params: data,
             });
-            console.log(result);
             setActivityLog(result.data.data);
             setTotalRecords(result.data.totalRecords);
         } catch (error) {
@@ -62,16 +61,46 @@ function Activity() {
         getData();
     }, [first, rows]);
 
-    const getAllLogs = async () => {
-        try {
-            let result = await axiosInstance.get("/allLogs")
-            console.log(result.data);
-            setActivityLog(result.data);
+
+    function generateEditData(data) {
+        const items = [];
+
+        for (const key in data) {
+            if (data.hasOwnProperty(key)) {
+                let renderedValue = '';
+                const value = data[key];
+
+                if (Array.isArray(value)) {
+                    if (value.length >= 2) {
+                        renderedValue = value[0] + ' --> ' + value[1];
+                    } else {
+                        renderedValue = value.join(', ');
+                    }
+                } else if (typeof value === 'object' && value !== null) {
+                    renderedValue = generateEditData(value);
+                } else {
+                    renderedValue = value;
+                }
+
+                const formattedKey = formatKey(key);
+                items.push(
+                    <li key={key}>
+                        <b style={{marginRight: '8px' }}>{formattedKey}: </b> {renderedValue}
+                    </li>
+                );
+            }
         }
-        catch (error) {
-            console.log(error);
-        }
+        return <ul className='p-0'>{items}</ul>;
     }
+
+    function formatKey(key) {
+        const words = key.replace(/_/g, ' ').split(/(?=[A-Z])/);
+        return words.map(word => {
+            return word ? word[0].toUpperCase() + word.slice(1) : word; 
+        }).join(' ');
+    }
+    
+
     return (
         <>
             <Sidebar />
@@ -147,9 +176,9 @@ function Activity() {
                             ) : (
                                 activityLog.map((elem, index) => (
                                     <tr key={index}>
-                                        <td>{elem.actionOnId}</td>
+                                        <td>{elem.actionOnEmail}</td>
                                         <td>{elem.page}</td>
-                                        <td>{elem.action}</td>
+                                        <td>{elem.action === "User Edited" ? generateEditData(elem.data) : elem.action}</td>
                                         <td>{(elem.timeStamp.split("GMT")[0]).trim()}</td>
                                     </tr>
                                 ))

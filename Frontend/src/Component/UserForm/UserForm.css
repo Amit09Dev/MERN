@@ -1,26 +1,16 @@
-.p-tabview-nav-link{
-    
-    color:black;
-
-}
-.p-tabview .p-tabview-nav .p-tabview-ink-bar
-{
-
-    background-color: #0b0c0c;
-
-}
-.p-unselectable-text p-tabview-selected p-highlight{
-    background-color: #0b0c0c;
-    color: white;
-}
-.p-unselectable-text{
- color: black;
-}
-.p-tabview-selected {
+.p-tabview-nav-link {
     color: black;
+
 }
 
-.p-highlight {
-    background-color: #1b1e1e !important;
-    color: #ffff !important;
+.p-tabview-nav-link{
+    text-decoration: none;
+}
+
+.p-tabview-nav .p-tabview-selected{
+    background-color: transparent !important;
+}
+
+.p-tabview-ink-bar{
+    background-color: white !important;
 }

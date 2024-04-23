@@ -19,7 +19,7 @@ const Form = () => {
     const [selectOptions, setSelectOptions] = useState({});
     const [newOption, setNewOption] = useState("");
     const dispatch = useDispatch()
-   
+
     const [formData, setFormData] = useState({
         companyName: "",
         email: "",
@@ -28,7 +28,7 @@ const Form = () => {
         companyFieldsName: [],
         companyFieldsName: []
     });
-    
+
 
 
     const handleAddOption = () => {
@@ -75,12 +75,12 @@ const Form = () => {
         //         console.log(ActiviyLog);
         //         const comanyActivity = await axiosInstance.post("/activityLog", ActiviyLog);
         //     }
-            handleReset();
-            console.log("Comapny Activity", ActiviyLog);
-            console.log("Comapny fields", fields);
-            dispatch(addData(fields));
-        } 
-    
+        handleReset();
+        console.log("Comapny Activity", ActiviyLog);
+        console.log("Comapny fields", fields);
+        dispatch(addData(fields));
+    }
+
 
     const handleReset = () => {
         setFields([]);
@@ -131,7 +131,7 @@ const Form = () => {
             <Sidebar />
             <TopNabvar />
             <main>
-                
+
                 <div className="row mt-2 mx-3 mb-2">
                     <div className="col-11"></div>
                     <div className="col-1 d-flex justify-content-end">
@@ -140,9 +140,7 @@ const Form = () => {
                 </div>
                 <form>
                     <div className="row mx-3 mt-2 shadow-lg p-3">
-                        <div className="d-flex justify-content-center">
-                            <h3>Make Dynamic Form</h3>
-                        </div>
+                        <h3 className="text-center">Make Dynamic Form</h3>
                         <div className="col-12 mt-2">
                             <div className="row">
                                 {fields.map((field, index) => {

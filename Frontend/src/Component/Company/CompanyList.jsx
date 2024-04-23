@@ -12,8 +12,8 @@ const CompanyList = () => {
       const result = await axiosInstance.get("/showCompanyData");
       setCompany(result.data.company);
       setTableHader(result.data.companyField);
-      console.log("tableheader", result.data.companyField)
-      console.log("company", result.data.company)
+      // console.log("tableheader", result.data.companyField)
+      // console.log("company", result.data.company)
     } catch (error) {
       console.log(error);
     }

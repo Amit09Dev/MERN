@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faTrashAlt, faEye } from "@fortawesome/free-solid-svg-icons";
 import axiosInstance from "../../api/Axios";
 import TopNabvar from "../topNavbar/topNavbar";
 import Sidebar from "../sidebar/Sidebar";
@@ -12,7 +12,6 @@ import "primereact/resources/themes/lara-light-cyan/theme.css";
 import { PrimeReactProvider } from "primereact/api";
 import { Paginator } from "primereact/paginator";
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
-import ActiviyLog from '../../api/Activitylog'
 import "./UserList.css"
 
 
@@ -35,6 +34,10 @@ function UserData() {
     startDate: "",
     endDate: "",
   });
+
+  const handleView = (id) => {
+    navigate(`/View/${id}`);
+  };
 
   const onPageChange = (event) => {
     setFirst(event.first);
@@ -123,9 +126,9 @@ function UserData() {
         console.log(error);
       }
 
-      const updatedFormData = {
-        ...inputValue,
-      };
+      // const updatedFormData = {
+      //   ...inputValue,
+      // };
     }
   };
 
@@ -162,6 +165,13 @@ function UserData() {
   const getUserId = (id) => {
     navigate(`/userForm/${id}`);
   };
+
+  function formatKey(key) {
+    const words = key.replace(/_/g, ' ').split(/(?=[A-Z])/);
+    return words.map(word => {
+      return word ? word[0].toUpperCase() + word.slice(1) : word;
+    }).join(' ');
+  }
 
   return (
     <PrimeReactProvider value={{ unstyled: false }}>
@@ -292,7 +302,7 @@ function UserData() {
                     <td>{user.jobRole}</td>
                     <td>
                       {user.userRole.map((role, roleIndex) => (
-                        <div key={roleIndex}>{role}</div>
+                        <div key={roleIndex}>{formatKey(role)}</div>
                       ))}
                     </td>
 
@@ -310,6 +320,13 @@ function UserData() {
                           className="btn"
                           onClick={() => confirmDelete(user._id)}
                         />
+                        <Link to={`/view/${user._id}`}>
+                          <FontAwesomeIcon
+                            icon={faEye}
+                            className="btn mr-2 me-2"
+                            onClick={() => handleView(user._id)}
+                          />
+                        </Link>
                       </div>
                     </td>
                   </tr>

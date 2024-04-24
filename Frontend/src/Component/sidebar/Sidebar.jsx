@@ -32,16 +32,12 @@ function Sidebar() {
                 </li>
                 <li className="d-flex align-items-center my-2">
                     <i className="bi bi-layout-text-window me-2"></i>
-                    <Link to="/companyList" >Company List</Link>
+                    <Link>Company List</Link>
                     <i className="fa-angle-right fa ms-auto fa-xs fa me-2"></i>
                 </li>
                 <li className="d-flex align-items-center my-2">
                     <i className="bi bi-box-arrow-in-down me-2"></i>
-                    <Link >Modal Examples</Link>
-                </li>
-                <li className="d-flex align-items-center my-2">
-                    <i className="bi bi-card-heading me-2"></i>
-                    <Link  >Cards</Link>
+                    <Link >Cards</Link>
                     <i className="fa-angle-right fa ms-auto fa-xs fa me-2"></i>
                 </li>
                 <li className="d-flex align-items-center my-2">

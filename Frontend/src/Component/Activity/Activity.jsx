@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Sidebar from '../sidebar/Sidebar';
 import TopNabvar from '../topNavbar/topNavbar';
-import './Activity.css'
 import axiosInstance from "src/api/Axios";
 import { Paginator } from "primereact/paginator";
 import { Dialog } from 'primereact/dialog';
+import './Activity.css'
 
 function Activity() {
     const [activityLog, setActivityLog] = useState([]);
@@ -77,38 +77,63 @@ function Activity() {
 
         const tableRows = Object.keys(data).map((key) => {
             if (key === "pastExperience") {
-                return data[key].old
-                    .map((item, index) => {
-                        const isDifferent = Object.keys(item).some((prop) =>
-                            item[prop] !== data[key].new[index]?.[prop]
-                        );
+                const editsAndAdditions = data[key].new.map((newItem, index) => {
+                    const oldItem = data[key].old[index];
 
-                        if (isDifferent) {
-                            return [
-                                <tr key={`${key}-${index}-header`} className='text-center'>
-                                    <td colSpan={3}>{key} ({index + 1})</td>
-                                </tr>,
-                                <tr key={`${key}-${index}-company`}>
-                                    <td>Company Name</td>
-                                    <td>{item.companyName}</td>
-                                    <td>{data[key].new[index]?.companyName ?? <span className='text-danger'>Removed</span>}</td>
-                                </tr>,
-                                <tr key={`${key}-${index}-start`}>
-                                    <td>Start Date</td>
-                                    <td>{item.startDate}</td>
-                                    <td>{data[key].new[index]?.startDate ?? <span className='text-danger'>Removed</span>}</td>
-                                </tr>,
-                                <tr key={`${key}-${index}-end`}>
-                                    <td>End Date</td>
-                                    <td>{item.endDate}</td>
-                                    <td>{data[key].new[index]?.endDate ?? <span className='text-danger'>Removed</span>}</td>
-                                </tr>
-                            ];
-                        } else {
-                            return [];
-                        }
-                    })
-                    .flat();
+                    if (!oldItem) {
+                        return [
+                            <tr key={`${key}-${index}-addition`} className='text-center'>
+                                <td colSpan={3}>Past Experience ({index + 1})</td>
+                            </tr>,
+                            <tr key={`${key}-${index}-company`}>
+                                <td>Company Name</td>
+                                <td></td>
+                                <td>{newItem.companyName}</td>
+                            </tr>,
+                            <tr key={`${key}-${index}-start`}>
+                                <td>Start Date</td>
+                                <td></td>
+                                <td>{newItem.startDate}</td>
+                            </tr>,
+                            <tr key={`${key}-${index}-end`}>
+                                <td>End Date</td>
+                                <td></td>
+                                <td>{newItem.endDate}</td>
+                            </tr>
+                        ];
+                    }
+
+                    const isDifferent = Object.keys(newItem).some((prop) =>
+                        newItem[prop] !== oldItem[prop]
+                    );
+
+                    if (isDifferent) {
+                        return [
+                            <tr key={`${key}-${index}-header`} className='text-center'>
+                                <td colSpan={3}>Past Experience ({index + 1})</td>
+                            </tr>,
+                            <tr key={`${key}-${index}-company`}>
+                                <td>Company Name</td>
+                                <td>{oldItem.companyName}</td>
+                                <td>{newItem.companyName}</td>
+                            </tr>,
+                            <tr key={`${key}-${index}-start`}>
+                                <td>Start Date</td>
+                                <td>{oldItem.startDate}</td>
+                                <td>{newItem.startDate}</td>
+                            </tr>,
+                            <tr key={`${key}-${index}-end`}>
+                                <td>End Date</td>
+                                <td>{oldItem.endDate}</td>
+                                <td>{newItem.endDate}</td>
+                            </tr>
+                        ];
+                    } else {
+                        return [];
+                    }
+                }).flat();
+
+                return editsAndAdditions;
             } else if (key === "userRole") {
                 const oldRoles = data[key].old.map(roleId => userRole[roleId]).join(", ");
                 const newRoles = data[key].new.map(roleId => userRole[roleId]).join(", ");
@@ -143,6 +168,88 @@ function Activity() {
             </table>
         );
     }
+
+
+
+    // function generateEditData(data) {
+    //     console.log(data);
+    //     const userRole = {
+    //         "6618da9655f5fd27cc987876": "User",
+    //         "6618dab055f5fd27cc987878": "Admin",
+    //         "6618dae355f5fd27cc98787a": "Super Admin"
+    //     };
+
+    //     const tableRows = Object.keys(data).map((key) => {
+    //         if (key === "pastExperience") {
+    //             return data[key].old
+    //                 .map((item, index) => {
+    //                     const isDifferent = Object.keys(item).some((prop) =>
+    //                         item[prop] !== data[key].new[index]?.[prop]
+    //                     );
+
+    //                     if (isDifferent) {
+    //                         return [
+    //                             <tr key={`${key}-${index}-header`} className='text-center'>
+    //                                 <td colSpan={3}>{key} ({index + 1})</td>
+    //                             </tr>,
+    //                             <tr key={`${key}-${index}-company`}>
+    //                                 <td>Company Name</td>
+    //                                 <td>{item.companyName}</td>
+    //                                 <td>{data[key].new[index]?.companyName ?? <span className='text-danger'>Removed</span>}</td>
+    //                             </tr>,
+    //                             <tr key={`${key}-${index}-start`}>
+    //                                 <td>Start Date</td>
+    //                                 <td>{item.startDate}</td>
+    //                                 <td>{data[key].new[index]?.startDate ?? <span className='text-danger'>Removed</span>}</td>
+    //                             </tr>,
+    //                             <tr key={`${key}-${index}-end`}>
+    //                                 <td>End Date</td>
+    //                                 <td>{item.endDate}</td>
+    //                                 <td>{data[key].new[index]?.endDate ?? <span className='text-danger'>Removed</span>}</td>
+    //                             </tr>
+    //                         ];
+    //                     } else {
+    //                         return [];
+    //                     }
+    //                 })
+    //                 .flat();
+    //         } else if (key === "userRole") {
+    //             const oldRoles = data[key].old.map(roleId => userRole[roleId]).join(", ");
+    //             const newRoles = data[key].new.map(roleId => userRole[roleId]).join(", ");
+    //             return (
+    //                 <tr key={key}>
+    //                     <td>{formatKey(key)}</td>
+    //                     <td>{oldRoles}</td>
+    //                     <td>{newRoles}</td>
+    //                 </tr>
+    //             );
+    //         } else if (key === "userRole"){
+    //             console.log(key);
+    //         }
+    //         else {
+    //             return (
+    //                 <tr key={key}>
+    //                     <td>{formatKey(key)}</td>
+    //                     <td>{data[key].old}</td>
+    //                     <td>{data[key].new}</td>
+    //                 </tr>
+    //             );
+    //         }
+    //     });
+
+    //     return (
+    //         <table className="table">
+    //             <thead>
+    //                 <tr>
+    //                     <th scope="col">Values</th>
+    //                     <th>From</th>
+    //                     <th>To</th>
+    //                 </tr>
+    //             </thead>
+    //             <tbody>{tableRows}</tbody>
+    //         </table>
+    //     );
+    // }
 
     function formatKey(key) {
         const words = key.replace(/_/g, ' ').split(/(?=[A-Z])/);
@@ -233,12 +340,24 @@ function Activity() {
                                                 <>
                                                     <div className='d-flex align-items-center'>
                                                         <p className='m-0'>Employe Edited </p>
-                                                        <i className="bi bi-box-arrow-up-right cursor-pointer ms-2 text-white py-1 px-2 rounded-2" style={{ backgroundColor: "#06b6d4" }} role='button'
+                                                        <i className="bi bi-box-arrow-up-right cursor-pointer ms-2 text-white py-1 px-2 rounded-2"
+                                                            style={{ backgroundColor: "#06b6d4", fontSize: "14px" }}
+                                                            role='button'
                                                             onClick={() => handleDialogVisibility(index, true)}></i>
                                                     </div>
                                                     <Dialog key={index} header="User Edited" visible={visible[index]} style={{ width: '50vw' }} onHide={() => handleDialogVisibility(index, false)}>
                                                         {generateEditData(elem.data)}
                                                     </Dialog>
+                                                </>
+                                            ) : elem.action === "Employe Added" ? (
+                                                <>
+                                                    <div className='d-flex align-items-center'>
+                                                        <p className='m-0'>Employe Added </p>
+                                                        <Link to={`/view/${elem.actionOnId}`}>
+                                                            <i className="bi bi-eye cursor-pointer ms-2 text-white py-1 px-2 rounded-2"
+                                                                style={{ backgroundColor: "#06b6d4", fontSize: "14px" }}></i>
+                                                        </Link>
+                                                    </div>
                                                 </>
                                             ) : (
                                                 <p>{elem.action}</p>

@@ -21,16 +21,19 @@ const newEmployeeAdd = async (req, res) => {
         (str) => new mongoose.Types.ObjectId(str)
       );
       const _newEmpData = await Employee.create(newEmpData);
+      const _actionOnEmp = await Employee.findOne({email: _newEmpData.email})
+      let _actionOnId = (_actionOnEmp._id).toString()
+      // _actionOnId.toString()
+      // console.log(_actionOnId);
       const addLogData = {
         loginEmployeeEmail: req.loginEmployeeEmail,
         page: "/userform",
         action: "Employe Added",
         data: "",
-        actionOnId: _newEmpData._id,
+        actionOnId: _actionOnId,
         actionOnEmail: _newEmpData.email,
       };
       await ActivityLog.create(addLogData);
-      console.log(_newEmpData);
       res.status(200).json(_newEmpData);
     }
   } catch (error) {
@@ -164,7 +167,7 @@ const allEmployeeList = async (req, res) => {
     }
 
     const page = parseInt(req.query.page) || 1;
-    const startIndex = page * pageSize - pageSize;
+    const startIndex = (page * pageSize) - pageSize;
 
     aggregationPipeline.push(...filters);
 
@@ -269,7 +272,9 @@ const employeeById = async (req, res) => {
 
 const deleteEmployee = async (req, res) => {
   try {
-    const employeeEmail = employeeById(req, res).email;
+    let employee = await Employee.findOne({_id: req.params.id});
+    const employeeEmail = employee.email
+    console.log(employeeEmail);
     const deleteLogData = {
       loginEmployeeEmail: req.loginEmployeeEmail,
       page: "/userlist",
@@ -278,6 +283,7 @@ const deleteEmployee = async (req, res) => {
       actionOnId: req.params.id,
       actionOnEmail: employeeEmail,
     };
+    console.log(deleteLogData);
     await Employee.findOneAndDelete({ _id: req.params.id });
     await ActivityLog.create(deleteLogData);
 
@@ -448,7 +454,11 @@ function logChanges(oldData, newData) {
 
     if (oldArray.length !== newArray.length) {
         hasChanges = true;
+        hasChanges = true;
     } else {
+        for (let i = 0; i < oldArray.length; i++) {
+            const oldElement = oldArray[i];
+            const newElement = newArray[i];
         for (let i = 0; i < oldArray.length; i++) {
             const oldElement = oldArray[i];
             const newElement = newArray[i];
@@ -463,7 +473,21 @@ function logChanges(oldData, newData) {
                 // Compare objects
                 const oldKeys = Object.keys(oldElement);
                 const newKeys = Object.keys(newElement);
+            // Check if the elements are MongoDB ObjectId instances
+            if (oldElement instanceof ObjectId && newElement instanceof ObjectId) {
+                if (oldElement.toString() !== newElement.toString()) {
+                    hasChanges = true;
+                    break;
+                }
+            } else if (typeof oldElement === 'object' && typeof newElement === 'object') {
+                // Compare objects
+                const oldKeys = Object.keys(oldElement);
+                const newKeys = Object.keys(newElement);
 
+                if (oldKeys.length !== newKeys.length || !oldKeys.every(key => newKeys.includes(key))) {
+                    hasChanges = true;
+                    break;
+                }
                 if (oldKeys.length !== newKeys.length || !oldKeys.every(key => newKeys.includes(key))) {
                     hasChanges = true;
                     break;
@@ -483,7 +507,25 @@ function logChanges(oldData, newData) {
                     break;
                 }
             }
+                // Compare the properties of the objects
+                for (const prop of oldKeys) {
+                    if (oldElement[prop] !== newElement[prop]) {
+                        hasChanges = true;
+                        break;
+                    }
+                }
+            } else {
+                // Compare other types of elements
+                if (oldElement !== newElement) {
+                    hasChanges = true;
+                    break;
+                }
+            }
 
+            if (hasChanges) {
+                break;
+            }
+        }
             if (hasChanges) {
                 break;
             }
@@ -492,7 +534,9 @@ function logChanges(oldData, newData) {
 
     if (hasChanges) {
         changes[key] = { old: oldArray, new: newArray };
+        changes[key] = { old: oldArray, new: newArray };
     }
+}
 }
 
 

@@ -8,7 +8,6 @@ import Select from "react-select";
 import TopNabvar from "../topNavbar/topNavbar";
 import Sidebar from "../sidebar/Sidebar";
 import axiosInstance from "../../api/Axios";
-import ActiviyLog from '../../api/Activitylog'
 import { useSelector } from 'react-redux'
 import { TabView, TabPanel } from 'primereact/tabview';
 import { DiffPatcher } from 'jsondiffpatch';
@@ -169,7 +168,6 @@ function UserForm() {
         .get(`/emp/${id}`)
         .then((response) => {
           const data = response.data;
-          console.log("gvdghgdhu", data);
           setTempData(data);
           setFormData({
             firstName: data.firstName || "",
@@ -255,7 +253,8 @@ function UserForm() {
     if (Object.keys(validationErrors).length === 0) {
       try {
         let updatedFormData = { ...formData };
-  
+
+
         if (JSON.stringify(selectedOption) !== JSON.stringify(formData.userRole)) {
           updatedFormData = {
             ...updatedFormData,
@@ -743,6 +742,7 @@ function UserForm() {
                 </div>
               )}
             </div>
+
           </TabPanel>
         </TabView>
       </main>

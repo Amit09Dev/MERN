@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axiosInstance from "../../api/Axios";
-import ActiviyLog from '../../api/Activitylog'
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -20,7 +19,6 @@ const LoginForm = () => {
       try {
         const result = await axiosInstance.post("/loggedin");
         if (result.status === 200) {
-          ActiviyLog.loginEmployeeId = result.data.loginEmployeeId;
           navigate("/UserForm");
         }
         else {
@@ -56,7 +54,6 @@ const LoginForm = () => {
       localStorage.setItem("token", res.data.token);
       toast.success("Logged in Successfully")
       if (res.data) {
-        ActiviyLog.loginEmployeeId = res.data.loginEmployeeId;
         navigate("/UserForm");
       }
     }

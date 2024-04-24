@@ -7,32 +7,32 @@ import Signup from './Component/signup/Signup.jsx';
 import Form from './Component/DynamicFrom/Form.jsx';
 import Activity from './Component/Activity/Activity';
 import Page404 from './Component/Page404.jsx';
-import CompanyList from './Component/Company/CompanyList';
 import { store } from './store/FormData';
 import { Provider } from 'react-redux';
+import UserView from './Component/UserView/UserView';
 
 function App() {
 
   return (
     <Provider store={store}>
-    <Router>
-      <div className="app">
-        <div className="content">
-          <Routes>
-          <Route path="/companyList" element={<CompanyList />} />
-            <Route path="/userList" element={<UserList />} />
-            <Route path="/userForm" element={<UserForm />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/form" element={<Form />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/activity" element={<Activity />} />
-            <Route path="/userForm/:id" element={<UserForm />} />
-            <Route path="/" element={<Login />} />
-            <Route path="*" element={<Page404 />} />
-          </Routes>
+      <Router>
+        <div className="app">
+          <div className="content">
+            <Routes>
+              <Route path="/userList" element={<UserList />} />
+              <Route path="/userForm" element={<UserForm />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/form" element={<Form />} />
+              <Route path="/view/:id" element={<UserView />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/activity" element={<Activity />} />
+              <Route path="/userForm/:id" element={<UserForm />} />
+              <Route path="/" element={<Login />} />
+              <Route path="*" element={<Page404 />} />
+            </Routes>
+          </div>
         </div>
-      </div>
-    </Router>
+      </Router>
     </Provider>
   );
 }

@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const employeeListRoutes = require("./routes/employeeListRoutes");
 const employeeLoginRoutes = require("./routes/employeeLoginRoutes");
 const activityLogRoutes = require("./routes/activityLogRoutes");
-const companyDataRoutes = require("./routes/companyDataRoutes");
+const additionalDataRoutes = require("./routes/additionalDataRoutes");
 const {checkEmail} = require("./controllers/emailExistController");
 const {getUserRole} = require("./controllers/getUserRoleController");
 const {authenticateEmployee, verifyToken} = require("./middleWare/employeeAuthentication");
@@ -18,7 +18,7 @@ app.use("/api/loggedin", verifyToken);
 
 app.use("/api", employeeLoginRoutes);
 
-app.use("/api", companyDataRoutes);
+app.use("/api", additionalDataRoutes);
 
 app.use("/api/role", getUserRole);
 

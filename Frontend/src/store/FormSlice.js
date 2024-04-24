@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
     fields: [],
+    selectOptions:[]
 };
 
 export const counterSlice = createSlice({
@@ -11,6 +12,7 @@ export const counterSlice = createSlice({
         addData: (state, action) => {
             console.log(state, action);
             state.fields = action.payload;
+       
         },
     },
 });

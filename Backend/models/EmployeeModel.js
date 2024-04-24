@@ -50,6 +50,10 @@ const employeeSchema = mongoose.Schema({
     type: Array,
     required: false,
   },
+  additionalInfo: {
+    type: Array,
+    required: false,
+  },
 });
 
 const Employee = mongoose.model("Employee", employeeSchema);

@@ -13,6 +13,7 @@ import { useSelector } from 'react-redux'
 import { TabView, TabPanel } from 'primereact/tabview';
 import { DiffPatcher } from 'jsondiffpatch';
 import "./UserForm.css";
+// import { type } from "@testing-library/user-event/dist/type";
 function UserForm() {
   const userFormData = {
     firstName: "",
@@ -37,7 +38,10 @@ function UserForm() {
   const [formData, setFormData] = useState(userFormData);
   const [errors, setErrors] = useState({});
   const [gridList, setGridList] = useState([initialGridState]);
-  const [selectedOption, setSelectedOption] = useState(null);
+  const [fieldName, setFieldName] = useState("");
+  const [fieldType, setFieldType] = useState("");
+  const [selectedOption, setSelectedOption] = useState({
+  });
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [touched, setTouched] = useState(false);
   const [tempData, setTempData] = useState({});
@@ -50,32 +54,36 @@ function UserForm() {
   let dynaminData = []
   dynaminData = useSelector((state) => state.counter.fields);
   useEffect(() => {
-    console.log("Dynamic Form", dynaminData);
+  console.log("Dynamic Form", dynaminData);
     if (dynaminData) {
 
-      const formattedFields = dynaminData.map((field) => ({
-        name: field.name,
-        type: field.type
+const formattedFields = dynaminData.map((field) => {
+  if (field.type === "select") {
+      setSelectOptions(prevState => ({
+          ...prevState,
+          [field.name]: field.options
       }));
-      setFields(formattedFields);
+  }
+  return {
+      name: field.name,
+      type: field.type
+  };
+});
+setFields(formattedFields);
     }
   }, [dynaminData]);
-  const companyhandleSubmit = async () => {
+  const additionalDataSave = async () => {
     try {
-      const data = fields.map(field => {
-        return {
-          name: field.name,
-          type: field.type,
-          value: company[field.name] || null,
-        }
-      })
-      console.log(data);
-
-
+      const data = fields.map((field) => ({
+        [field.name]: company[field.name] || null,
+      }));
+      console.log("Additional Data",data);
+      setCompany({});
     } catch (error) {
       console.log(error);
     }
   };
+  
 
 
   const handleChange = (selectedOption) => {
@@ -651,47 +659,51 @@ function UserForm() {
               </form>
             </div>
           </TabPanel>
-          <TabPanel header="CompanyForm" >
-            <div className="m-0">
-              {fields.length > 0 && <div className="col-12 mt-2 mx-3 mt-2 shadow-lg p-3">
-                <div className="row">
-                  {fields.map((field, index) => {
-                    return (
-                      <div className="col-6" key={index}>
-                        <label htmlFor={field.name} className="form-label">{field.name}</label>
-                        {field.type === "select" ? (
-                          <div className="d-flex justify-content-between">
-                            <select
-                              className="form-select"
-                              value={company[field.name] || ""}
-                              onChange={(e) => handleFieldChange(field.name, e.target.value)}>
-                              <option value="null">Select</option>
-                              {selectOptions[field.name] && selectOptions[field.name].map((option, optionIndex) => (
-                                <option key={optionIndex} value={option}>{option}</option>
-                              ))}
-                            </select>
-                          </div>
-                        ) : (
-                          <div className="d-flex justify-content-between">
-                            <input
-                              type={field.type}
-                              className="form-control"
-                              placeholder={field.name}
-                              value={company[field.name] || ""}
-                              onChange={(e) => handleFieldChange(field.name, e.target.value)}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
+          <TabPanel header="AdditionalForm" >
+          <div className="me-4">
+  {fields.length > 0 && (
+    <div className="col-12 mt-2 mx-3 mt-2 shadow-lg p-3">
+      <div className="row">
+        {fields.map((field, index) => {
+          return (
+            <div className="col-6 mt-2" key={index}>
+              <label htmlFor={field.name} className="form-label">{field.name}</label>
+              {field.type === "select" ? (
+                <div className="d-flex justify-content-between mt-2">
+                  <select
+                    className="form-select"
+                    value={company[field.name] || ""}
+                    onChange={(e) => handleFieldChange(field.name, e.target.value)}>
+                    <option value="null">Select</option>
+                    {selectOptions[field.name] && selectOptions[field.name].map((option, optionIndex) => (
+                      <option key={optionIndex} value={option}>{option}</option>
+                    ))}
+                  </select>
                 </div>
-                {fields.length > 0 && <div className="d-flex justify-content-end mt-3">
-                  <button className="btn btn-warning " onClick={companyhandleSubmit}>Save</button>
-                </div>}
-              </div>}
-
+              ) : (
+                <div className="d-flex justify-content-between mt-2">
+                  <input
+                    type={field.type}
+                    className="form-control"
+                    placeholder={field.name}
+                    value={company[field.name] || ""}
+                    onChange={(e) => handleFieldChange(field.name, e.target.value)}
+                  />
+                </div>
+              )}
             </div>
+          );
+        })}
+      </div>
+      {fields.length > 0 && (
+        <div className="d-flex justify-content-end mt-3">
+          <button className="btn btn-warning " onClick={additionalDataSave}>Save</button>
+        </div>
+      )}
+    </div>
+  )}
+</div>
+
           </TabPanel>
         </TabView>
       </main>

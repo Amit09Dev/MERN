@@ -1,12 +1,12 @@
 const { Employee } = require("../models/EmployeeModel");
-const { company } = require("../models/companyModel");
+// const { company } = require("../models/companyModel");
 const mongoose = require("mongoose");
 
 const { ActivityLog } = require("../models/activityLogModel");
 
 const models = {
   Employee,
-  company,
+  // company,
 };
 
 const newActivityLog = async (req, res) => {

@@ -1,14 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useDispatch } from 'react-redux';
 import { Dialog } from 'primereact/dialog';
 import Sidebar from "../sidebar/Sidebar";
 import TopNabvar from "../topNavbar/topNavbar";
 import { toast } from "react-toastify";
-import axiosInstance from "src/api/Axios";
+
 import ActiviyLog from "src/api/Activitylog";
 import { addData } from "src/store/FormSlice";
 import { useRef } from "react";
-
+import axiosInstance from "../../api/Axios";
 
 const Form = () => {
     const [visible, setVisible] = useState(false);
@@ -51,35 +51,20 @@ const Form = () => {
     };
 
     const handleSubmit = async () => {
-        // try {
-        //     const data = {
-        //         companyName: formData.companyName,
-        //         email: formData.email,
-        //         companyFieldsName: [],
-        //         email: formData.email,
-        //         companyFieldsName: [],
-        //         companyAdditionalDetails: fields.map(field => ({
-        //             name: field.name,
-        //             type: field.type,
-        //             value: company[field.name] || null,
-        //         })),
-        //     };
-        //     data.companyAdditionalDetails.forEach(elem => data.companyFieldsName.push(elem["name"]))
+        toast.success("Form Update Successfully")
+        console.log("formdata", fields);
+        // handleReset();
+        try {
+            const result = await axiosInstance.post("/additionalFields", fields)
+            console.log("result", result.data)
 
-        //     const result = await axiosInstance.post("/companyData", data)
-        //     if (result.status === 200) {
-        //         ActiviyLog.page = window.location.href;
-        //         ActiviyLog.action = "Company added";
-        //         ActiviyLog.actionOnEmail = data.email
-        //         ActiviyLog.dataType = "company"
-        //         console.log(ActiviyLog);
-        //         const comanyActivity = await axiosInstance.post("/activityLog", ActiviyLog);
-        //     }
-        handleReset();
-        console.log("Comapny Activity", ActiviyLog);
-        console.log("Comapny fields", fields);
+        } catch (error) {
+            console.log(error)
+        }
         dispatch(addData(fields));
-    }
+    };
+
+
 
 
     const handleReset = () => {
@@ -98,22 +83,31 @@ const Form = () => {
     };
 
     useEffect(() => {
+
+        fetchData();
         if (visible === false) {
             setFieldName("");
             setFieldType("");
             setNewOption("");
         }
-    }, [visible]);
-
+    }, []);
+    const fetchData = async () => {
+        try {
+            const response = await axiosInstance.get("/additionalFields");
+            setFields(response.data);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    }
     const handleAddRow = () => {
         if (fieldName && fieldType) {
             const existingFieldIndex = fields.findIndex(field => field.name === fieldName);
             if (existingFieldIndex !== -1) {
                 const updatedFields = [...fields];
-                updatedFields[existingFieldIndex] = { ...updatedFields[existingFieldIndex], type: fieldType };
+                updatedFields[existingFieldIndex] = { ...updatedFields[existingFieldIndex], type: fieldType, options: selectOptions[fieldName] || [] };
                 setFields(updatedFields);
             } else {
-                const newField = { name: fieldName, type: fieldType };
+                const newField = { name: fieldName, type: fieldType, options: selectOptions[fieldName] || [] };
                 setFields([...fields, newField]);
             }
             setVisible(false);
@@ -121,6 +115,7 @@ const Form = () => {
             setFieldType("");
         }
     };
+
     const handleRemoveOption = (fieldName, index) => {
         const updatedOptionsMap = { ...selectOptions };
         updatedOptionsMap[fieldName].splice(index, 1);
@@ -151,6 +146,7 @@ const Form = () => {
                                                 <div className="d-flex justify-content-between">
                                                     <select
                                                         className="form-select"
+                                                        disabled
                                                         value={company[field.name] || ""}
                                                         onChange={(e) => handleFieldChange(field.name, e.target.value)}>
                                                         <option value="null">Select</option>
@@ -168,6 +164,7 @@ const Form = () => {
                                                         placeholder={field.name}
                                                         value={company[field.name] || ""}
                                                         onChange={(e) => handleFieldChange(field.name, e.target.value)}
+                                                        disabled
                                                     />
 
 
@@ -179,6 +176,21 @@ const Form = () => {
                                     );
                                 })}
                             </div>
+                            {/* <div className="row">
+                                {fields.map((field, index) =>{
+                                    return(
+                                        <>
+                                        <div className="col-6" key={index}>
+                                            <li>Lable Name:{field.name}</li>
+                                            <li>Input Type:{field.type}</li>
+                                         <span>
+                                         <i className="bi bi-trash ms-1 fs-5 text-white pointer rounded-2" role="button" onClick={() => handleRemoveField(field.name, index)} style={{ backgroundColor: '#dc3545', padding: '4px 8px' }}></i>
+                                         </span>
+                                        </div>
+                                        </>
+                                    )
+                                })}
+                            </div> */}
                         </div>
                         <div className="d-flex justify-content-end mt-2">
                             <button type="button" className="btn btn-primary" onClick={() => setVisible(true)}>Add Row</button>

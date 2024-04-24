@@ -1,6 +1,8 @@
 const { Employee } = require("../models/EmployeeModel");
 const { ActivityLog } = require("../models/activityLogModel");
+const { ActivityLog } = require("../models/activityLogModel");
 const { Role } = require("../models/userRoleModel");
+const { ObjectId } = require("mongodb");
 const { ObjectId } = require("mongodb");
 const mongoose = require("mongoose");
 const _ = require("lodash");
@@ -174,6 +176,7 @@ const allEmployeeList = async (req, res) => {
         data: [
           {
             $sort: { firstName: 1, _id: 1 },
+            $sort: { firstName: 1, _id: 1 },
           },
           {
             $skip: startIndex,
@@ -275,6 +278,8 @@ const deleteEmployee = async (req, res) => {
     await Employee.findOneAndDelete({ _id: req.params.id });
     await ActivityLog.create(deleteLogData);
 
+    await ActivityLog.create(deleteLogData);
+
     res.status(200).json({ msg: "deleted" });
   } catch (error) {
     res.status(400).send({ success: false, msg: error.message });
@@ -286,6 +291,32 @@ const updateEmployee = async (req, res) => {
     const newUserRole = req.body.userRole.map(
       (str) => new mongoose.Types.ObjectId(str)
     );
+    let oldEmployee = await Employee.findOne({ _id: req.params.id });
+
+    oldEmployee = {
+      firstName: oldEmployee.firstName,
+      lastName: oldEmployee.lastName,
+      email: oldEmployee.email,
+      address: oldEmployee.address,
+      state: oldEmployee.state,
+      city: oldEmployee.city,
+      zip: oldEmployee.zip,
+      jobRole: oldEmployee.jobRole,
+      userRole: oldEmployee.userRole,
+      pastExperience: oldEmployee.pastExperience,
+      color: oldEmployee.color,
+    };
+
+    let newEmployee = req.body;
+    newEmployee.userRole = newUserRole;
+
+    // const updatelog = diff(oldEmployee, req.body);
+
+    const updatelog = logChanges(oldEmployee, newEmployee);
+
+    // console.log(oldEmployee.pastExperience);
+
+    console.log(updatelog);
     let oldEmployee = await Employee.findOne({ _id: req.params.id });
 
     oldEmployee = {
@@ -329,6 +360,18 @@ const updateEmployee = async (req, res) => {
       },
       { new: true }
     );
+
+    const logData = {
+      loginEmployeeEmail: req.loginEmployeeEmail,
+      page: "/userform",
+      action: "Employe Edited",
+      data: updatelog,
+      actionOnId: req.params.id,
+      actionOnEmail: oldEmployee.email,
+    };
+
+    await ActivityLog.create(logData);
+
 
     const logData = {
       loginEmployeeEmail: req.loginEmployeeEmail,
@@ -537,5 +580,6 @@ module.exports = {
   allEmployeeList,
   employeeById,
   deleteEmployee,
+  updateEmployee,
   updateEmployee,
 };

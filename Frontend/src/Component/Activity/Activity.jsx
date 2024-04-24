@@ -68,7 +68,7 @@ function Activity() {
 
 
     function generateEditData(data) {
-        console.log(data);
+        // console.log(data);
         const userRole = {
             "6618da9655f5fd27cc987876": "User",
             "6618dab055f5fd27cc987878": "Admin",
@@ -334,7 +334,7 @@ function Activity() {
                                 activityLog.map((elem, index) => (
                                     <tr key={index}>
                                         <td>{elem.actionOnEmail}</td>
-                                 
+
                                         <td>
                                             {elem.action === "Employe Edited" ? (
                                                 <>

@@ -268,13 +268,6 @@ function UserForm() {
           const res = await axiosInstance.post("/addEmp", updatedFormData);
           insertnotify();
           resetForm();
-          if (res.status === 200) {
-            ActiviyLog.page = window.location.href;
-            ActiviyLog.action = "User Added";
-            ActiviyLog.dataType = "Employee";
-            ActiviyLog.actionOnEmail = updatedFormData.email;
-            await axiosInstance.post("/activityLog", ActiviyLog);
-          }
         } else if (id === undefined && fields.length > 0) {
           setActiveTabIndex(1);
         } 

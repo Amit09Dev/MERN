@@ -127,16 +127,17 @@ const showActivityLog = async (req, res) => {
       },
     ];
     const logs = await ActivityLog.aggregate(aggregationPipeline).exec();
-    // console.log(logs[0].data);
+  
     if (logs[0].totalRecords.length == 0) {
       logs[0].totalRecords[0] = 1
     }
 
-    console.log(logs);
     const allLogsData = {
       data: logs[0].data,
       totalRecords: logs[0].totalRecords[0].total,
     };
+
+    console.log(logs);
 
     res.status(200).json(allLogsData);
   } catch (error) {

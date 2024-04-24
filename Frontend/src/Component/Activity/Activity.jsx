@@ -67,8 +67,8 @@ function Activity() {
     }, [first, rows]);
 
 
-
     function generateEditData(data) {
+        console.log(data);
         const userRole = {
             "6618da9655f5fd27cc987876": "User",
             "6618dab055f5fd27cc987878": "Admin",
@@ -110,11 +110,13 @@ function Activity() {
                     })
                     .flat();
             } else if (key === "userRole") {
+                const oldRoles = data[key].old.map(roleId => userRole[roleId]).join(", ");
+                const newRoles = data[key].new.map(roleId => userRole[roleId]).join(", ");
                 return (
                     <tr key={key}>
                         <td>{formatKey(key)}</td>
-                        <td>{userRole[data[key].old]}</td>
-                        <td>{userRole[data[key].new]}</td>
+                        <td>{oldRoles}</td>
+                        <td>{newRoles}</td>
                     </tr>
                 );
             } else {
@@ -210,7 +212,6 @@ function Activity() {
                         <thead className="">
                             <tr>
                                 <th scope="col">Action On</th>
-                                {/* <th scope="col">Page</th> */}
                                 <th scope="col">Action</th>
                                 <th scope="col">Time</th>
                             </tr>
@@ -226,7 +227,7 @@ function Activity() {
                                 activityLog.map((elem, index) => (
                                     <tr key={index}>
                                         <td>{elem.actionOnEmail}</td>
-                                        {/* <td>{elem.page}</td> */}
+                                 
                                         <td>
                                             {elem.action === "Employe Edited" ? (
                                                 <>

@@ -27,6 +27,7 @@ function UserForm() {
     userRole: [],
     color: "#000000",
     pastExperience: [],
+    additionalInfo: []
   };
   const initialGridState = {
     id: 0,
@@ -40,8 +41,8 @@ function UserForm() {
   const [gridList, setGridList] = useState([initialGridState]);
   const [fieldName, setFieldName] = useState("");
   const [fieldType, setFieldType] = useState("");
-  const [selectedOption, setSelectedOption] = useState({
-  });
+  const [selectedOption, setSelectedOption] = useState([]);
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [touched, setTouched] = useState(false);
   const [tempData, setTempData] = useState({});
@@ -51,40 +52,62 @@ function UserForm() {
   const [selectOptions, setSelectOptions] = useState({});
   const animatedComponents = makeAnimated();
   const [fields, setFields] = useState([]);
-  let dynaminData = []
-  dynaminData = useSelector((state) => state.counter.fields);
   useEffect(() => {
-  console.log("Dynamic Form", dynaminData);
-    if (dynaminData) {
-
-const formattedFields = dynaminData.map((field) => {
-  if (field.type === "select") {
-      setSelectOptions(prevState => ({
-          ...prevState,
-          [field.name]: field.options
-      }));
-  }
-  return {
-      name: field.name,
-      type: field.type
-  };
-});
-setFields(formattedFields);
+    fetchData();
+  }, []);
+  const fetchData = async () => {
+    try {
+      const response = await axiosInstance.get("/additionalFields");
+      const dynamicData = response.data;
+      const formattedFields = dynamicData.map((field) => {
+        if (field.type === "select") {
+          setSelectOptions(prevState => ({
+            ...prevState,
+            [field.name]: field.options
+          }));
+        }
+        return {
+          name: field.name,
+          type: field.type
+        };
+      });
+      setFields(formattedFields);
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
-  }, [dynaminData]);
+  }
+
   const additionalDataSave = async () => {
     try {
+      debugger;
       const data = fields.map((field) => ({
         [field.name]: company[field.name] || null,
       }));
-      console.log("Additional Data",data);
+      formData.additionalInfo = data;
+      formData.userRole = selectedOption.map(option => option.value);
+  
+      try {
+        if (id === undefined) {
+          await axiosInstance.post("/addEmp", formData);
+          toast.success('Data is saved successfully');
+          resetForm();
+        } else {
+          console.log(formData);
+          await axiosInstance.patch(`/emp/${id}`, formData);
+          updatenotify();
+          resetForm();
+          navigate("/userlist");
+        }
+  
+      } catch (error) {
+        console.error(error);
+      }
       setCompany({});
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
   
-
 
   const handleChange = (selectedOption) => {
     setSelectedOption(selectedOption);
@@ -96,7 +119,6 @@ setFields(formattedFields);
       userRole: selectedValues,
     });
   };
-
   const handleEmailCheck = async (e) => {
     const email = e.target.value;
     const emailElm = document.getElementById("email");
@@ -140,7 +162,6 @@ setFields(formattedFields);
       }
     }
   };
-
   useEffect(() => {
     RoleData();
     if (id) {
@@ -148,6 +169,7 @@ setFields(formattedFields);
         .get(`/emp/${id}`)
         .then((response) => {
           const data = response.data;
+          console.log("gvdghgdhu", data);
           setTempData(data);
           setFormData({
             firstName: data.firstName || "",
@@ -168,12 +190,24 @@ setFields(formattedFields);
             endDate: experience.endDate || "",
           }));
           setGridList(pastExperiences);
+          const additionalData = data.additionalInfo.map((info) => {
+            for (const key in info) {
+              if (info.hasOwnProperty(key)) {
+                const value = info[key];
+                setCompany(prevState => ({
+                  ...prevState,
+                  [key]: value
+                }));
+              }
+            }
+          });
         })
         .catch((error) => {
           console.error("Error fetching user data:", error);
         });
     }
   }, [id]);
+
   const handleFieldChange = (fieldName, value) => {
     setCompany({ ...company, [fieldName]: value });
   };
@@ -216,12 +250,12 @@ setFields(formattedFields);
 
 
   const handleSave = async () => {
+    debugger
     const validationErrors = validateForm(formData);
     if (Object.keys(validationErrors).length === 0) {
       try {
         let updatedFormData = { ...formData };
-
-
+  
         if (JSON.stringify(selectedOption) !== JSON.stringify(formData.userRole)) {
           updatedFormData = {
             ...updatedFormData,
@@ -229,25 +263,32 @@ setFields(formattedFields);
             pastExperience: [...gridList]
           };
         }
-
-        if (id === undefined) {
+  
+        if (id === undefined && fields.length === 0) {
+          console.log(formData);
           const res = await axiosInstance.post("/addEmp", updatedFormData);
+          insertnotify();
+          resetForm();
           if (res.status === 200) {
             ActiviyLog.page = window.location.href;
             ActiviyLog.action = "User Added";
             ActiviyLog.dataType = "Employee";
             ActiviyLog.actionOnEmail = updatedFormData.email;
-            await axiosInstance.post("/activityLog", ActiviyLog)
+            await axiosInstance.post("/activityLog", ActiviyLog);
           }
-          insertnotify();
-          resetForm();
-        }
-        else {
+        } else if (id === undefined && fields.length > 0) {
+          setActiveTabIndex(1);
+        } 
+        else if (id !== null && fields.length > 0) {
+          setActiveTabIndex(1);
+        } 
+        else if (id !== undefined && fields.length===0) {
           await axiosInstance.patch(`/emp/${id}`, updatedFormData);
           updatenotify();
           resetForm();
           navigate("/userlist");
         }
+        
       } catch (error) {
         console.error("Error:", error);
       }
@@ -368,7 +409,7 @@ setFields(formattedFields);
             </ol>
           </nav>
         </div>
-        <TabView>
+        <TabView activeIndex={activeTabIndex} onTabChange={(e) => setActiveTabIndex(e.index)}>
           <TabPanel header="UserForm">
             <div className="m-0">
               <form autoComplete="off">
@@ -651,7 +692,7 @@ setFields(formattedFields);
                         className="btn btn-success"
                         onClick={handleSave}
                       >
-                        Submit
+                        Save
                       </button>
                     </div>
                   </div>
@@ -659,51 +700,49 @@ setFields(formattedFields);
               </form>
             </div>
           </TabPanel>
-          <TabPanel header="AdditionalForm" >
-          <div className="me-4">
-  {fields.length > 0 && (
-    <div className="col-12 mt-2 mx-3 mt-2 shadow-lg p-3">
-      <div className="row">
-        {fields.map((field, index) => {
-          return (
-            <div className="col-6 mt-2" key={index}>
-              <label htmlFor={field.name} className="form-label">{field.name}</label>
-              {field.type === "select" ? (
-                <div className="d-flex justify-content-between mt-2">
-                  <select
-                    className="form-select"
-                    value={company[field.name] || ""}
-                    onChange={(e) => handleFieldChange(field.name, e.target.value)}>
-                    <option value="null">Select</option>
-                    {selectOptions[field.name] && selectOptions[field.name].map((option, optionIndex) => (
-                      <option key={optionIndex} value={option}>{option}</option>
+          <TabPanel header="AdditionalForm">
+            <div className="me-4">
+              {fields.length > 0 && (
+                <div className="col-12 mt-2 mx-3 mt-2 shadow-lg p-3">
+                  <div className="row">
+                    {fields.map((field, index) => (
+                      <div className="col-6 mt-2" key={index}>
+                        <label htmlFor={field.name} className="form-label">{field.name}</label>
+                        {field.type === "select" ? (
+                          <div className="d-flex justify-content-between mt-2">
+                            <select
+                              className="form-select"
+                              value={company[field.name] || ""}
+                              onChange={(e) => handleFieldChange(field.name, e.target.value)}
+                            >
+                              <option value="">Select</option>
+                              {selectOptions[field.name] && selectOptions[field.name].map((option, optionIndex) => (
+                                <option key={optionIndex} value={option}>{option}</option>
+                              ))}
+                            </select>
+                          </div>
+                        ) : (
+                          <div className="d-flex justify-content-between mt-2">
+                            <input
+                              type={field.type}
+                              className="form-control"
+                              placeholder={field.name}
+                              value={company[field.name] || ""}
+                              onChange={(e) => handleFieldChange(field.name, e.target.value)}
+                            />
+                          </div>
+                        )}
+                      </div>
                     ))}
-                  </select>
-                </div>
-              ) : (
-                <div className="d-flex justify-content-between mt-2">
-                  <input
-                    type={field.type}
-                    className="form-control"
-                    placeholder={field.name}
-                    value={company[field.name] || ""}
-                    onChange={(e) => handleFieldChange(field.name, e.target.value)}
-                  />
+                  </div>
+                  {fields.length > 0 && (
+                    <div className="d-flex justify-content-end mt-3">
+                      <button className="btn btn-warning" onClick={additionalDataSave}>Save</button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
-          );
-        })}
-      </div>
-      {fields.length > 0 && (
-        <div className="d-flex justify-content-end mt-3">
-          <button className="btn btn-warning " onClick={additionalDataSave}>Save</button>
-        </div>
-      )}
-    </div>
-  )}
-</div>
-
           </TabPanel>
         </TabView>
       </main>

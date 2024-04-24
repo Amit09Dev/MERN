@@ -3,8 +3,8 @@ const { additionalField } = require("../models/additionalFieldModel");
 const additionalFieldsData = async (req, res) => {
   try {
     const additionalFieldsName = req.body;
-    console.log(additionalFieldsName);
     if (additionalFieldsName.length > 0) {
+      console.log("additional",additionalFieldsName);
       for (let i = 0; i < additionalFieldsName.length; i++) {
         const additionalFieldData = {
           name: additionalFieldsName[i].name,
@@ -47,4 +47,4 @@ const deleteAdditionalFields = async (req, res) => {
   }
 };
 
-module.exports = { additionalFieldsData, additionalFields, deleteAdditionalFields};
+module.exports = { additionalFieldsData, additionalFields, deleteAdditionalFields };

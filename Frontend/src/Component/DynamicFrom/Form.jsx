@@ -4,7 +4,6 @@ import { Dialog } from 'primereact/dialog';
 import Sidebar from "../sidebar/Sidebar";
 import TopNabvar from "../topNavbar/topNavbar";
 import { toast } from "react-toastify";
-
 import ActiviyLog from "src/api/Activitylog";
 import { addData } from "src/store/FormSlice";
 import { useRef } from "react";
@@ -40,10 +39,16 @@ const Form = () => {
         }
     };
 
-    const handleRemoveField = (fieldName, index) => {
-        const updatedFields = [...fields];
-        updatedFields.splice(index, 1);
-        setFields(updatedFields);
+    const handleRemoveField = async(id) => {
+        try {
+            const response = await axiosInstance.delete(`/deleteFields/${id}`);
+            console.log("response", response.data);
+            toast.warn("Field Deleted Successfully")
+         fetchData();
+            
+        } catch (error) {
+            
+        }
     };
 
     const handleFieldChange = (fieldName, value) => {
@@ -54,14 +59,7 @@ const Form = () => {
         toast.success("Form Update Successfully")
         console.log("formdata", fields);
         // handleReset();
-        try {
-            const result = await axiosInstance.post("/additionalFields", fields)
-            console.log("result", result.data)
-
-        } catch (error) {
-            console.log(error)
-        }
-        dispatch(addData(fields));
+       
     };
 
 
@@ -99,22 +97,35 @@ const Form = () => {
             console.error("Error fetching data:", error);
         }
     }
-    const handleAddRow = () => {
+    const handleAddRow = async () => {
         if (fieldName && fieldType) {
             const existingFieldIndex = fields.findIndex(field => field.name === fieldName);
+            let updatedFields;
             if (existingFieldIndex !== -1) {
-                const updatedFields = [...fields];
-                updatedFields[existingFieldIndex] = { ...updatedFields[existingFieldIndex], type: fieldType, options: selectOptions[fieldName] || [] };
-                setFields(updatedFields);
+                updatedFields = fields.map(field =>
+                    field.name === fieldName
+                        ? { ...field, type: fieldType, options: selectOptions[fieldName] || [] }
+                        : field
+                );
             } else {
                 const newField = { name: fieldName, type: fieldType, options: selectOptions[fieldName] || [] };
-                setFields([...fields, newField]);
+                updatedFields = [...fields, newField];
             }
-            setVisible(false);
-            setFieldName("");
-            setFieldType("");
+    
+            try {
+                const result = await axiosInstance.post("/additionalFields", updatedFields);
+                console.log("result", result.data);
+                setFields(updatedFields);
+                dispatch(addData(updatedFields));
+                setVisible(false);
+                setFieldName("");
+                setFieldType("");
+            } catch (error) {
+                console.log(error);
+            }
         }
     };
+    
 
     const handleRemoveOption = (fieldName, index) => {
         const updatedOptionsMap = { ...selectOptions };
@@ -154,7 +165,7 @@ const Form = () => {
                                                             <option key={optionIndex} value={option}>{option}</option>
                                                         ))}
                                                     </select>
-                                                    <i className="bi bi-trash ms-1 fs-5 text-white pointer rounded-2" role="button" onClick={() => handleRemoveField(field.name, index)} style={{ backgroundColor: '#dc3545', padding: '4px 8px' }}></i>
+                                                    <i className="bi bi-trash ms-1 fs-5 text-white pointer rounded-2" role="button" onClick={() => handleRemoveField(field._id)} style={{ backgroundColor: '#dc3545', padding: '4px 8px' }}></i>
                                                 </div>
                                             ) : (
                                                 <div className="d-flex justify-content-between">
@@ -168,7 +179,7 @@ const Form = () => {
                                                     />
 
 
-                                                    <i className="bi bi-trash ms-1 fs-5 text-white pointer rounded-2" role="button" onClick={() => handleRemoveField(field.name, index)}
+                                                    <i className="bi bi-trash ms-1 fs-5 text-white pointer rounded-2" role="button" onClick={() => handleRemoveField(field._id)}
                                                         style={{ backgroundColor: '#dc3545', padding: '4px 8px' }}></i>
                                                 </div>
                                             )}

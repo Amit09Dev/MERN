@@ -78,20 +78,31 @@ function UserForm() {
 
   const additionalDataSave = async () => {
     try {
+      let updatedFormData = { ...formData };
+
       const data = fields.map((field) => ({
         [field.name]: company[field.name] || null,
       }));
       formData.additionalInfo = data;
       formData.userRole = selectedOption.map(option => option.value);
-  
+      formData.pastExperience=gridList.map(option => option.value);
+      if (JSON.stringify(selectedOption) !== JSON.stringify(formData.userRole)) {
+        updatedFormData = {
+          ...formData,
+          userRole: selectedOption.map(option => option.value),
+          pastExperience: [...gridList]
+        };
+      }
+      
       try {
         if (id === undefined) {
-          await axiosInstance.post("/addEmp", formData);
+          console.log(updatedFormData);
+          await axiosInstance.post("/addEmp", updatedFormData);
           toast.success('Data is saved successfully');
           resetForm();
         } else {
-          console.log(formData);
-          await axiosInstance.patch(`/emp/${id}`, formData);
+          console.log(updatedFormData);
+          await axiosInstance.patch(`/emp/${id}`, updatedFormData);
           updatenotify();
           resetForm();
           navigate("/userlist");
@@ -273,6 +284,7 @@ function UserForm() {
           setActiveTabIndex(1);
         } 
         else if (id !== undefined && fields.length===0) {
+          console.log(updatedFormData);
           await axiosInstance.patch(`/emp/${id}`, updatedFormData);
           updatenotify();
           resetForm();

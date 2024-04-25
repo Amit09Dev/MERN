@@ -7,6 +7,7 @@ const { json } = require("body-parser");
 const { createDeepComparer } = require("deep-comparer");
 const { log } = require("deep-comparer/src/utils/performance-logger");
 const deepCompare = createDeepComparer();
+const {diff} = require('object-diff-3000');
 
 const newEmployeeAdd = async (req, res) => {
   try {
@@ -370,6 +371,11 @@ const deleteEmployee = async (req, res) => {
 //   }
 // };
 
+
+
+// custom for user role
+
+
 const updateEmployee = async (req, res) => {
   try {
     const newUserRole = req.body.userRole.map(
@@ -450,6 +456,8 @@ const updateEmployee = async (req, res) => {
     res.status(400).send({ success: false, msg: error.message });
   }
 };
+
+
 
 function getChangesInUserRole(oldUserRole, newUserRole) {
   let changes = [];

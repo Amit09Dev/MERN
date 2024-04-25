@@ -137,7 +137,7 @@ const showActivityLog = async (req, res) => {
       totalRecords: logs[0].totalRecords[0].total,
     };
 
-    console.log(logs);
+    // console.log(logs);
 
     res.status(200).json(allLogsData);
   } catch (error) {

@@ -347,7 +347,7 @@ const updateEmployee = async (req, res) => {
       { new: true }
     );
 
-    const logData = {
+    let logData = {
       loginEmployeeEmail: req.loginEmployeeEmail,
       page: "/userform",
       action: "Employe Edited",
@@ -357,7 +357,10 @@ const updateEmployee = async (req, res) => {
     };
 
 
+// console.log("elog",logData.data);
 
+    const tempLogData = delete logData.data.additionalInfo;
+    // console.log("temp",logData);
     await ActivityLog.create(logData);
 
     res.status(200).json({ msg: "success" });

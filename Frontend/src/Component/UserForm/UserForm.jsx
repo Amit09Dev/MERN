@@ -78,7 +78,6 @@ function UserForm() {
 
   const additionalDataSave = async () => {
     try {
-      debugger;
       const data = fields.map((field) => ({
         [field.name]: company[field.name] || null,
       }));
@@ -248,7 +247,6 @@ function UserForm() {
 
 
   const handleSave = async () => {
-    debugger
     const validationErrors = validateForm(formData);
     if (Object.keys(validationErrors).length === 0) {
       try {

@@ -141,7 +141,7 @@ const Form = () => {
                 <div className="row mt-2 mx-3 mb-2">
                     <div className="col-11"></div>
                     <div className="col-1 d-flex justify-content-end">
-                        <button className="btn btn-success" onClick={handleSubmit}>Save</button>
+                        {/* <button className="btn btn-success" onClick={handleSubmit}>Save</button> */}
                     </div>
                 </div>
                 <form>

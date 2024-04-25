@@ -5,6 +5,8 @@ const { ObjectId } = require("mongodb");
 const mongoose = require("mongoose");
 const _ = require("lodash");
 const { json } = require("body-parser");
+const { createDeepComparer } = require("deep-comparer");
+const deepCompare = createDeepComparer();
 
 const newEmployeeAdd = async (req, res) => {
   try {
@@ -21,8 +23,8 @@ const newEmployeeAdd = async (req, res) => {
         (str) => new mongoose.Types.ObjectId(str)
       );
       const _newEmpData = await Employee.create(newEmpData);
-      const _actionOnEmp = await Employee.findOne({ email: _newEmpData.email })
-      let _actionOnId = (_actionOnEmp._id).toString()
+      const _actionOnEmp = await Employee.findOne({ email: _newEmpData.email });
+      let _actionOnId = _actionOnEmp._id.toString();
       // _actionOnId.toString()
       // console.log(_actionOnId);
       const addLogData = {
@@ -167,7 +169,7 @@ const allEmployeeList = async (req, res) => {
     }
 
     const page = parseInt(req.query.page) || 1;
-    const startIndex = (page * pageSize) - pageSize;
+    const startIndex = page * pageSize - pageSize;
 
     aggregationPipeline.push(...filters);
 
@@ -273,8 +275,8 @@ const employeeById = async (req, res) => {
 const deleteEmployee = async (req, res) => {
   try {
     let employee = await Employee.findOne({ _id: req.params.id });
-    const employeeEmail = employee.email
-    console.log(employeeEmail);
+    const employeeEmail = employee.email;
+    // console.log(employeeEmail);
     const deleteLogData = {
       loginEmployeeEmail: req.loginEmployeeEmail,
       page: "/userlist",
@@ -283,7 +285,7 @@ const deleteEmployee = async (req, res) => {
       actionOnId: req.params.id,
       actionOnEmail: employeeEmail,
     };
-    console.log(deleteLogData);
+    // console.log(deleteLogData);
     await Employee.findOneAndDelete({ _id: req.params.id });
     await ActivityLog.create(deleteLogData);
 
@@ -295,7 +297,7 @@ const deleteEmployee = async (req, res) => {
 
 const updateEmployee = async (req, res) => {
   try {
-    console.log(req.body.userRole);
+    // console.log(req.body.userRole);
     const newUserRole = req.body.userRole.map(
       (str) => new mongoose.Types.ObjectId(str)
     );
@@ -313,7 +315,7 @@ const updateEmployee = async (req, res) => {
       userRole: oldEmployee.userRole,
       pastExperience: oldEmployee.pastExperience,
       color: oldEmployee.color,
-
+      additionalInfo: oldEmployee.additionalInfo,
     };
 
     let newEmployee = req.body;
@@ -321,13 +323,15 @@ const updateEmployee = async (req, res) => {
 
     // const updatelog = diff(oldEmployee, req.body);
 
-    const updatelog = logChanges(oldEmployee, newEmployee);
+    // const updatelog = logChanges(oldEmployee, newEmployee);
 
+    console.log("new", newEmployee);
 
+    const updatelog = await deepCompare(oldEmployee, newEmployee);
 
     // console.log(oldEmployee.pastExperience);
 
-    // console.log(updatelog);
+    console.log(updatelog);
     const updatedEmployee = await Employee.findOneAndUpdate(
       { _id: req.params.id },
       {
@@ -342,7 +346,7 @@ const updateEmployee = async (req, res) => {
         userRole: newUserRole,
         loginEmployeeID: req.loginEmployeeId,
         pastExperience: req.body.pastExperience,
-        additionalInfo: req.body.additionalInfo
+        additionalInfo: req.body.additionalInfo,
       },
       { new: true }
     );
@@ -356,12 +360,11 @@ const updateEmployee = async (req, res) => {
       actionOnEmail: oldEmployee.email,
     };
 
-
-// console.log("elog",logData.data);
+    // console.log("elog",logData.data);
 
     const tempLogData = delete logData.data.additionalInfo;
     // console.log("temp",logData);
-    await ActivityLog.create(logData);
+    // await ActivityLog.create(logData);
 
     res.status(200).json({ msg: "success" });
   } catch (error) {
@@ -369,201 +372,215 @@ const updateEmployee = async (req, res) => {
   }
 };
 
-function logChanges(oldData, newData) {
-  let oldDataCopy = _.cloneDeep(oldData);
-  let newDataCopy = _.cloneDeep(newData);
-  const changes = {};
+// function logChanges(oldData, newData) {
+//   let oldDataCopy = _.cloneDeep(oldData);
+//   let newDataCopy = _.cloneDeep(newData);
+//   const changes = {};
 
-  // function compareArrays(oldArray, newArray, key) {
-  //   let hasChanges = false;
+//   // function compareArrays(oldArray, newArray, key) {
+//   //   let hasChanges = false;
 
-  //   if (oldArray.length !== newArray.length) {
-  //     hasChanges = true;
-  //   } else {
-  //     for (let i = 0; i < oldArray.length; i++) {
-  //       if (oldArray[i] instanceof ObjectId && newArray[i] instanceof ObjectId) {
-  //           if (oldArray[i].toString() !== newArray[i].toString()) {
-  //               hasChanges = true;
-  //               break;
-  //           }
-  //       } else {
-  //           if (oldArray[i] !== newArray[i]) {
-  //               hasChanges = true;
-  //               break;
-  //           }
-  //       }
-  //   }
-  //   }
+//   //   if (oldArray.length !== newArray.length) {
+//   //     hasChanges = true;
+//   //   } else {
+//   //     for (let i = 0; i < oldArray.length; i++) {
+//   //       if (oldArray[i] instanceof ObjectId && newArray[i] instanceof ObjectId) {
+//   //           if (oldArray[i].toString() !== newArray[i].toString()) {
+//   //               hasChanges = true;
+//   //               break;
+//   //           }
+//   //       } else {
+//   //           if (oldArray[i] !== newArray[i]) {
+//   //               hasChanges = true;
+//   //               break;
+//   //           }
+//   //       }
+//   //   }
+//   //   }
 
-  //   if (hasChanges) {
-  //     changes[key] = { old: oldArray, new: newArray };
-  //   }
-  // }
+//   //   if (hasChanges) {
+//   //     changes[key] = { old: oldArray, new: newArray };
+//   //   }
+//   // }
 
-  // function compareArrays(oldArray, newArray, key) {
-  //   let hasChanges = false;
+//   // function compareArrays(oldArray, newArray, key) {
+//   //   let hasChanges = false;
 
-  //   if (oldArray.length !== newArray.length) {
-  //     hasChanges = true;
-  //   } else {
-  //     for (let i = 0; i < oldArray.length; i++) {
-  //       const oldElement = oldArray[i];
-  //       const newElement = newArray[i];
+//   //   if (oldArray.length !== newArray.length) {
+//   //     hasChanges = true;
+//   //   } else {
+//   //     for (let i = 0; i < oldArray.length; i++) {
+//   //       const oldElement = oldArray[i];
+//   //       const newElement = newArray[i];
 
-  //       // Check if the elements are objects
-  //       if (typeof oldElement === "object" && typeof newElement === "object") {
-  //         // Compare objects
-  //         const oldKeys = Object.keys(oldElement);
-  //         const newKeys = Object.keys(newElement);
+//   //       // Check if the elements are objects
+//   //       if (typeof oldElement === "object" && typeof newElement === "object") {
+//   //         // Compare objects
+//   //         const oldKeys = Object.keys(oldElement);
+//   //         const newKeys = Object.keys(newElement);
 
-  //         if (
-  //           oldKeys.length !== newKeys.length ||
-  //           !oldKeys.every((key) => newKeys.includes(key))
-  //         ) {
-  //           hasChanges = true;
-  //           break;
-  //         }
+//   //         if (
+//   //           oldKeys.length !== newKeys.length ||
+//   //           !oldKeys.every((key) => newKeys.includes(key))
+//   //         ) {
+//   //           hasChanges = true;
+//   //           break;
+//   //         }
 
-  //         // Compare the properties of the objects
-  //         for (const prop of oldKeys) {
-  //           if (oldElement[prop] !== newElement[prop]) {
-  //             hasChanges = true;
-  //             break;
-  //           }
-  //         }
-  //       } else {
-  //         // Compare other types of elements
-  //         if (oldElement !== newElement) {
-  //           hasChanges = true;
-  //           break;
-  //         }
-  //       }
+//   //         // Compare the properties of the objects
+//   //         for (const prop of oldKeys) {
+//   //           if (oldElement[prop] !== newElement[prop]) {
+//   //             hasChanges = true;
+//   //             break;
+//   //           }
+//   //         }
+//   //       } else {
+//   //         // Compare other types of elements
+//   //         if (oldElement !== newElement) {
+//   //           hasChanges = true;
+//   //           break;
+//   //         }
+//   //       }
 
-  //       if (hasChanges) {
-  //         break;
-  //       }
-  //     }
-  //   }
+//   //       if (hasChanges) {
+//   //         break;
+//   //       }
+//   //     }
+//   //   }
 
-  //   if (hasChanges) {
-  //     changes[key] = { old: oldArray, new: newArray };
-  //   }
-  // }
+//   //   if (hasChanges) {
+//   //     changes[key] = { old: oldArray, new: newArray };
+//   //   }
+//   // }
 
+//   function compareArrays(oldArray, newArray, key) {
+//     let hasChanges = false;
 
+//     if (oldArray.length !== newArray.length) {
+//       hasChanges = true;
+//       hasChanges = true;
+//     } else {
+//       for (let i = 0; i < oldArray.length; i++) {
+//         const oldElement = oldArray[i];
+//         const newElement = newArray[i];
+//         for (let i = 0; i < oldArray.length; i++) {
+//           const oldElement = oldArray[i];
+//           const newElement = newArray[i];
 
-  function compareArrays(oldArray, newArray, key) {
-    let hasChanges = false;
+//           // Check if the elements are MongoDB ObjectId instances
+//           if (
+//             oldElement instanceof ObjectId &&
+//             newElement instanceof ObjectId
+//           ) {
+//             if (oldElement.toString() !== newElement.toString()) {
+//               hasChanges = true;
+//               break;
+//             }
+//           } else if (
+//             typeof oldElement === "object" &&
+//             typeof newElement === "object"
+//           ) {
+//             // Compare objects
+//             const oldKeys = Object.keys(oldElement);
+//             const newKeys = Object.keys(newElement);
+//             // Check if the elements are MongoDB ObjectId instances
+//             if (
+//               oldElement instanceof ObjectId &&
+//               newElement instanceof ObjectId
+//             ) {
+//               if (oldElement.toString() !== newElement.toString()) {
+//                 hasChanges = true;
+//                 break;
+//               }
+//             } else if (
+//               typeof oldElement === "object" &&
+//               typeof newElement === "object"
+//             ) {
+//               // Compare objects
+//               const oldKeys = Object.keys(oldElement);
+//               const newKeys = Object.keys(newElement);
 
-    if (oldArray.length !== newArray.length) {
-      hasChanges = true;
-      hasChanges = true;
-    } else {
-      for (let i = 0; i < oldArray.length; i++) {
-        const oldElement = oldArray[i];
-        const newElement = newArray[i];
-        for (let i = 0; i < oldArray.length; i++) {
-          const oldElement = oldArray[i];
-          const newElement = newArray[i];
+//               if (
+//                 oldKeys.length !== newKeys.length ||
+//                 !oldKeys.every((key) => newKeys.includes(key))
+//               ) {
+//                 hasChanges = true;
+//                 break;
+//               }
+//               if (
+//                 oldKeys.length !== newKeys.length ||
+//                 !oldKeys.every((key) => newKeys.includes(key))
+//               ) {
+//                 hasChanges = true;
+//                 break;
+//               }
 
-          // Check if the elements are MongoDB ObjectId instances
-          if (oldElement instanceof ObjectId && newElement instanceof ObjectId) {
-            if (oldElement.toString() !== newElement.toString()) {
-              hasChanges = true;
-              break;
-            }
-          } else if (typeof oldElement === 'object' && typeof newElement === 'object') {
-            // Compare objects
-            const oldKeys = Object.keys(oldElement);
-            const newKeys = Object.keys(newElement);
-            // Check if the elements are MongoDB ObjectId instances
-            if (oldElement instanceof ObjectId && newElement instanceof ObjectId) {
-              if (oldElement.toString() !== newElement.toString()) {
-                hasChanges = true;
-                break;
-              }
-            } else if (typeof oldElement === 'object' && typeof newElement === 'object') {
-              // Compare objects
-              const oldKeys = Object.keys(oldElement);
-              const newKeys = Object.keys(newElement);
+//               // Compare the properties of the objects
+//               for (const prop of oldKeys) {
+//                 if (oldElement[prop] !== newElement[prop]) {
+//                   hasChanges = true;
+//                   break;
+//                 }
+//               }
+//             } else {
+//               // Compare other types of elements
+//               if (oldElement !== newElement) {
+//                 hasChanges = true;
+//                 break;
+//               }
+//             }
+//             // Compare the properties of the objects
+//             for (const prop of oldKeys) {
+//               if (oldElement[prop] !== newElement[prop]) {
+//                 hasChanges = true;
+//                 break;
+//               }
+//             }
+//           } else {
+//             // Compare other types of elements
+//             if (oldElement !== newElement) {
+//               hasChanges = true;
+//               break;
+//             }
+//           }
 
-              if (oldKeys.length !== newKeys.length || !oldKeys.every(key => newKeys.includes(key))) {
-                hasChanges = true;
-                break;
-              }
-              if (oldKeys.length !== newKeys.length || !oldKeys.every(key => newKeys.includes(key))) {
-                hasChanges = true;
-                break;
-              }
+//           if (hasChanges) {
+//             break;
+//           }
+//         }
+//         if (hasChanges) {
+//           break;
+//         }
+//       }
+//     }
 
-              // Compare the properties of the objects
-              for (const prop of oldKeys) {
-                if (oldElement[prop] !== newElement[prop]) {
-                  hasChanges = true;
-                  break;
-                }
-              }
-            } else {
-              // Compare other types of elements
-              if (oldElement !== newElement) {
-                hasChanges = true;
-                break;
-              }
-            }
-            // Compare the properties of the objects
-            for (const prop of oldKeys) {
-              if (oldElement[prop] !== newElement[prop]) {
-                hasChanges = true;
-                break;
-              }
-            }
-          } else {
-            // Compare other types of elements
-            if (oldElement !== newElement) {
-              hasChanges = true;
-              break;
-            }
-          }
+//     if (hasChanges) {
+//       changes[key] = { old: oldArray, new: newArray };
+//       changes[key] = { old: oldArray, new: newArray };
+//     }
+//   }
 
-          if (hasChanges) {
-            break;
-          }
-        }
-        if (hasChanges) {
-          break;
-        }
-      }
-    }
+//   function compareObjects(oldObj, newObj) {
+//     Object.keys(newObj).forEach((key) => {
+//       if (Array.isArray(oldObj[key]) && Array.isArray(newObj[key])) {
+//         compareArrays(oldObj[key], newObj[key], key);
+//       } else if (
+//         typeof oldObj[key] === "object" &&
+//         typeof newObj[key] === "object"
+//       ) {
+//         compareObjects(oldObj[key], newObj[key]);
+//       } else {
+//         if (oldObj[key] !== newObj[key]) {
+//           changes[key] = { old: oldObj[key], new: newObj[key] };
+//         }
+//       }
+//     });
+//   }
 
-    if (hasChanges) {
-      changes[key] = { old: oldArray, new: newArray };
-      changes[key] = { old: oldArray, new: newArray };
-    }
-  }
+//   compareObjects(oldDataCopy, newDataCopy);
 
-
-
-function compareObjects(oldObj, newObj) {
-  Object.keys(newObj).forEach((key) => {
-    if (Array.isArray(oldObj[key]) && Array.isArray(newObj[key])) {
-      compareArrays(oldObj[key], newObj[key], key);
-    } else if (
-      typeof oldObj[key] === "object" &&
-      typeof newObj[key] === "object"
-    ) {
-      compareObjects(oldObj[key], newObj[key]);
-    } else {
-      if (oldObj[key] !== newObj[key]) {
-        changes[key] = { old: oldObj[key], new: newObj[key] };
-      }
-    }
-  });
-}
-
-compareObjects(oldDataCopy, newDataCopy);
-
-return changes;
-}
+//   return changes;
+// }
 
 // function logChanges(oldData, newData) {
 //   const changes = {};

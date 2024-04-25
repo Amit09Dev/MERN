@@ -83,9 +83,15 @@ function UserForm() {
       const data = fields.map((field) => ({
         [field.name]: company[field.name] || null,
       }));
-      formData.additionalInfo = data;
+      const mergedData = {};
+      data.forEach(obj => {
+        Object.keys(obj).forEach(key => {
+          mergedData[key] = obj[key];
+        });
+      });
+      formData.additionalInfo = mergedData;
       formData.userRole = selectedOption.map(option => option.value);
-      formData.pastExperience=gridList.map(option => option.value);
+      formData.pastExperience = gridList.map(option => option.value);
       if (JSON.stringify(selectedOption) !== JSON.stringify(formData.userRole)) {
         updatedFormData = {
           ...formData,
@@ -93,7 +99,8 @@ function UserForm() {
           pastExperience: [...gridList]
         };
       }
-      
+      console.log(updatedFormData);
+
       try {
         if (id === undefined) {
           console.log(updatedFormData);
@@ -107,7 +114,7 @@ function UserForm() {
           resetForm();
           navigate("/userlist");
         }
-  
+
       } catch (error) {
         console.error(error);
       }
@@ -116,7 +123,7 @@ function UserForm() {
       console.error(error);
     }
   };
-  
+
 
   const handleChange = (selectedOption) => {
     setSelectedOption(selectedOption);
@@ -271,7 +278,7 @@ function UserForm() {
             pastExperience: [...gridList]
           };
         }
-  
+
         if (id === undefined && fields.length === 0) {
           console.log(formData);
           const res = await axiosInstance.post("/addEmp", updatedFormData);
@@ -279,18 +286,18 @@ function UserForm() {
           resetForm();
         } else if (id === undefined && fields.length > 0) {
           setActiveTabIndex(1);
-        } 
+        }
         else if (id !== null && fields.length > 0) {
           setActiveTabIndex(1);
-        } 
-        else if (id !== undefined && fields.length===0) {
+        }
+        else if (id !== undefined && fields.length === 0) {
           console.log(updatedFormData);
           await axiosInstance.patch(`/emp/${id}`, updatedFormData);
           updatenotify();
           resetForm();
           navigate("/userlist");
         }
-        
+
       } catch (error) {
         console.error("Error:", error);
       }

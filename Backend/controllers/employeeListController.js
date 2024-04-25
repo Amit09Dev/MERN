@@ -1,11 +1,11 @@
 const { Employee } = require("../models/EmployeeModel");
 const { ActivityLog } = require("../models/activityLogModel");
-const { Role } = require("../models/userRoleModel");
 const { ObjectId } = require("mongodb");
 const mongoose = require("mongoose");
 const _ = require("lodash");
 const { json } = require("body-parser");
 const { createDeepComparer } = require("deep-comparer");
+const { log } = require("deep-comparer/src/utils/performance-logger");
 const deepCompare = createDeepComparer();
 
 const newEmployeeAdd = async (req, res) => {
@@ -264,6 +264,7 @@ const employeeById = async (req, res) => {
     employee[0].userRole = employee[0].userRole.map((role) => {
       return { value: role.value[0].toString(), label: role.label[0] };
     });
+    // console.log("to be edited: ",employee[0]);
     res.status(200).json(...employee);
   } catch (error) {
     res.status(400).send({ success: false, msg: error.message });
@@ -291,11 +292,90 @@ const deleteEmployee = async (req, res) => {
   }
 };
 
+// const updateEmployee = async (req, res) => {
+//   try {
+//     const newUserRole = req.body.userRole.map(
+//       (str) => new mongoose.Types.ObjectId(str)
+//     );
+//     let oldEmployee = await Employee.findOne({ _id: req.params.id });
+
+//     oldEmployee = {
+//       firstName: oldEmployee.firstName,
+//       lastName: oldEmployee.lastName,
+//       email: oldEmployee.email,
+//       address: oldEmployee.address,
+//       state: oldEmployee.state,
+//       city: oldEmployee.city,
+//       zip: oldEmployee.zip,
+//       jobRole: oldEmployee.jobRole,
+//       userRole: oldEmployee.userRole,
+//       pastExperience: oldEmployee.pastExperience,
+//       color: oldEmployee.color,
+//       additionalInfo: oldEmployee.additionalInfo,
+//     };
+
+//     let newEmployee = req.body;
+//     newEmployee.additionalInfo = [req.body.additionalInfo];
+//     newEmployee.userRole = newUserRole;
+
+//     const updatelog = await deepCompare(oldEmployee, newEmployee);
+
+//     // Convert buffer notation to string representation for ObjectId
+//     updatelog.forEach((change) => {
+//       if (change.path.startsWith('root.userRole[')) {
+//         const indexStart = change.path.indexOf('buffer.');
+//         if (indexStart !== -1) {
+//           const bufferIndex = change.path.substring(indexStart + 7);
+//           change.path = change.path.replace(`buffer.${bufferIndex}`, bufferIndex);
+//           change.oldVal = oldEmployee.userRole[bufferIndex].toString();
+//           change.newVal = newUserRole[bufferIndex].toString();
+//         }
+//       }
+//     });
+
+//     const updatedEmployee = await Employee.findOneAndUpdate(
+//       { _id: req.params.id },
+//       {
+//         firstName: req.body.firstName,
+//         lastName: req.body.lastName,
+//         email: req.body.email,
+//         address: req.body.address,
+//         state: req.body.state,
+//         city: req.body.city,
+//         zip: req.body.zip,
+//         jobRole: req.body.jobRole,
+//         userRole: newUserRole,
+//         loginEmployeeID: req.loginEmployeeId,
+//         pastExperience: req.body.pastExperience,
+//         additionalInfo: req.body.additionalInfo,
+//       },
+//       { new: true }
+//     );
+
+//     let logData = {
+//       loginEmployeeEmail: req.loginEmployeeEmail,
+//       page: "/userform",
+//       action: "Employe Edited",
+//       data: updatelog,
+//       actionOnId: req.params.id,
+//       actionOnEmail: oldEmployee.email,
+//     };
+
+//     console.log(logData);
+//     await ActivityLog.create(logData);
+
+//     res.status(200).json({ msg: "success" });
+//   } catch (error) {
+//     res.status(400).send({ success: false, msg: error.message });
+//   }
+// };
+
 const updateEmployee = async (req, res) => {
   try {
     const newUserRole = req.body.userRole.map(
       (str) => new mongoose.Types.ObjectId(str)
     );
+
     let oldEmployee = await Employee.findOne({ _id: req.params.id });
 
     oldEmployee = {
@@ -314,9 +394,22 @@ const updateEmployee = async (req, res) => {
     };
 
     let newEmployee = req.body;
+    newEmployee.additionalInfo = [req.body.additionalInfo];
     newEmployee.userRole = newUserRole;
 
-    const updatelog = await deepCompare(oldEmployee, newEmployee);
+    const updatedUserRole = getChangesInUserRole(
+      oldEmployee.userRole,
+      newEmployee.userRole
+    );
+    console.log("updatedUserRole", updatedUserRole);
+
+    delete oldEmployee.userRole;
+    delete newEmployee.userRole;
+
+    let updatelog = await deepCompare(oldEmployee, newEmployee);
+
+    updatelog.push(...updatedUserRole);
+    console.log("updatelog", updatelog);
 
     const updatedEmployee = await Employee.findOneAndUpdate(
       { _id: req.params.id },
@@ -346,13 +439,53 @@ const updateEmployee = async (req, res) => {
       actionOnEmail: oldEmployee.email,
     };
 
-    await ActivityLog.create(logData);
+    console.log(logData);
+
+    if (updatelog.length > 0 || updatedUserRole.length > 0) {
+      await ActivityLog.create(logData);
+    }
 
     res.status(200).json({ msg: "success" });
   } catch (error) {
     res.status(400).send({ success: false, msg: error.message });
   }
 };
+
+function getChangesInUserRole(oldUserRole, newUserRole) {
+  let changes = [];
+  if (oldUserRole.length !== newUserRole.length) {
+    changes.push({
+      path: "root.userRole",
+      oldVal: oldUserRole,
+      newVal: newUserRole,
+    });
+    return changes;
+  } else {
+    const tempOldVal = [];
+    const tempNewVal = [];
+    for (let i = 0; i < oldUserRole.length; i++) {
+      let found = false;
+      for (let j = 0; j < newUserRole.length; j++) {
+        if (oldUserRole[i].toString() === newUserRole[j].toString()) {
+          found = true;
+          break; // Exit inner loop if a match is found
+        }
+      }
+      if (!found) {
+        tempOldVal.push(oldUserRole[i]);
+        tempNewVal.push(newUserRole[i]);
+      }
+    }
+    if (tempOldVal.length !== 0 && tempNewVal.length !== 0) {
+      changes.push({
+        path: `root.userRole`,
+        oldVal: tempOldVal,
+        newVal: tempNewVal,
+      });
+    }
+    return changes;
+  }
+}
 
 module.exports = {
   newEmployeeAdd,

@@ -129,24 +129,6 @@ function UserData() {
     }
   };
 
-  // const fetchData = async () => {
-  //   const data = {
-  //     fullName: inputValue.fullName,
-  //     page: Math.floor((first / rows + 1)),
-  //     pageSize: rows,
-  //     ...inputValue
-  //   };
-  //   try {
-  //     const response = await axiosInstance.get("/emp", {
-  //       params: data,
-  //     });
-  //     console.log(response.data);
-  //     setUsers(response.data);
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //   }
-  // };
-
   const confirmDelete = (id) => {
     confirmDialog({
       message: 'Are you sure you want to delete this record?',
@@ -308,7 +290,7 @@ function UserData() {
                     <td>{user.jobRole}</td>
                     <td>
                       {user.userRole.map((role, roleIndex) => (
-                        <div key={roleIndex}>{formatKey(role)}</div>
+                        <div key={roleIndex}>{formatKey(role.toString())}</div>
                       ))}
                     </td>
 

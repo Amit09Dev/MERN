@@ -1,13 +1,9 @@
 const { Employee } = require("../models/EmployeeModel");
 const { ActivityLog } = require("../models/activityLogModel");
-const { ObjectId } = require("mongodb");
 const mongoose = require("mongoose");
 const _ = require("lodash");
-const { json } = require("body-parser");
 const { createDeepComparer } = require("deep-comparer");
-const { log } = require("deep-comparer/src/utils/performance-logger");
 const deepCompare = createDeepComparer();
-const {diff} = require('object-diff-3000');
 
 const newEmployeeAdd = async (req, res) => {
   try {
@@ -44,7 +40,6 @@ const newEmployeeAdd = async (req, res) => {
 
 const allEmployeeList = async (req, res) => {
   try {
-    const pageSize = parseInt(req.query.pageSize);
     const _loginEmployeeId = req.loginEmployeeId;
     let aggregationPipeline = [
       {
@@ -119,7 +114,7 @@ const allEmployeeList = async (req, res) => {
         },
       });
     }
-
+    
     const userRoles = req.query.userRole;
     if (userRoles && userRoles.length > 0) {
       const roleMatches = await userRoles.map((role) => ({ userRole: role }));
@@ -129,10 +124,10 @@ const allEmployeeList = async (req, res) => {
         },
       });
     }
-
+    
     const startDateStr = req.query.startDate;
     const endDateStr = req.query.endDate;
-
+    
     if (startDateStr && endDateStr) {
       const startDate = new Date(startDateStr).toISOString();
       const endDate = new Date(endDateStr).toISOString();
@@ -166,9 +161,14 @@ const allEmployeeList = async (req, res) => {
         }
       );
     }
-
+    
     const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize);
     const startIndex = page * pageSize - pageSize;
+
+    console.log("page", page);
+    console.log("pageSize", pageSize);
+    console.log("startIndex", startIndex);
 
     aggregationPipeline.push(...filters);
 
@@ -265,7 +265,6 @@ const employeeById = async (req, res) => {
     employee[0].userRole = employee[0].userRole.map((role) => {
       return { value: role.value[0].toString(), label: role.label[0] };
     });
-    // console.log("to be edited: ",employee[0]);
     res.status(200).json(...employee);
   } catch (error) {
     res.status(400).send({ success: false, msg: error.message });
@@ -292,89 +291,6 @@ const deleteEmployee = async (req, res) => {
     res.status(400).send({ success: false, msg: error.message });
   }
 };
-
-// const updateEmployee = async (req, res) => {
-//   try {
-//     const newUserRole = req.body.userRole.map(
-//       (str) => new mongoose.Types.ObjectId(str)
-//     );
-//     let oldEmployee = await Employee.findOne({ _id: req.params.id });
-
-//     oldEmployee = {
-//       firstName: oldEmployee.firstName,
-//       lastName: oldEmployee.lastName,
-//       email: oldEmployee.email,
-//       address: oldEmployee.address,
-//       state: oldEmployee.state,
-//       city: oldEmployee.city,
-//       zip: oldEmployee.zip,
-//       jobRole: oldEmployee.jobRole,
-//       userRole: oldEmployee.userRole,
-//       pastExperience: oldEmployee.pastExperience,
-//       color: oldEmployee.color,
-//       additionalInfo: oldEmployee.additionalInfo,
-//     };
-
-//     let newEmployee = req.body;
-//     newEmployee.additionalInfo = [req.body.additionalInfo];
-//     newEmployee.userRole = newUserRole;
-
-//     const updatelog = await deepCompare(oldEmployee, newEmployee);
-
-//     // Convert buffer notation to string representation for ObjectId
-//     updatelog.forEach((change) => {
-//       if (change.path.startsWith('root.userRole[')) {
-//         const indexStart = change.path.indexOf('buffer.');
-//         if (indexStart !== -1) {
-//           const bufferIndex = change.path.substring(indexStart + 7);
-//           change.path = change.path.replace(`buffer.${bufferIndex}`, bufferIndex);
-//           change.oldVal = oldEmployee.userRole[bufferIndex].toString();
-//           change.newVal = newUserRole[bufferIndex].toString();
-//         }
-//       }
-//     });
-
-//     const updatedEmployee = await Employee.findOneAndUpdate(
-//       { _id: req.params.id },
-//       {
-//         firstName: req.body.firstName,
-//         lastName: req.body.lastName,
-//         email: req.body.email,
-//         address: req.body.address,
-//         state: req.body.state,
-//         city: req.body.city,
-//         zip: req.body.zip,
-//         jobRole: req.body.jobRole,
-//         userRole: newUserRole,
-//         loginEmployeeID: req.loginEmployeeId,
-//         pastExperience: req.body.pastExperience,
-//         additionalInfo: req.body.additionalInfo,
-//       },
-//       { new: true }
-//     );
-
-//     let logData = {
-//       loginEmployeeEmail: req.loginEmployeeEmail,
-//       page: "/userform",
-//       action: "Employe Edited",
-//       data: updatelog,
-//       actionOnId: req.params.id,
-//       actionOnEmail: oldEmployee.email,
-//     };
-
-//     console.log(logData);
-//     await ActivityLog.create(logData);
-
-//     res.status(200).json({ msg: "success" });
-//   } catch (error) {
-//     res.status(400).send({ success: false, msg: error.message });
-//   }
-// };
-
-
-
-// custom for user role
-
 
 const updateEmployee = async (req, res) => {
   try {
@@ -456,8 +372,6 @@ const updateEmployee = async (req, res) => {
     res.status(400).send({ success: false, msg: error.message });
   }
 };
-
-
 
 function getChangesInUserRole(oldUserRole, newUserRole) {
   let changes = [];

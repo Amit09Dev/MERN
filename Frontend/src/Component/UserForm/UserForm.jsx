@@ -273,14 +273,8 @@ function UserForm() {
             pastExperience: [...gridList]
           };
         }
-        if(tempData.additionalInfo==null) {
-          await axiosInstance.patch(`/emp/${id}`, updatedFormData);
-          updatenotify();
-          resetForm();
-          navigate("/userlist");
-          return
-        }
-        else{
+       
+       
           if (id === undefined && fields.length === 0) {
             const res = await axiosInstance.post("/addEmp", updatedFormData);
             insertnotify();
@@ -297,7 +291,7 @@ function UserForm() {
             resetForm();
             navigate("/userlist");
           }
-        }
+        
 
       } catch (error) {
         console.error("Error:", error);

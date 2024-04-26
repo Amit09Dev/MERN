@@ -41,9 +41,12 @@ function Activity() {
         };
         console.log(data);
     try {
-       const res= await axiosInstance.post("/allLogs",{
+       const res= await axiosInstance.get("/allLogs",{
         params:data
        });
+       setActivityLog(res.data.data);
+       setTotalRecords(res.data.totalRecords);  
+
        
     } catch (error) {
         console.log(error);

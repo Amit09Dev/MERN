@@ -22,14 +22,23 @@ const newEmployeeAdd = async (req, res) => {
       const _newEmpData = await Employee.create(newEmpData);
       const _actionOnEmp = await Employee.findOne({ email: _newEmpData.email });
       let _actionOnId = _actionOnEmp._id.toString();
+
+
+
+      let currentDate = new Date();
+      let currentDateTime = currentDate.toLocaleString("en-IN", {
+        timeZone: "Asia/Kolkata",
+      });
       const addLogData = {
         loginEmployeeEmail: req.loginEmployeeEmail,
         page: "/userform",
-        action: "Employe Added",
+        action: "Employee Added",
         data: "",
         actionOnId: _actionOnId,
         actionOnEmail: _newEmpData.email,
+        timeStamp: currentDateTime,
       };
+
       await ActivityLog.create(addLogData);
       res.status(200).json(_newEmpData);
     }
@@ -114,7 +123,7 @@ const allEmployeeList = async (req, res) => {
         },
       });
     }
-    
+
     const userRoles = req.query.userRole;
     if (userRoles && userRoles.length > 0) {
       const roleMatches = await userRoles.map((role) => ({ userRole: role }));
@@ -124,10 +133,10 @@ const allEmployeeList = async (req, res) => {
         },
       });
     }
-    
+
     const startDateStr = req.query.startDate;
     const endDateStr = req.query.endDate;
-    
+
     if (startDateStr && endDateStr) {
       const startDate = new Date(startDateStr).toISOString();
       const endDate = new Date(endDateStr).toISOString();
@@ -161,14 +170,10 @@ const allEmployeeList = async (req, res) => {
         }
       );
     }
-    
+
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize);
     const startIndex = page * pageSize - pageSize;
-
-    console.log("page", page);
-    console.log("pageSize", pageSize);
-    console.log("startIndex", startIndex);
 
     aggregationPipeline.push(...filters);
 
@@ -275,6 +280,10 @@ const deleteEmployee = async (req, res) => {
   try {
     let employee = await Employee.findOne({ _id: req.params.id });
     const employeeEmail = employee.email;
+    let currentDate = new Date();
+    let currentDateTime = currentDate.toLocaleString("en-IN", {
+      timeZone: "Asia/Kolkata",
+    });
     const deleteLogData = {
       loginEmployeeEmail: req.loginEmployeeEmail,
       page: "/userlist",
@@ -282,6 +291,7 @@ const deleteEmployee = async (req, res) => {
       data: "",
       actionOnId: req.params.id,
       actionOnEmail: employeeEmail,
+      timeStamp: currentDateTime,
     };
     await Employee.findOneAndDelete({ _id: req.params.id });
     await ActivityLog.create(deleteLogData);
@@ -352,6 +362,11 @@ const updateEmployee = async (req, res) => {
       { new: true }
     );
 
+    let currentDate = new Date();
+    let currentDateTime = currentDate.toLocaleString("en-IN", {
+      timeZone: "Asia/Kolkata",
+    });
+
     let logData = {
       loginEmployeeEmail: req.loginEmployeeEmail,
       page: "/userform",
@@ -359,6 +374,7 @@ const updateEmployee = async (req, res) => {
       data: updatelog,
       actionOnId: req.params.id,
       actionOnEmail: oldEmployee.email,
+      timeStamp: currentDateTime,
     };
 
     console.log(logData);

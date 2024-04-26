@@ -8,7 +8,7 @@ const activityLogSchema = new mongoose.Schema({
   data: {type : Object},
   actionOnId: { type: String },
   actionOnEmail : {type: String},
-  timeStamp: { type: String, default: new Date() },
+  timeStamp: { type: String },
 });
 
 const ActivityLog = mongoose.model("ActivityLog", activityLogSchema);

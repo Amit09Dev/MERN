@@ -49,7 +49,7 @@ function Signup() {
                     <form className="d-flex h-75 align-items-center" onSubmit={handleSubmit}>
                         <div className="signupDetails w-100 ps-3">
                             <div className="form-floating mb-3 mt-5">
-                                <input type="email" className="form-control w-100" id="email" mailto:placeholder="name@example.com"
+                                <input type="email" className="form-control w-100" id="email" placeholder="name@example.com"
                                     value={values.email}
                                     onChange={handleChange}
                                     onBlur={handleBlur} />

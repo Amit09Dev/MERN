@@ -55,6 +55,7 @@ function UserData() {
       const result = await axiosInstance.get("/emp", {
         params: data,
       });
+      console.log(result.data.data);
       setUsers(result.data.data);
       setTotalRecords(result.data.totalRecords);
     } catch (error) {
@@ -125,21 +126,26 @@ function UserData() {
       } catch (error) {
         console.log(error);
       }
-
-      // const updatedFormData = {
-      //   ...inputValue,
-      // };
     }
   };
 
-  const fetchData = async () => {
-    try {
-      const response = await axiosInstance.get("/emp");
-      setUsers(response.data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+  // const fetchData = async () => {
+  //   const data = {
+  //     fullName: inputValue.fullName,
+  //     page: Math.floor((first / rows + 1)),
+  //     pageSize: rows,
+  //     ...inputValue
+  //   };
+  //   try {
+  //     const response = await axiosInstance.get("/emp", {
+  //       params: data,
+  //     });
+  //     console.log(response.data);
+  //     setUsers(response.data);
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //   }
+  // };
 
   const confirmDelete = (id) => {
     confirmDialog({
@@ -156,7 +162,7 @@ function UserData() {
       await axiosInstance.delete(`/emp/${id}`);
       getData();
       toast.success("Data delete Successfully");
-      await fetchData();
+      // await fetchData();
     } catch (error) {
       console.error("Error deleting user:", error);
     }

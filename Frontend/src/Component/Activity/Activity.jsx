@@ -33,8 +33,22 @@ function Activity() {
             [id]: value,
         });
     }
-    const SearchResults = () => {
-        console.log(searchValue);
+    const SearchResults = async() => {
+        const data = {
+            page: Math.floor(first / rows + 1),
+            pageSize: rows,
+            ...searchValue
+        };
+        console.log(data);
+    try {
+       const res= await axiosInstance.post("/allLogs",{
+        params:data
+       });
+       
+    } catch (error) {
+        console.log(error);
+    }
+
     }
 
 

@@ -1,5 +1,5 @@
 import './Signup.css';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axiosInstance from "../../api/Axios";
@@ -19,9 +19,11 @@ function Signup() {
             try {
                 const result = await axiosInstance.post("/register", values)
                 console.log(result.data);
+                toast.success("Registered Successfully")
                 navigate("/login")
 
             } catch (error) {
+                toast.error(error.response.data.message);
                 console.log(error);
             }
             action.resetForm();
@@ -31,7 +33,6 @@ function Signup() {
 
     const clearToken = () => {
         localStorage.clear();
-
     }
 
     useEffect(() => {
@@ -48,7 +49,7 @@ function Signup() {
                     <form className="d-flex h-75 align-items-center" onSubmit={handleSubmit}>
                         <div className="signupDetails w-100 ps-3">
                             <div className="form-floating mb-3 mt-5">
-                                <input type="email" className="form-control w-100" id="email" placeholder="name@example.com"
+                                <input type="email" className="form-control w-100" id="email" mailto:placeholder="name@example.com"
                                     value={values.email}
                                     onChange={handleChange}
                                     onBlur={handleBlur} />

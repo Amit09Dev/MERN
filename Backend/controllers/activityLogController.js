@@ -9,29 +9,29 @@ const models = {
   // company,
 };
 
-const newActivityLog = async (req, res) => {
-  try {
-    const newActivityLogData = req.body;
-    const modelName = req.body.dataType;
-    console.log(modelName);
-    const Model = models[modelName];
+// const newActivityLog = async (req, res) => {
+//   try {
+//     const newActivityLogData = req.body;
+//     const modelName = req.body.dataType;
+//     console.log(modelName);
+//     const Model = models[modelName];
 
-    if (!newActivityLogData.actionOnId) {
-      const newDataAdded = await Model.findOne({
-        email: newActivityLogData.actionOnEmail,
-      });
-      console.log(newDataAdded);
-      newActivityLogData.actionOnId = newDataAdded._id;
+//     if (!newActivityLogData.actionOnId) {
+//       const newDataAdded = await Model.findOne({
+//         email: newActivityLogData.actionOnEmail,
+//       });
+//       console.log(newDataAdded);
+//       newActivityLogData.actionOnId = newDataAdded._id;
 
-    }
-    newActivityLogData.loginEmployeeId = req.loginEmployeeEmail;
-    const _newActivityLogData = await ActivityLog.create(newActivityLogData);
-    console.log(_newActivityLogData);
-    res.status(200).json(_newActivityLogData);
-  } catch (error) {
-    res.status(400).send({ success: false, msg: error.message });
-  }
-};
+//     }
+//     newActivityLogData.loginEmployeeId = req.loginEmployeeEmail;
+//     const _newActivityLogData = await ActivityLog.create(newActivityLogData);
+//     console.log(_newActivityLogData);
+//     res.status(200).json(_newActivityLogData);
+//   } catch (error) {
+//     res.status(400).send({ success: false, msg: error.message });
+//   }
+// };
 
 const showActivityLog = async (req, res) => {
   try {
@@ -145,4 +145,4 @@ const showActivityLog = async (req, res) => {
   }
 };
 
-module.exports = { newActivityLog, showActivityLog };
+module.exports = { showActivityLog };

@@ -1,23 +1,21 @@
 const { additionalField } = require("../models/additionalFieldModel");
+const { Employee } = require("../models/EmployeeModel");
 
 const additionalFieldsData = async (req, res) => {
   try {
     const additionalFieldsName = req.body;
     if (additionalFieldsName.length > 0) {
-      console.log("additional",additionalFieldsName);
       for (let i = 0; i < additionalFieldsName.length; i++) {
         const additionalFieldData = {
           name: additionalFieldsName[i].name,
           type: additionalFieldsName[i].type,
           options: additionalFieldsName[i].options
         };
-        console.log("afd",additionalFieldData);
         const checkAdditionalField = await additionalField.findOne({
           name: additionalFieldData.name,
           type: additionalFieldData.type,
           options : additionalFieldData.options
         });
-        console.log("checkAdditionalField",checkAdditionalField);
         if (!checkAdditionalField) {
           await additionalField.create(additionalFieldData);
         }
@@ -40,6 +38,15 @@ const additionalFields = async (req, res) => {
 
 const deleteAdditionalFields = async (req, res) => {
   try {
+
+    // const additionalFieldName = await additionalField.findOne({ _id: req.params.id });
+    
+    // const _additionalFields = await Employee.findOne({ 
+    //   [additionalFieldName.name]: { $exists: true }
+    //  });
+
+    //  console.log(additionalFieldName.name);
+    
     await additionalField.findOneAndDelete({ _id: req.params.id });
     res.status(200).json({ msg: "deleted" });
   } catch (error) {

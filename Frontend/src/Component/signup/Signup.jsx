@@ -11,26 +11,26 @@ function Signup() {
         email: "",
         password: "",
         confirmpassword: "",
-      };
-      const {values,errors,touched,handleBlur,handleSubmit,handleChange} = useFormik({
+    };
+    const { values, errors, touched, handleBlur, handleSubmit, handleChange } = useFormik({
         initialValues: initialValues,
-        validationSchema:SignUp,
-        onSubmit:async (values,action) => {
-          try {
-            const result=await axiosInstance.post("/register",values)
-            console.log(result.data);
-            navigate("/login")
-            
-          } catch (error) {
-            console.log(error);
-          }
-          action.resetForm();
+        validationSchema: SignUp,
+        onSubmit: async (values, action) => {
+            try {
+                const result = await axiosInstance.post("/register", values)
+                console.log(result.data);
+                navigate("/login")
+
+            } catch (error) {
+                console.log(error);
+            }
+            action.resetForm();
         },
-      });
+    });
 
 
     const clearToken = () => {
-            localStorage.clear();
+        localStorage.clear();
 
     }
 
@@ -38,18 +38,18 @@ function Signup() {
         clearToken();
     }, [])
 
-  
+
 
     return (
         <div className="container-fluid SignupContainer vh-100 d-flex justify-content-center  align-items-center">
             <div className="row bg-white formRow">
                 <div className="col-6">
                     <h4 className='text-center signupText'>Signup</h4>
-                    <form className="d-flex h-75 align-items-center" onSubmit={handleSubmit}> 
+                    <form className="d-flex h-75 align-items-center" onSubmit={handleSubmit}>
                         <div className="signupDetails w-100 ps-3">
                             <div className="form-floating mb-3 mt-5">
                                 <input type="email" className="form-control w-100" id="email" placeholder="name@example.com"
-                                    value={values.email} 
+                                    value={values.email}
                                     onChange={handleChange}
                                     onBlur={handleBlur} />
                                 <label forhtml="email">Email address</label>
@@ -57,17 +57,17 @@ function Signup() {
                             </div>
                             <div className="form-floating mb-3">
                                 <input type="password" className="form-control" id="password" placeholder="Password"
-                                 value={values.password} 
-                                 onChange={handleChange}
-                                 onBlur={handleBlur}/>
+                                    value={values.password}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur} />
                                 <label forhtml="password">Password</label>
                                 {errors.password && touched.password ? <p className="form-error">{errors.password}</p> : null}
                             </div>
                             <div className="form-floating mb-3">
                                 <input type="password" className="form-control" id="confirmpassword" placeholder="Confirm Password"
-                                     value={values.confirmpassword} 
-                                     onChange={handleChange}
-                                     onBlur={handleBlur}/>
+                                    value={values.confirmpassword}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur} />
                                 <label forhtml="confirmPassword">Confirm Password</label>
                                 {errors.confirmpassword && touched.confirmpassword ? <p className="form-error">{errors.confirmpassword}</p> : null}
                             </div>

@@ -19,7 +19,6 @@ const View = () => {
         };
         if (id) fetchData();
     }, [id]);
-
     const renderUserRoles = () => {
         if (!userData?.userRole) return null;
 
@@ -45,6 +44,21 @@ const View = () => {
         ));
     };
 
+
+    const renderDeatils = () => {
+        if (!userData?.additionalInfo) return null;
+            return userData.additionalInfo.map((experience, index) => (
+            <div className="row mt-3" key={index}>
+                <div className="col-4">
+                    <InputField label="ESI Number" value={experience['ESI Number'] } />
+                </div>
+                <div className="col-4">
+                    <InputField label=" Company Type" value={experience['Company Type']} />
+                </div>
+               
+            </div>
+        ));
+    };
     function formatKey(key) {
         const words = key.replace(/_/g, ' ').split(/(?=[A-Z])/);
         return words.map(word => {
@@ -86,6 +100,16 @@ const View = () => {
                             {renderPastExperience()}
                         </div>
                     </div>
+
+                    <div className="row mt-5">
+                        <div className="col-12">
+                            <p className="fw-bold">Additional Details</p>
+                            <hr />
+                            {renderDeatils()}
+                        </div>
+                    </div>
+
+
                 </div>
             </main>
         </>

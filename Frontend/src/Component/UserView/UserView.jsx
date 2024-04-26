@@ -18,14 +18,13 @@ const View = () => {
             }
         };
         if (id) fetchData();
-        console.log(id);
     }, [id]);
 
     const renderUserRoles = () => {
         if (!userData?.userRole) return null;
 
         const userRolesStr = userData.userRole.map((role) => role.label).join(", ");
-        return formatKey(userRolesStr)
+        return formatKey(userRolesStr);
     };
 
     const renderPastExperience = () => {
@@ -34,19 +33,17 @@ const View = () => {
         return userData.pastExperience.map((experience, index) => (
             <div className="row mt-3" key={index}>
                 <div className="col-4">
-                    <InputField label="Company" value={experience.companyName || ""} />
+                    <InputField label="Company" value={experience.companyName} />
                 </div>
                 <div className="col-4">
-                    <InputField label="Start Date" value={experience.startDate || ""} />
+                    <InputField label="Start Date" value={experience.startDate} />
                 </div>
                 <div className="col-4">
-                    <InputField label="End Date" value={experience.endDate || ""} />
+                    <InputField label="End Date" value={experience.endDate} />
                 </div>
             </div>
         ));
     };
-
-
 
     function formatKey(key) {
         const words = key.replace(/_/g, ' ').split(/(?=[A-Z])/);
@@ -101,7 +98,7 @@ const InputField = ({ label, value }) => (
             <b>{label}:</b>
         </div>
         <div className="col-8 mt-1">
-            <input type="text" className="form-control" value={value} readOnly />
+            <input type="text" className="form-control" value={value || ""} readOnly />
         </div>
     </div>
 );

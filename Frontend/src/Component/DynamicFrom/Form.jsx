@@ -39,15 +39,15 @@ const Form = () => {
         }
     };
 
-    const handleRemoveField = async(id) => {
+    const handleRemoveField = async (id) => {
         try {
             const response = await axiosInstance.delete(`/deleteFields/${id}`);
             console.log("response", response.data);
             toast.warn("Field Deleted Successfully")
-         fetchData();
-            
+            fetchData();
+
         } catch (error) {
-            
+
         }
     };
 
@@ -59,12 +59,8 @@ const Form = () => {
         toast.success("Form Update Successfully")
         console.log("formdata", fields);
         // handleReset();
-       
+
     };
-
-
-
-
     const handleReset = () => {
         setFields([]);
         setFieldName("");
@@ -79,9 +75,7 @@ const Form = () => {
         setSelectOptions("");
         setNewOption("");
     };
-
     useEffect(() => {
-
         fetchData();
         if (visible === false) {
             setFieldName("");
@@ -111,7 +105,7 @@ const Form = () => {
                 const newField = { name: fieldName, type: fieldType, options: selectOptions[fieldName] || [] };
                 updatedFields = [...fields, newField];
             }
-    
+
             try {
                 const result = await axiosInstance.post("/additionalFields", updatedFields);
                 console.log("result", result.data);
@@ -125,8 +119,6 @@ const Form = () => {
             }
         }
     };
-    
-
     const handleRemoveOption = (fieldName, index) => {
         const updatedOptionsMap = { ...selectOptions };
         updatedOptionsMap[fieldName].splice(index, 1);

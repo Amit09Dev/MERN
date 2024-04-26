@@ -24,7 +24,7 @@ const showActivityLog = async (req, res) => {
           ],
           data: [
             {
-              $sort: { timeStamp: 1 },
+              $sort: { timeStamp: -1 },
             },
             {
               $skip: startIndex,

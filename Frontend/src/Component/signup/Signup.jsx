@@ -3,27 +3,34 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axiosInstance from "../../api/Axios";
-
+import { useFormik } from "formik";
+import { SignUp } from './SignUpSchema';
 function Signup() {
     const navigate = useNavigate();
-    const [error, setError] = useState("");
-    const [inputValue, setInputValue] = useState({
+    const initialValues = {
         email: "",
         password: "",
-        confirmPassword: ""
-    })
+        confirmpassword: "",
+      };
+      const {values,errors,touched,handleBlur,handleSubmit,handleChange} = useFormik({
+        initialValues: initialValues,
+        validationSchema:SignUp,
+        onSubmit:async (values,action) => {
+          try {
+            const result=await axiosInstance.post("/register",values)
+            console.log(result.data);
+            navigate("/login")
+            
+          } catch (error) {
+            console.log(error);
+          }
+          action.resetForm();
+        },
+      });
 
-    const handleInputChange = (e) => {
-        const { id, value } = e.target;
-        setInputValue({
-            ...inputValue,
-            [id]: value,
-        });
-        setError({})
-    };
 
     const clearToken = () => {
-        localStorage.clear();
+            localStorage.clear();
 
     }
 
@@ -31,81 +38,43 @@ function Signup() {
         clearToken();
     }, [])
 
-    const verifyRegister = async () => {
-        const result = validateInput(inputValue);
-        if (Object.keys(result).length > 0) {
-            return;
-        }
-        try {
-            const signup = await axiosInstance.post("/register", inputValue);
-            if (signup.status === 200) {
-                toast.success("Registered Succesfully")
-                navigate("/login");
-            }
-        } catch (error) {
-            console.error("Error:",error.response);
-            toast.error(error.response.data.message);
-        }
-
-    }
-
-    const validateInput = (data) => {
-        const errors = {};
-
-        if ((data.email).trim() === "") {
-            errors.email = "Email Address is required";
-        }
-        else if (data.email && !isValidEmail(data.email)) {
-            errors.email = "Invalid email address";
-        }
-
-        if ((data.password).trim() === "") {
-            errors.password = "Password is required"
-        }
-
-        if ((data.confirmPassword).trim() !== data.password) {
-            errors.confirmPassword = "Confrim password and Password is not same"
-        }
-        setError(errors);
-        return errors;
-    }
-
-    const isValidEmail = (email) => {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    };
+  
 
     return (
         <div className="container-fluid SignupContainer vh-100 d-flex justify-content-center  align-items-center">
             <div className="row bg-white formRow">
                 <div className="col-6">
                     <h4 className='text-center signupText'>Signup</h4>
-                    <div className="d-flex h-75 align-items-center">
+                    <form className="d-flex h-75 align-items-center" onSubmit={handleSubmit}> 
                         <div className="signupDetails w-100 ps-3">
                             <div className="form-floating mb-3 mt-5">
                                 <input type="email" className="form-control w-100" id="email" placeholder="name@example.com"
-                                    value={inputValue.email}
-                                    onChange={handleInputChange} />
+                                    value={values.email} 
+                                    onChange={handleChange}
+                                    onBlur={handleBlur} />
                                 <label forhtml="email">Email address</label>
-                                {error.email && (<span className="error">{error.email}</span>)}
+                                {errors.email && touched.email ? <p className="form-error">{errors.email}</p> : null}
                             </div>
                             <div className="form-floating mb-3">
                                 <input type="password" className="form-control" id="password" placeholder="Password"
-                                    value={inputValue.password}
-                                    onChange={handleInputChange} />
+                                 value={values.password} 
+                                 onChange={handleChange}
+                                 onBlur={handleBlur}/>
                                 <label forhtml="password">Password</label>
-                                {error.password && (<span className="error">{error.password}</span>)}
+                                {errors.password && touched.password ? <p className="form-error">{errors.password}</p> : null}
                             </div>
                             <div className="form-floating mb-3">
-                                <input type="password" className="form-control" id="confirmPassword" placeholder="Confirm Password"
-                                    value={inputValue.confirmPassword}
-                                    onChange={handleInputChange} />
+                                <input type="password" className="form-control" id="confirmpassword" placeholder="Confirm Password"
+                                     value={values.confirmpassword} 
+                                     onChange={handleChange}
+                                     onBlur={handleBlur}/>
                                 <label forhtml="confirmPassword">Confirm Password</label>
-                                {error.confirmPassword && (<span className="error">{error.confirmPassword}</span>)}
+                                {errors.confirmpassword && touched.confirmpassword ? <p className="form-error">{errors.confirmpassword}</p> : null}
                             </div>
-                            <button className='btn btn-primary w-100 submitBtn' onClick={verifyRegister}>Submit</button>
+                            <button type='submit' className='btn btn-primary w-100 submitBtn'>Submit</button>
                             <p className='text-center mt-3 loginText'> Already a user? <Link to="/Login">Login</Link> </p>
                         </div>
-                    </div>
+                    </form>
                 </div>
                 <div className="col-6">
                     <img src="/img/signup.jpg" alt="Sign Up" />

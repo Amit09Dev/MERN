@@ -13,6 +13,8 @@ function Activity() {
     const [rows, setRows] = useState(5);
     const [totalRecords, setTotalRecords] = useState(1);
     const [visible, setVisible] = useState(Array(activityLog.length).fill(false));
+    const [RoleList, setRoleList] = useState([]);
+    let pastExperienceCount = 0;
     const [searchValue, setSearchValue] = useState({
         actionOn: "",
         action: "",
@@ -62,29 +64,42 @@ function Activity() {
         }
     };
 
+    const RoleData = async () => {
+        try {
+            const response = await axiosInstance.get("/role");
+            const formattedRoles = response.data.map((role) => ({
+                [role._id]: role.role,
+            }));
+            setRoleList([...formattedRoles]);
+        } catch (error) {
+            console.error("Error fetching role data:", error.response);
+            if (error.response && error.response.data.includes("jwt expired")) {
+                navigate("/login");
+            }
+        }
+    };
+
     useEffect(() => {
+        RoleData()
         getData();
     }, [first, rows]);
 
 
 
-
     function generateEditData(data) {
-        console.log(data);
-        const userRole = {
-            "6618da9655f5fd27cc987876": "User",
-            "6618dab055f5fd27cc987878": "Admin",
-            "6618dae355f5fd27cc98787a": "Super Admin"
-        };
+        // console.log(data);
         const tableRows = data.map((entry) => {
             const pathParts = entry.path.split(".");
             const fieldName = formatKey(pathParts.pop());
 
             if (entry.path === "root.userRole") {
-                return handleUserRole(entry, userRole);
+                return handleUserRole(entry);
+            } else if (entry.path.startsWith("root.pastExperience")) {
+                return handlePastExperience(entry);
             } else if (entry.path.startsWith("root.additionalInfo")) {
                 return handleAdditionalInfo(entry);
-            } else {
+            }
+            else {
                 return (
                     <tr key={entry.path}>
                         <td>{fieldName}</td>
@@ -109,14 +124,37 @@ function Activity() {
         );
     }
 
-    function handleUserRole(entry, userRole) {
-        const oldRoles = entry.oldVal.map(roleId => userRole[roleId]).join(", ");
-        const newRoles = entry.newVal.map(roleId => userRole[roleId]).join(", ");
+    function handleUserRole(entry) {
+        const oldRoles = entry.oldVal.map(roleId => RoleList.find(obj => obj[roleId])?.[roleId] || "Role not found").join(", ");
+        const newRoles = entry.newVal.map(roleId => RoleList.find(obj => obj[roleId])?.[roleId] || "Role not found").join(", ");
+        const pathParts = entry.path.split(".");
+        const fieldName = formatKey(pathParts.pop());
         return (
             <tr key={entry.path}>
-                <td>{formatKey(entry.path)}</td>
+                <td>{fieldName}</td>
                 <td>{oldRoles}</td>
                 <td>{newRoles}</td>
+            </tr>
+        );
+    }
+
+    function extractNumber(string) {
+        const match = string.match(/\d+/g);
+        if (match) {
+            return match[0];
+        } else {
+            return null;
+        }
+    }
+
+    function handlePastExperience(entry) {
+        const pathParts = entry.path.split(".");
+        const fieldName = formatKey(pathParts.pop());
+        return (
+            <tr key={entry.path}>
+                <td>{`${fieldName} ( ${Number(extractNumber(entry.path)) + 1} )`} </td>
+                <td>{entry.oldVal || '-'}</td>
+                <td>{entry.newVal || '-'}</td>
             </tr>
         );
     }
@@ -133,13 +171,26 @@ function Activity() {
                 </tr>
             );
         } else if (entry.note === "Added") {
-            return (
-                <tr key={entry.path}>
-                    <td>{fieldName}</td>
-                    <td> - </td>
-                    <td style={{ color: "green" }}>{entry.newVal}</td>
-                </tr>
-            );
+            if (typeof entry.newVal === 'object' && entry.newVal !== null) {
+                const properties = Object.entries(entry.newVal)
+                    .filter(([key, value]) => value !== null)
+                    .map(([key, value]) => (
+                        <tr key={key}>
+                            <td>{key}</td>
+                            <td> - </td>
+                            <td style={{ color: "green" }}>{value}</td>
+                        </tr>
+                    ));
+                return properties.length > 0 ? properties : null;
+            } else {
+                return (
+                    <tr key={entry.path}>
+                        <td>{fieldName}</td>
+                        <td> - </td>
+                        <td style={{ color: "green" }}>{entry.newVal}</td>
+                    </tr>
+                );
+            }
         } else {
             return (
                 <tr key={entry.path}>
@@ -150,6 +201,8 @@ function Activity() {
             );
         }
     }
+
+
 
     function formatKey(key) {
         const words = key.replace(/_/g, ' ').split(/(?=[A-Z])/);

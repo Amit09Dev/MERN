@@ -30,3 +30,6 @@ img{
 .loginText{
     font-size: 14px;
 }
+.form-error{
+    color: red !important;
+}

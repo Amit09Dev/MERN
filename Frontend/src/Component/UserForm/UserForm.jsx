@@ -12,7 +12,6 @@ import { useSelector } from 'react-redux'
 import { TabView, TabPanel } from 'primereact/tabview';
 import { DiffPatcher } from 'jsondiffpatch';
 import "./UserForm.css";
-// import { type } from "@testing-library/user-event/dist/type";
 function UserForm() {
   const userFormData = {
     firstName: "",
@@ -99,16 +98,13 @@ function UserForm() {
           pastExperience: [...gridList]
         };
       }
-      console.log(updatedFormData);
 
       try {
         if (id === undefined) {
-          console.log(updatedFormData);
           await axiosInstance.post("/addEmp", updatedFormData);
           toast.success('Data is saved successfully');
           resetForm();
         } else {
-          console.log(updatedFormData);
           await axiosInstance.patch(`/emp/${id}`, updatedFormData);
           updatenotify();
           resetForm();
@@ -265,12 +261,11 @@ function UserForm() {
 
 
   const handleSave = async () => {
+
     const validationErrors = validateForm(formData);
     if (Object.keys(validationErrors).length === 0) {
       try {
         let updatedFormData = { ...formData };
-
-
         if (JSON.stringify(selectedOption) !== JSON.stringify(formData.userRole)) {
           updatedFormData = {
             ...updatedFormData,
@@ -278,24 +273,30 @@ function UserForm() {
             pastExperience: [...gridList]
           };
         }
-
-        if (id === undefined && fields.length === 0) {
-          console.log(formData);
-          const res = await axiosInstance.post("/addEmp", updatedFormData);
-          insertnotify();
-          resetForm();
-        } else if (id === undefined && fields.length > 0) {
-          setActiveTabIndex(1);
-        }
-        else if (id !== null && fields.length > 0) {
-          setActiveTabIndex(1);
-        }
-        else if (id !== undefined && fields.length === 0) {
-          console.log(updatedFormData);
+        if(tempData.additionalInfo==null) {
           await axiosInstance.patch(`/emp/${id}`, updatedFormData);
           updatenotify();
           resetForm();
           navigate("/userlist");
+          return
+        }
+        else{
+          if (id === undefined && fields.length === 0) {
+            const res = await axiosInstance.post("/addEmp", updatedFormData);
+            insertnotify();
+            resetForm();
+          } else if (id === undefined && fields.length > 0) {
+            setActiveTabIndex(1);
+          }
+          else if (id !== null && fields.length > 0) {
+            setActiveTabIndex(1);
+          }
+          else if (id !== undefined && fields.length === 0) {
+            await axiosInstance.patch(`/emp/${id}`, updatedFormData);
+            updatenotify();
+            resetForm();
+            navigate("/userlist");
+          }
         }
 
       } catch (error) {
@@ -396,7 +397,7 @@ function UserForm() {
     setSelectedOption('');
     setRoleList("");
 
-    document.getElementById("email").classList.remove("is-invalid", "is-valid");
+    // document.getElementById("email").classList.remove("is-invalid", "is-valid");
   };
   const insertnotify = () => toast.success("Data insert Successfully");
   const updatenotify = () => toast.info("Data updated Successfully");

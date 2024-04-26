@@ -102,31 +102,23 @@ function UserData() {
   };
 
   const SearchResults = async () => {
-    if (
-      inputValue.fullName === "" &&
-      inputValue.userRole === "" &&
-      inputValue.startDate === "" &&
-      inputValue.endDate === ""
-    ) {
-      toast.warn("Enter Value to Search");
-      return;
-    } else {
-      const data = {
-        fullName: inputValue.fullName,
-        page: Math.floor((first / rows + 1)),
-        pageSize: rows,
-        ...inputValue
-      };
-      try {
-        const search = await axiosInstance.get("/emp", {
-          params: data,
-        });
-        setUsers(search.data.data);
-        setTotalRecords(search.data.totalRecords);
-      } catch (error) {
-        console.log(error);
-      }
+
+    const data = {
+      fullName: inputValue.fullName,
+      page: Math.floor((first / rows + 1)),
+      pageSize: rows,
+      ...inputValue
+    };
+    try {
+      const search = await axiosInstance.get("/emp", {
+        params: data,
+      });
+      setUsers(search.data.data);
+      setTotalRecords(search.data.totalRecords);
+    } catch (error) {
+      console.log(error);
     }
+
   };
 
   const confirmDelete = (id) => {

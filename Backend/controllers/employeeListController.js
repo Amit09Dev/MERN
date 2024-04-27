@@ -340,8 +340,10 @@ const updateEmployee = async (req, res) => {
 
     let updatelog = await deepCompare(oldEmployee, newEmployee);
 
-    updatelog.push(...updatedUserRole);
     console.log("updatelog", updatelog);
+
+    updatelog.push(...updatedUserRole);
+    // console.log("updatelog", updatelog);
 
     const updatedEmployee = await Employee.findOneAndUpdate(
       { _id: req.params.id },
@@ -377,7 +379,7 @@ const updateEmployee = async (req, res) => {
       timeStamp: currentDateTime,
     };
 
-    console.log(logData);
+    // console.log(logData);
 
     if (updatelog.length > 0 || updatedUserRole.length > 0) {
       await ActivityLog.create(logData);

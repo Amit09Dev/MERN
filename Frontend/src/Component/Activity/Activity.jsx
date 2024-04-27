@@ -176,6 +176,7 @@ function Activity() {
         );
     }
 
+
     function handleAdditionalInfo(entry) {
         const pathParts = entry.path.split(".");
         const fieldName = pathParts.pop();
